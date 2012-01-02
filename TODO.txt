@@ -1,0 +1,86 @@
+
+Feature requests:
+
+1. LIMIT statement
+2. refactoring of HTMLArea inclusion in case of more than one RTE in the same form
+3. globalCustomProcess, globalCustomHeaders and globalCustomQuery management
+4. substituteInsertMarkers
+5. https support
+6. page title from wfqbe fields
+
+
+
+
+
+
+
+
+
+
+
+Cose da fare nel WFQBE in ordine di priorità:
+
+URGENTI:
+
+-	insert - select_wizard:
+	- aggiungere supporto a custom template
+	- aggiungere possibilità di effettuare ricerche
+	- aggiungere funzioni di validazione input (sullo stile delle funzioni di pulizia, con selezione multipla)
+
+
+NON URGENTI:
+
+-	insert: upload file via AJAX
+-	insert: possibilità di aggiungere record a tabelle ausiliarie - implementare per XAJAX
+-	insert: prevedere form su più pagine
+- 	insert: includere il captcha
+
+-	results:  FILTRI! (Francois)
+-	results: Search fallback: when a search produces no results, we would like to be able to point to another
+			 search, with less restrictive parameters, to provide users with some alternate possibilities. Thus it
+			 would be nice to be able to chain queries. To be logical with what I wrote above about Query
+			 tables, content elements and templates, it should be the content elements that are chained
+-	results: correggere type=181 nel codice: renderlo parametrico
+-	results: nella pagina di dettaglio poter impostare quale campo diventerà il titolo della pagina (e breadcrumbs)
+-	results: For queries with join it would be convenient to have a way to indicate groups of results, that
+			 would be handled by "sub-rows" in the template. Example: a list of product belonging to various
+			 categories. One might want to display a header for each category, then the list of products for that
+			 category.
+-	results: gestire la cache
+
+			 
+-	search: When no values are selected in search forms for fields corresponding to foreign keys, those fields
+			should not be taken into account (rather that use a LIKE '%%' condition).
+-	search wizard: Value selection: enhance the QBE to be visually select values for a given field in the WHERE
+				   clause. You select a field and the "=" sign, then there would be an option that would fetch the
+				   (DISTINCT) data from that field and make a select element out of it. That way a specific value
+			       could be chosen without having to know it exactly.
+-	search: form su più pagine
+-	search: includere il captcha
+-	search: fare aggiornamento automatico dei risultati della ricerca (anche basato su AJAX)
+-	search: campo input nascosto
+-	search: valori di default
+
+-	general: fare il prepand di tutti gli id con l'id specificato nel FF del content element per evitare omonimie
+-	general: nel FF del content element, rendere obbligatorio e univoco il campo div_id
+
+-	supporto a inserimento plugin nel template via TS (es. form di ricerca, risultato query da mostrare in ogni pagina)
+-	supporto a constant editor di tutte le costanti configurabili
+
+-	completo supporto AJAX per presentazione risultati da FE
+-	modulo di BE per lista risultati, ricerca record, modifica, inserimento anche in BE
+
+-	select: test della query (prevedere un pulsante nel QBE che apre un popup che permette di 
+	inserire dei dati e esegue la query) 
+
+-	supporto a RealUrl
+-	localizzazione delle labels nelle form di BE
+-	supporto campo md5
+
+
+Funzionalità da documentare:
+-	Campo "Update on change" nella form di ricerca
+-	Campo "Update on change" nella form di inserimento
+
+
+
