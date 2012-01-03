@@ -34,6 +34,8 @@ class tx_wfqbe_belib	{
 	
 	var $title = 'DB Management';
 	var $page_id = 0;
+	var $mode = '';
+	var $conf;
 	
 	
 	/**
@@ -51,7 +53,10 @@ class tx_wfqbe_belib	{
 		}
 		
 		$this->page_id = intval(t3lib_div::_GP('id'));
-		$backend_id = intval(t3lib_div::_GP('tx_wfqbe_backend'));
+		$beVars = t3lib_div::_GP('tx_wfqbe_backend');
+		$query_id = intval($beVars['query']);
+		$backend_id = intval($beVars['uid']);
+		$this->mode = $beVars['mode'];
 		
 		$where = '';
 		if (t3lib_div::testInt($backend_id) && $backend_id>0)	{
@@ -62,7 +67,7 @@ class tx_wfqbe_belib	{
 		if ($res!==false && $GLOBALS['TYPO3_DB']->sql_num_rows($res)>1)	{
 			$content = $this->getAvailableBackend($res);
 		}	elseif ($res!==false && $GLOBALS['TYPO3_DB']->sql_num_rows($res)==1)	{
-			$content = $this->getList($GLOBALS['TYPO3_DB']->sql_fetch_assoc($res));
+			$content = $this->getBackendRecord($GLOBALS['TYPO3_DB']->sql_fetch_assoc($res), $query_id);
 		}	elseif ($res!==false)	{
 			$content = $LANG->getLL('not_available');
 		}	else	{
@@ -97,7 +102,7 @@ class tx_wfqbe_belib	{
 		while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res))	{
 			$content .= '
 			<tr class="db_list_normal">
-				<td class="col-title"><a href="index.php?&M=web_txwfqbeM2&id='.$this->page_id.'&tx_wfqbe_backend='.$row['uid'].'">'.$row['title'].'</a></td>
+				<td class="col-title"><a href="index.php?&M=web_txwfqbeM2&id='.$this->page_id.'&tx_wfqbe_backend[uid]='.$row['uid'].'">'.$row['title'].'</a></td>
 				<td>'.$row['description'].'</td>
 			</tr>
 			';
@@ -114,23 +119,119 @@ class tx_wfqbe_belib	{
 	 * Action selected, returns the records list
 	 * @param unknown_type $res
 	 */
-	function getList($backend)	{
-		$content = t3lib_div::view_array($backend);
+	function getBackendRecord($backend, $query=0)	{
+		/*$content = t3lib_div::view_array($this->conf);
+		return $content;
+		*/
+		// Initialize typoscript configuration
+		$this->initConfig($backend['typoscript']);
 		
-		/*
 		$PI1 = t3lib_div::makeInstance('tx_wfqbe_pi1');
-		
-		$PI1->conf['ff_data']['queryObject'] = $backend['uid'];
+		$PI1->conf = $this->conf;
+		$PI1->beMode = true;
+		$PI1->templateContent = @file_get_contents(PATH_site.$GLOBALS['TSFE']->tmpl->getFileName($this->conf['template']));
 		
 		$this->title = $backend['title'];
 		$content = '';
 		
-		$form_built = '';
-		$content = $LIST->do_general('', $form_built);
-		*/
+		if ($query>0)	{
+			if ($query==$backend['insertq'])	{
+				$PI1->conf['ff_data']['queryObject'] = $backend['insertq'];
+				$form_built = false;
+				$content .= $PI1->do_general('', $form_built);
+			}
+		}	elseif ($this->mode=='details')	{
+			$PI1->conf['ff_data']['queryObject'] = $backend['detailsq'];
+			$form_built = false;
+			$content .= $PI1->do_general('', $form_built);
+		}	else	{
+			if ($backend['searchq']>0)	{
+				$PI1->conf['ff_data']['queryObject'] = $backend['searchq'];
+				$form_built = false;
+				$content .= $PI1->do_general('do_sGetForm', $form_built);
+			}
+			
+			if ($backend['listq']>0)	{
+				$PI1->conf['ff_data']['queryObject'] = $backend['listq'];
+				if ($backend['recordsforpage']>0)
+					$PI1->conf['ff_data']['recordsForPage'] = $backend['recordsforpage'];
+				$form_built = false;
+				$content .= $PI1->do_general('', $form_built);
+			}
+			
+			if ($backend['insertq']>0)	{
+				$content .= '<br /><p><a href="index.php?&M=web_txwfqbeM2&id='.$this->page_id.'&tx_wfqbe_backend[uid]='.$backend['uid'].'&tx_wfqbe_backend[query]='.$backend['insertq'].'"><span class="t3-icon t3-icon-actions t3-icon-actions-document t3-icon-document-new">&nbsp;</span>Create new record</a></p>';
+			}
+		}
 		
 		return $content;
 	}
+	
+	
+	
+	/**
+	 * 
+	 * Function used to initialize typoscript configuration, merging standard and specific backend typoscript
+	 */
+	function initConfig($typoscript='')	{
+		$this->conf = $this->retrievePageConfig($this->page_id);
+		if (is_array($this->conf['backend.']))	{
+			$beConf = $this->conf['backend.'];
+			unset($this->conf['backend.']);
+			$this->conf = array_replace_recursive($this->conf, $beConf);
+		}
+		
+		if ($typoscript!='')	{
+			require_once(PATH_t3lib.'class.t3lib_tsparser.php');
+			$tsparser = t3lib_div::makeInstance('t3lib_tsparser');
+			// Copy conf into existing setup
+			$tsparser->setup = $this->conf;
+			// Parse the new Typoscript
+			$tsparser->parse($typoscript);
+			// Copy the resulting setup back into conf
+			$this->conf = $tsparser->setup;
+		}
+	}
+	
+	
+	
+	
+	/**
+     * Retrieves the configuration (TS setup) of the page with the PID provided
+     * as the parameter $pageId.
+     */
+    function retrievePageConfig($pageId) {
+        require_once(PATH_t3lib.'class.t3lib_page.php');
+        
+        if (!is_object($GLOBALS['TT']))	{
+        	require_once(PATH_t3lib . 'class.t3lib_timetrack.php');
+        	$GLOBALS['TT'] = new t3lib_timeTrack();
+        }
+
+        $GLOBALS['TSFE']->tmpl = t3lib_div::makeInstance('t3lib_TStemplate');
+        // Disables the logging of time-performance information.
+        $GLOBALS['TSFE']->tmpl->tt_track = 0;
+        $GLOBALS['TSFE']->tmpl->init();
+        $GLOBALS['TSFE']->tmpl->getFileName_backPath = PATH_site;
+
+        // Gets the root line.
+        $GLOBALS['TSFE']->sys_page = t3lib_div::makeInstance('t3lib_pageSelect');
+        // Finds the selected page in the BE exactly as in t3lib_SCbase::init().
+        $rootline = $GLOBALS['TSFE']->sys_page->getRootLine($pageId);
+        //t3lib_div::debug(array($rootline,$sys_page->error_getRootLine, $sys_page->error_getRootLine_failPid, $pageId));
+          // Generates the constants/config and hierarchy info for the template.
+        $GLOBALS['TSFE']->tmpl->runThroughTemplates($rootline, 0);
+        $GLOBALS['TSFE']->tmpl->generateConfig();
+
+        if (isset($GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_wfqbe_pi1.'])) {
+            $result = $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_wfqbe_pi1.'];
+        } else {
+            $result = array();
+        }
+        //t3lib_div::debug($result);
+        return $result;
+    }
+	
 	
 }
 

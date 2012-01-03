@@ -198,7 +198,10 @@ class tx_wfqbe_results {
 	 * This function is used to show the empty results template
 	 */
 	function emptyLayout($row)	{
-		$file = $this->cObj->fileResource($this->conf['template']);
+		if ($this->pibase->templateContent!='')
+			$file = $this->pibase->templateContent;
+		else
+			$file = $this->cObj->fileResource($this->conf['template']);
 		$emptyTemplate = trim($this->cObj->getSubpart($file,"EMPTY_RESULT_TEMPLATE"));
 
 		foreach ($row as $key => $value)
@@ -232,7 +235,10 @@ class tx_wfqbe_results {
 	 */
 	function defaultLayout($ris,$row){
 		$listaTabelle='';//dovr� contenere un elenco di template di varie tabelle
-		$file = $this->cObj->fileResource($this->conf['template']);
+		if ($this->pibase->templateContent!='')
+			$file = $this->pibase->templateContent;
+		else
+			$file = $this->cObj->fileResource($this->conf['template']);
 
 		if ($this->pibase->piVars['wfqbe_select_wizard']!='')	{
 			$templateTabella = trim($this->cObj->getSubpart($file,"SELECT_WIZARD_TEMPLATE"));
@@ -480,7 +486,10 @@ class tx_wfqbe_results {
 	 * This function is used to show the custom results template
 	 */
 	function userLayout($ris,$row){
-		$file = $this->cObj->fileResource($this->conf["template"]);
+		if ($this->pibase->templateContent!='')
+			$file = $this->pibase->templateContent;
+		else
+			$file = $this->cObj->fileResource($this->conf['template']);
 		$template = trim($this->cObj->getSubpart($file,"RESULT_TEMPLATE"));;
 		$templateLista = trim($this->cObj->getSubpart($template,"DATA_TEMPLATE"));
 		$listaRighe="";
@@ -625,10 +634,16 @@ class tx_wfqbe_results {
 		if (is_array($confArray) && is_array($wfqbeArray))	{
 			foreach ($confArray as $k => $value)	{
 				if (is_array($value))
-					$confArray[$k] = $this->parseTypoScriptConfiguration($value, $wfqbeArray);
+					$value = $this->parseTypoScriptConfiguration($value, $wfqbeArray);
 				elseif (strpos($value, "###WFQBE_FIELD_")!==false)	{
-					$confArray[$k] = $this->cObj->substituteMarkerArray($value, $wfqbeArray);
+					$value = $this->cObj->substituteMarkerArray($value, $wfqbeArray);
+				}	
+				
+				if ($this->pibase->beMode==1 && $k=='additionalParams')	{
+					$value = $value.'&tx_wfqbe_backend[mode]=details';
 				}
+				
+				$confArray[$k] = $value;
 			}
 		}
 		return $confArray;
@@ -681,6 +696,12 @@ class tx_wfqbe_results {
 	 * This function is used to show the page browser
 	 */
 	function showBrowser(&$mA, $numPages, $numRows, $actualPage, $uid)	{
+		if ($this->pibase->beMode==1)	{
+			$altPageId = t3lib_div::_GP('id');
+		}	else	{
+			$altPageId = $GLOBALS['TSFE']->id;
+		}
+		
 		$lA = array();
 		$lA['###PAGE_RECORDS_TOTAL###'] = $numRows;
 		$lA['###PAGE_RECORDS_FROM###'] = ($this->conf['ff_data']['recordsForPage']*($actualPage-1))+1;
@@ -691,10 +712,10 @@ class tx_wfqbe_results {
 		$mA['###PAGE_ACTUAL###'] = (int)$actualPage;
 		unset($this->pibase->piVars['wfqbe_results_query']);
 		$this->pibase->piVars['showpage'][$uid] = $actualPage-1>0 ? $actualPage-1 : 1;
-		$mA['###PAGE_PREV###'] = htmlentities($this->pibase->pi_linkTP_keepPIvars_url());
+		$mA['###PAGE_PREV###'] = htmlentities($this->pibase->pi_linkTP_keepPIvars_url(array(),0,0,$altPageId));
 		$mA['###PAGE_PREV_TITLE###'] = 'title="'.$this->pibase->pi_getLL('prev').'"';
 		$this->pibase->piVars['showpage'][$uid] = $actualPage+1<$numPages ? $actualPage+1 : $numPages;
-		$mA['###PAGE_NEXT###'] = htmlentities($this->pibase->pi_linkTP_keepPIvars_url());
+		$mA['###PAGE_NEXT###'] = htmlentities($this->pibase->pi_linkTP_keepPIvars_url(array(),0,0,$altPageId));
 		$mA['###PAGE_NEXT_TITLE###'] = 'title="'.$this->pibase->pi_getLL('next').'"';
 
 		$mA['###LABEL_NEXT_LINK###'] = $this->pibase->pi_getLL('next_link', '&gt;&gt;');
@@ -708,7 +729,7 @@ class tx_wfqbe_results {
 				$mA['###PAGE_LIST###'] .= ' '.$i.' - ';
 			else	{
 				$this->pibase->piVars['showpage'][$uid] = $i;
-				$mA['###PAGE_LIST###'] .= ' <a href="'.htmlentities($this->pibase->pi_linkTP_keepPIvars_url()).'" title="'.$this->pibase->pi_getLL('go_to_page').' '.$i.'">'.$i.'</a> - ';
+				$mA['###PAGE_LIST###'] .= ' <a href="'.htmlentities($this->pibase->pi_linkTP_keepPIvars_url(array(),0,0,$altPageId)).'" title="'.$this->pibase->pi_getLL('go_to_page').' '.$i.'">'.$i.'</a> - ';
 			}
 		}
 		if ($mA['###PAGE_LIST###']!='')

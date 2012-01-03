@@ -293,7 +293,7 @@ $TCA["tx_wfqbe_query"] = Array (
 $TCA["tx_wfqbe_backend"] = Array (
 	"ctrl" => $TCA["tx_wfqbe_backend"]["ctrl"],
 	"interface" => Array (
-		"showRecordFieldList" => "hidden,title,description,listq,detailsq,searchq,insertq,typoscript"
+		"showRecordFieldList" => "hidden,title,description,listq,detailsq,searchq,insertq,typoscript,recordsforpage"
 	),
 	"feInterface" => $TCA["tx_wfqbe_backend"]["feInterface"],
 	"columns" => Array (
@@ -379,9 +379,18 @@ $TCA["tx_wfqbe_backend"] = Array (
 				"rows" => "20",	
 			)
 		),
+		"recordsforpage" => Array (		
+			"exclude" => 1,		
+			"label" => "LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_backend.recordsforpage",		
+			"config" => Array (
+				"type" => "input",	
+				"size" => "5",
+				"eval" => "int",
+			)
+		),
 	),
 	"types" => Array (
-		"0" => Array("showitem" => "hidden;;1;;1-1-1, title,description,--div--;Listing,listq,--div--;Details,detailsq,--div--;Search,searchq,--div--;Insert,insertq,--div--;Config,typoscript"),
+		"0" => Array("showitem" => "hidden;;1;;1-1-1, title,description,--div--;Listing,listq, recordsforpage,--div--;Details,detailsq,--div--;Search,searchq,--div--;Insert,insertq,--div--;Config,typoscript"),
 	),
 	"palettes" => Array (
 	)

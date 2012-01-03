@@ -69,7 +69,7 @@ $TCA["tx_wfqbe_backend"] = Array (
 		"iconfile" => t3lib_extMgm::extRelPath($_EXTKEY)."icon_tx_wfqbe_query.gif",
 	),
 	"feInterface" => Array (
-		"fe_admin_fieldList" => "hidden,title,description,listq,detailsq,searchq,insertq,typoscript",
+		"fe_admin_fieldList" => "hidden,title,description,listq,detailsq,searchq,insertq,typoscript,recordsforpage",
 	)
 );
 

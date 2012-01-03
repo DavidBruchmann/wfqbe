@@ -62,8 +62,12 @@ class tx_wfqbe_search {
 	
 	function do_sGetForm($row, $h, &$form_built)	{
 		$blocks = $this->getBlocks($row, $h);
-		$file = $this->cObj->fileResource($this->conf['template']);
+		if ($this->pibase->templateContent!='')
+			$file = $this->pibase->templateContent;
+		else
+			$file = $this->cObj->fileResource($this->conf['template']);
 		$file = $this->cObj->getSubpart($file, '###SEARCH_TEMPLATE###');
+
 		// Search module creation
 		if (is_array($blocks['fields']) && !$form_built)	{
 			$content .= $this->searchForm($file, $blocks['fields'], $h, $row);
@@ -123,6 +127,7 @@ class tx_wfqbe_search {
 				$i++;
 			}
 		}
+
 		$content = $this->cObj->substituteSubpart($content, '###SEARCH_BLOCK###', $blockList, 0,0);
 		return $content;
 	}

@@ -51,6 +51,9 @@ class tx_wfqbe_pi1 extends tslib_pibase {
 	var $original_row = ''; // This parameter is used to save the original query record when using the add_new option
 	var $insertBlocks = ''; // This parameter contains the original insert form while using insert wizards
 	
+	var $templateContent = ''; // Used in DB management backend module
+	var $beMode = false;
+	
 	
 	/**
 	 * The main method of the PlugIn
@@ -76,7 +79,7 @@ class tx_wfqbe_pi1 extends tslib_pibase {
 		if ($this->conf['recordsForPage']!='')
 			$this->conf['ff_data']['recordsForPage'] = $this->conf['recordsForPage'];
 
-		//controllo se è stato definito un css. Se si lo utilizzo altrimenti prendo quello di default
+		//controllo se ï¿½ stato definito un css. Se si lo utilizzo altrimenti prendo quello di default
 		if($this->conf['style']!="")	{
 			$css = $this->cObj->fileResource($this->conf["style"]);
 			$GLOBALS["TSFE"]->setCSS($this->extKey, $css);
@@ -268,6 +271,10 @@ class tx_wfqbe_pi1 extends tslib_pibase {
 	
 	function do_general($to_function, &$form_built)	{
 		$content='';
+		
+		if (!is_object($this->cObj))	{
+			$this->cObj = t3lib_div::makeInstance('tslib_cObj');
+		}
 
 		if ($this->piVars['wfqbe_add_new']!='' && intval($this->piVars['wfqbe_add_new'])>0)	{
 			$where = 'tx_wfqbe_query.uid='.intval($this->conf['ff_data']['queryObject']).' AND ';

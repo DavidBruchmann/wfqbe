@@ -54,6 +54,13 @@ plugin.tx_wfqbe_pi1 {
 		field_email_user = 
 		notify_subject_user = 
 	}
+	
+	
+	backend {
+		template = EXT:wfqbe/res/backend_default_template.html
+	}
+	
+	
 }
 
 
