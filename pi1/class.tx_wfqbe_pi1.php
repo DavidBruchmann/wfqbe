@@ -51,7 +51,6 @@ class tx_wfqbe_pi1 extends tslib_pibase {
 	var $original_row = ''; // This parameter is used to save the original query record when using the add_new option
 	var $insertBlocks = ''; // This parameter contains the original insert form while using insert wizards
 	
-	var $templateContent = ''; // Used in DB management backend module
 	var $beMode = false;
 	
 	

@@ -112,8 +112,8 @@ class tx_wfqbe_insert {
 	 * @return string the form html
 	 */
 	function do_sGetFormResult($row, $h, $new_id='')	{
-		if ($this->pibase->templateContent!='')
-			$file = $this->pibase->templateContent;
+		if ($this->pibase->beMode!='')
+			$file = @file_get_contents(PATH_site.$GLOBALS['TSFE']->tmpl->getFileName($this->conf['template']));
 		else
 			$file = $this->cObj->fileResource($this->conf['template']);
 		$this->blocks = $this->getBlocks($row);

@@ -120,6 +120,7 @@ class tx_wfqbe_belib	{
 	 * @param unknown_type $res
 	 */
 	function getBackendRecord($backend, $query=0)	{
+		global $LANG, $BACK_PATH;
 		/*$content = t3lib_div::view_array($this->conf);
 		return $content;
 		*/
@@ -129,7 +130,6 @@ class tx_wfqbe_belib	{
 		$PI1 = t3lib_div::makeInstance('tx_wfqbe_pi1');
 		$PI1->conf = $this->conf;
 		$PI1->beMode = true;
-		$PI1->templateContent = @file_get_contents(PATH_site.$GLOBALS['TSFE']->tmpl->getFileName($this->conf['template']));
 		
 		$this->title = $backend['title'];
 		$content = '';
@@ -139,11 +139,14 @@ class tx_wfqbe_belib	{
 				$PI1->conf['ff_data']['queryObject'] = $backend['insertq'];
 				$form_built = false;
 				$content .= $PI1->do_general('', $form_built);
+				$content .= '<br /><p><a href="index.php?&M=web_txwfqbeM2&id='.$this->page_id.'&tx_wfqbe_backend[uid]='.$backend['uid'].'"><img height="16" width="16" src="'.$BACK_PATH.'sysext/t3skin/icons/module_web_list.gif" title="'.$LANG->getLL('back_to_list').'" alt="'.$LANG->getLL('back_to_list').'"> '.$LANG->getLL('back_to_list').'</a></p>';
 			}
 		}	elseif ($this->mode=='details')	{
 			$PI1->conf['ff_data']['queryObject'] = $backend['detailsq'];
 			$form_built = false;
 			$content .= $PI1->do_general('', $form_built);
+			
+			$content .= '<br /><p><a href="index.php?&M=web_txwfqbeM2&id='.$this->page_id.'&tx_wfqbe_backend[uid]='.$backend['uid'].'"><img height="16" width="16" src="'.$BACK_PATH.'sysext/t3skin/icons/module_web_list.gif" title="'.$LANG->getLL('back_to_list').'" alt="'.$LANG->getLL('back_to_list').'"> '.$LANG->getLL('back_to_list').'</a></p>';
 		}	else	{
 			if ($backend['searchq']>0)	{
 				$PI1->conf['ff_data']['queryObject'] = $backend['searchq'];
@@ -160,7 +163,7 @@ class tx_wfqbe_belib	{
 			}
 			
 			if ($backend['insertq']>0)	{
-				$content .= '<br /><p><a href="index.php?&M=web_txwfqbeM2&id='.$this->page_id.'&tx_wfqbe_backend[uid]='.$backend['uid'].'&tx_wfqbe_backend[query]='.$backend['insertq'].'"><span class="t3-icon t3-icon-actions t3-icon-actions-document t3-icon-document-new">&nbsp;</span>Create new record</a></p>';
+				$content .= '<br /><p><a href="index.php?&M=web_txwfqbeM2&id='.$this->page_id.'&tx_wfqbe_backend[uid]='.$backend['uid'].'&tx_wfqbe_backend[query]='.$backend['insertq'].'"><span class="t3-icon t3-icon-actions t3-icon-actions-document t3-icon-document-new">&nbsp;</span>'.$LANG->getLL('new_record').'</a></p>';
 			}
 		}
 		

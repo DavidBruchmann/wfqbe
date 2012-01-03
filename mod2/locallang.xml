@@ -11,6 +11,8 @@
             <label index="not_available">Sorry, there are no records configured for this page.</label>
             <label index="please_select">Please select one of the following actions:</label>
             <label index="please_select_more">Select one of the following available actions to start manage records.</label>
+            <label index="back_to_list">Back to list</label>
+            <label index="new_record">Create new record</label>
         </languageKey>
     </data>
 </T3locallang>

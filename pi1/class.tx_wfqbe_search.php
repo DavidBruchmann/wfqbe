@@ -62,8 +62,8 @@ class tx_wfqbe_search {
 	
 	function do_sGetForm($row, $h, &$form_built)	{
 		$blocks = $this->getBlocks($row, $h);
-		if ($this->pibase->templateContent!='')
-			$file = $this->pibase->templateContent;
+		if ($this->pibase->beMode!='')
+			$file = @file_get_contents(PATH_site.$GLOBALS['TSFE']->tmpl->getFileName($this->conf['template']));
 		else
 			$file = $this->cObj->fileResource($this->conf['template']);
 		$file = $this->cObj->getSubpart($file, '###SEARCH_TEMPLATE###');

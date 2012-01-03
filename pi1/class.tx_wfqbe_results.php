@@ -67,6 +67,11 @@ class tx_wfqbe_results {
 			// if the resultset is empty, it shows the empty results template
 			$content .= $this->emptyLayout($row);
 		}	else	{
+			if ($this->conf['customProcess.'][$row['uid'].'.']['template']!='')
+				$this->conf['template'] = $this->conf['customProcess.'][$row['uid'].'.']['template'];
+			if ($this->conf['customProcess.'][$row['uid'].'.']['defLayout']!='')
+				$this->conf['defLayout'] = $this->conf['customProcess.'][$row['uid'].'.']['defLayout'];
+			
 			// This checks if the user has set a template. If yes it uses the template set, else it uses the default one
 			if($this->conf["defLayout"]==0 || $this->conf["defLayout"]=="" || t3lib_div::_GP('type')==181)
 				$content.=$this->defaultLayout($ris,$row);
@@ -235,8 +240,8 @@ class tx_wfqbe_results {
 	 */
 	function defaultLayout($ris,$row){
 		$listaTabelle='';//dovr� contenere un elenco di template di varie tabelle
-		if ($this->pibase->templateContent!='')
-			$file = $this->pibase->templateContent;
+		if ($this->pibase->beMode!='')
+			$file = @file_get_contents(PATH_site.$GLOBALS['TSFE']->tmpl->getFileName($this->conf['template']));
 		else
 			$file = $this->cObj->fileResource($this->conf['template']);
 
@@ -493,8 +498,8 @@ class tx_wfqbe_results {
 	 * This function is used to show the custom results template
 	 */
 	function userLayout($ris,$row){
-		if ($this->pibase->templateContent!='')
-			$file = $this->pibase->templateContent;
+		if ($this->pibase->beMode!='')
+			$file = @file_get_contents(PATH_site.$GLOBALS['TSFE']->tmpl->getFileName($this->conf['template']));
 		else
 			$file = $this->cObj->fileResource($this->conf['template']);
 		$template = trim($this->cObj->getSubpart($file,"RESULT_TEMPLATE"));;
@@ -645,6 +650,7 @@ class tx_wfqbe_results {
 	 * This function is used for parsing the TS fields configuration and to substitute the markers with the field value
 	 */
 	function parseTypoScriptConfiguration($confArray, $wfqbeArray)	{
+		$backend = t3lib_div::_GP('tx_wfqbe_backend');
 		if (is_array($confArray) && is_array($wfqbeArray))	{
 			foreach ($confArray as $k => $value)	{
 				if (is_array($value))
@@ -654,7 +660,7 @@ class tx_wfqbe_results {
 				}	
 				
 				if ($this->pibase->beMode==1 && $k=='additionalParams')	{
-					$value = $value.'&tx_wfqbe_backend[mode]=details';
+					$value = $value.'&tx_wfqbe_backend[mode]=details&tx_wfqbe_backend[uid]='.$backend['uid'];
 				}
 				
 				$confArray[$k] = $value;
