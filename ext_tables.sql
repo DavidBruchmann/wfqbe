@@ -51,3 +51,29 @@ CREATE TABLE tx_wfqbe_query (
 	PRIMARY KEY (uid),
 	KEY parent (pid)
 );
+
+
+
+#
+# Table structure for table 'tx_wfqbe_backend'
+#
+CREATE TABLE tx_wfqbe_backend (
+	uid int(11) NOT NULL auto_increment,
+	pid int(11) DEFAULT '0' NOT NULL,
+	tstamp int(11) DEFAULT '0' NOT NULL,
+	crdate int(11) DEFAULT '0' NOT NULL,
+	cruser_id int(11) DEFAULT '0' NOT NULL,
+	sorting int(10) DEFAULT '0' NOT NULL,
+	deleted tinyint(4) DEFAULT '0' NOT NULL,
+	hidden tinyint(4) DEFAULT '0' NOT NULL,
+	title tinytext NOT NULL,
+	description text NOT NULL,
+	listq text NOT NULL,
+	detailsq text NOT NULL,
+	searchq text NOT NULL,
+	insertq text NOT NULL,
+	typoscript text NOT NULL,
+		
+	PRIMARY KEY (uid),
+	KEY parent (pid)
+);

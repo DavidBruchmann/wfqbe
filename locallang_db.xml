@@ -74,6 +74,14 @@
 			<label index="field_email_user">Form field containing email (field number!!!)</label>
 			<label index="notify_subject_user">Subject of the notify email to the user</label>
 			<label index="mailTemplate">Email template file</label>
+			<label index="tx_wfqbe_backend">Backend management configuration</label>
+			<label index="tx_wfqbe_backend.title">Title</label>
+			<label index="tx_wfqbe_backend.description">Description</label>
+			<label index="tx_wfqbe_backend.listq">List query</label>
+			<label index="tx_wfqbe_backend.detailsq">Details queries</label>
+			<label index="tx_wfqbe_backend.searchq">Search query</label>
+			<label index="tx_wfqbe_backend.insertq">Insert query</label>
+			<label index="tx_wfqbe_backend.typoscript">Typoscript configuration</label>
 		</languageKey>
 		<languageKey index="it" type="array">
 			<label index="tx_wfqbe_credentials">Credenziali utente</label>

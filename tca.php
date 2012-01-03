@@ -286,4 +286,104 @@ $TCA["tx_wfqbe_query"] = Array (
 		"1" => Array("showitem" => "fe_group"),
 	)
 );
+
+
+
+
+$TCA["tx_wfqbe_backend"] = Array (
+	"ctrl" => $TCA["tx_wfqbe_backend"]["ctrl"],
+	"interface" => Array (
+		"showRecordFieldList" => "hidden,title,description,listq,detailsq,searchq,insertq,typoscript"
+	),
+	"feInterface" => $TCA["tx_wfqbe_backend"]["feInterface"],
+	"columns" => Array (
+		"hidden" => Array (		
+			"exclude" => 1,
+			"label" => "LLL:EXT:lang/locallang_general.xml:LGL.hidden",
+			"config" => Array (
+				"type" => "check",
+				"default" => "0"
+			)
+		),
+		"title" => Array (		
+			"exclude" => 1,		
+			"label" => "LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_backend.title",		
+			"config" => Array (
+				"type" => "input",	
+				"size" => "30",
+			)
+		),
+		"description" => Array (		
+			"exclude" => 1,		
+			"label" => "LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_backend.description",		
+			"config" => Array (
+				"type" => "text",
+				"cols" => "30",	
+				"rows" => "5",
+			)
+		),
+		"listq" => Array (		
+			"exclude" => 1,		
+			"label" => "LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_backend.listq",		
+			"config" => Array (
+				"type" => "group",	
+				"internal_type" => "db",	
+				"allowed" => "tx_wfqbe_query",	
+				"size" => 1,	
+				"minitems" => 0,
+				"maxitems" => 1,
+			)
+		),
+		"detailsq" => Array (		
+			"exclude" => 1,		
+			"label" => "LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_backend.detailsq",		
+			"config" => Array (
+				"type" => "group",	
+				"internal_type" => "db",	
+				"allowed" => "tx_wfqbe_query",	
+				"size" => 1,	
+				"minitems" => 0,
+				"maxitems" => 1,
+			)
+		),
+		"searchq" => Array (		
+			"exclude" => 1,		
+			"label" => "LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_backend.searchq",		
+			"config" => Array (
+				"type" => "group",	
+				"internal_type" => "db",	
+				"allowed" => "tx_wfqbe_query",	
+				"size" => 1,	
+				"minitems" => 0,
+				"maxitems" => 1,
+			)
+		),
+		"insertq" => Array (		
+			"exclude" => 1,		
+			"label" => "LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_backend.insertq",		
+			"config" => Array (
+				"type" => "group",	
+				"internal_type" => "db",	
+				"allowed" => "tx_wfqbe_query",	
+				"size" => 1,	
+				"minitems" => 0,
+				"maxitems" => 1,
+			)
+		),
+		"typoscript" => Array (		
+			"exclude" => 1,		
+			"label" => "LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_backend.typoscript",		
+			"config" => Array (
+				"type" => "text",
+				"cols" => "80",	
+				"rows" => "20",	
+			)
+		),
+	),
+	"types" => Array (
+		"0" => Array("showitem" => "hidden;;1;;1-1-1, title,description,--div--;Listing,listq,--div--;Details,detailsq,--div--;Search,searchq,--div--;Insert,insertq,--div--;Config,typoscript"),
+	),
+	"palettes" => Array (
+	)
+);
 ?>

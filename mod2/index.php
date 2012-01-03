@@ -35,6 +35,8 @@ $BE_USER->modAccess($MCONF,1);    // This checks permissions and exits if the us
     // DEFAULT initialization of a module [END]
 
 
+require_once (t3lib_extMgm::extPath('wfqbe').'mod2/class.tx_wfqbe_belib.php');
+
 
 /**
  * Module 'DB management' for the 'wfqbe' extension.
@@ -96,7 +98,7 @@ class  tx_wfqbe_module2 extends t3lib_SCbase {
                     if (($this->id && $access) || ($BE_USER->user['admin'] && !$this->id))    {
 
                             // Draw the header.
-                        $this->doc = t3lib_div::makeInstance('mediumDoc');
+                        $this->doc = t3lib_div::makeInstance('bigDoc');
                         $this->doc->backPath = $BACK_PATH;
                         $this->doc->form='<form action="" method="POST">';
 
@@ -119,9 +121,9 @@ class  tx_wfqbe_module2 extends t3lib_SCbase {
                         $headerSection = $this->doc->getHeader('pages',$this->pageinfo,$this->pageinfo['_thePath']).'<br />'.$LANG->sL('LLL:EXT:lang/locallang_core.xml:labels.path').': '.t3lib_div::fixed_lgd_pre($this->pageinfo['_thePath'],50);
 
                         $this->content.=$this->doc->startPage($LANG->getLL('title'));
-                        $this->content.=$this->doc->header($LANG->getLL('title'));
+                        //$this->content.=$this->doc->header($LANG->getLL('title'));
                         $this->content.=$this->doc->spacer(5);
-                        $this->content.=$this->doc->section('',$this->doc->funcMenu($headerSection,t3lib_BEfunc::getFuncMenu($this->id,'SET[function]',$this->MOD_SETTINGS['function'],$this->MOD_MENU['function'])));
+                        //$this->content.=$this->doc->section('',$this->doc->funcMenu($headerSection,t3lib_BEfunc::getFuncMenu($this->id,'SET[function]',$this->MOD_SETTINGS['function'],$this->MOD_MENU['function'])));
                         $this->content.=$this->doc->divider(5);
 
 
@@ -165,26 +167,10 @@ class  tx_wfqbe_module2 extends t3lib_SCbase {
                  * @return    void
                  */
                 function moduleContent()    {
-                    switch((string)$this->MOD_SETTINGS['function'])    {
-                        case 1:
-                            $content='<div align="center"><strong>Hello World!</strong></div><br />
-                                The "Kickstarter" has made this module automatically, it contains a default framework for a backend module but apart from that it does nothing useful until you open the script '.substr(t3lib_extMgm::extPath('wfqbe'),strlen(PATH_site)).$pathSuffix.'index.php and edit it!
-                                <hr />
-                                <br />This is the GET/POST vars sent to the script:<br />'.
-                                'GET:'.t3lib_div::view_array($_GET).'<br />'.
-                                'POST:'.t3lib_div::view_array($_POST).'<br />'.
-                                '';
-                            $this->content.=$this->doc->section('Message #1:',$content,0,1);
-                        break;
-                        case 2:
-                            $content='<div align=center><strong>Menu item #2...</strong></div>';
-                            $this->content.=$this->doc->section('Message #2:',$content,0,1);
-                        break;
-                        case 3:
-                            $content='<div align=center><strong>Menu item #3...</strong></div>';
-                            $this->content.=$this->doc->section('Message #3:',$content,0,1);
-                        break;
-                    }
+                    $BELIB = t3lib_div::makeInstance('tx_wfqbe_belib');
+                	$content = $BELIB->getContent($this);
+                    $title = $BELIB->getTitle();
+					$this->content.=$this->doc->section($title,$content,0,1);
                 }
             }
 

@@ -7,9 +7,10 @@
     <data type="array">
         <languageKey index="default" type="array">
             <label index="title">DB management</label>
-            <label index="function1">Function #1</label>
-            <label index="function2">Function #2</label>
-            <label index="function3">Function #3</label>
+            <label index="not_allowed">Sorry, you are not allowed to perform this action.</label>
+            <label index="not_available">Sorry, there are no records configured for this page.</label>
+            <label index="please_select">Please select one of the following actions:</label>
+            <label index="please_select_more">Select one of the following available actions to start manage records.</label>
         </languageKey>
     </data>
 </T3locallang>
