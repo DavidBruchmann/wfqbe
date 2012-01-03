@@ -11,17 +11,17 @@
 
 <body>
 <!-- ###SEARCH_TEMPLATE### -->
+<table class="typo3-dblist">
 <!-- ###SEARCH_BLOCK### -->
-<div id="###SEARCH_ID###" class="###WFQBE_CLASS###">
 	<!-- ###FIELD_BLOCK### -->
-	<label style="font-weight: bold;" for="###SEARCH_ID_FIELD###">###SEARCH_LABEL###</label>
-	###SEARCH_FIELD###
+	<tr>
+	<td><label style="font-weight: bold;" for="###SEARCH_ID_FIELD###">###SEARCH_LABEL###</label></td>
+	<td>###SEARCH_FIELD###</td>
+	</tr>
 	<!-- ###FIELD_BLOCK### -->
-</div>
 <!-- ###SEARCH_BLOCK### -->
-<div class="wfqbe_block">
-	<br /><input type="submit" name="tx_wfqbe_pi1[submit]" value="###LABEL_SEARCH###" />
-</div>
+	<tr><td></td><td><input type="submit" name="tx_wfqbe_pi1[submit]" value="###LABEL_SEARCH###" /></td></tr>
+</table>
 <br /><br />
 <!-- ###SEARCH_TEMPLATE### -->
 
@@ -82,7 +82,7 @@
 
 
 <!-- ###INSERT_TEMPLATE### -->
-<div id="###CONF_DIVID###">
+<table class="typo3-dblist">
 	<script type="text/javascript">
 		function submitActions()	{
 			// RTE management
@@ -90,43 +90,45 @@
 		}
 	</script>
 	<form id="###CONF_DIVID###_form" method="post" enctype="multipart/form-data" ###XAJAX_SUBMIT### action="###CONF_INSERT###" onsubmit="submitActions();">
-	<div class="wfqbe_description">###INSERT_DESCRIPTION###</div>
-	<input type="hidden" id="wfqbe_add_new" value="" name="tx_wfqbe_pi1[wfqbe_add_new]" />
-	<input type="hidden" id="wfqbe_select_wizard" value="" name="tx_wfqbe_pi1[wfqbe_select_wizard]" />
-	<input type="hidden" id="wfqbe_edit_subrecord" value="" name="tx_wfqbe_pi1[wfqbe_edit_subrecord]" />
-	<input type="hidden" id="wfqbe_delete_subrecord" value="" name="tx_wfqbe_pi1[wfqbe_delete_subrecord]" />
+		<input type="hidden" id="wfqbe_add_new" value="" name="tx_wfqbe_pi1[wfqbe_add_new]" />
+		<input type="hidden" id="wfqbe_select_wizard" value="" name="tx_wfqbe_pi1[wfqbe_select_wizard]" />
+		<input type="hidden" id="wfqbe_edit_subrecord" value="" name="tx_wfqbe_pi1[wfqbe_edit_subrecord]" />
+		<input type="hidden" id="wfqbe_delete_subrecord" value="" name="tx_wfqbe_pi1[wfqbe_delete_subrecord]" />
 
 		<!-- ###INSERT_BLOCK### -->
-		<div id="###INSERT_ID###" class="wfqbe_block ###WFQBE_CLASS###">
+		<tr>
 			<!-- ###FIELD_BLOCK### -->
-			<span class="label"><label style="font-weight: bold;" for="field_###INSERT_ID###">###INSERT_LABEL###</label>
-			###INSERT_HELP_LINK###</span>
-			<div class="field">###INSERT_FIELD### ###INSERT_SELECT_WIZARD### ###INSERT_ADD_NEW###</div>
-			<div class="wfqbe_help" id="help_###INSERT_ID###">###INSERT_HELP###</div>
-			<!-- ###REQUIRED_TEMPLATE### -->
-			<div class="wfqbe_required_field" id="wfqbe_required_###INSERT_ID###">###LABEL_REQUIRED###</div>
-			<!-- ###REQUIRED_TEMPLATE### -->
-			<!-- ###CUSTOM_VALIDATION_TEMPLATE### -->
-			<div id="wfqbe_custom_validation_###INSERT_ID###">###CUSTOM_VALIDATION_TEXT###</div>
-			<!-- ###CUSTOM_VALIDATION_TEMPLATE### -->
+			<td><label style="font-weight: bold;" for="field_###INSERT_ID###">###INSERT_LABEL###</label>
+			###INSERT_HELP_LINK###</td>
+			<td>###INSERT_FIELD### ###INSERT_SELECT_WIZARD### ###INSERT_ADD_NEW### ###INSERT_HELP###
+				<!-- ###REQUIRED_TEMPLATE### -->
+				<div class="wfqbe_required_field" id="wfqbe_required_###INSERT_ID###">###LABEL_REQUIRED###</div>
+				<!-- ###REQUIRED_TEMPLATE### -->
+				<!-- ###CUSTOM_VALIDATION_TEMPLATE### -->
+				<div id="wfqbe_custom_validation_###INSERT_ID###">###CUSTOM_VALIDATION_TEXT###</div>
+				<!-- ###CUSTOM_VALIDATION_TEMPLATE### -->
+			</td>
 			<!-- ###FIELD_BLOCK### -->
-		</div>
+		</tr>
 		<!-- ###INSERT_BLOCK### -->
 
 
-		<div class="wfqbe_block">
-			<!-- ###HIDDEN_BLOCK### -->
-				###INSERT_FIELD###
-			<!-- ###HIDDEN_BLOCK### -->
+		<tr>
+			<td></td>
+			<td>
+				<!-- ###HIDDEN_BLOCK### -->
+					###INSERT_FIELD###
+				<!-- ###HIDDEN_BLOCK### -->
 
-			###INSERT_HIDDEN_FIELDS###
-			<input type="submit" ###XAJAX_CLEAR### name="tx_wfqbe_pi1[###CONF_SUBMIT###]" value="###CONF_SUBMIT_LABEL###" />
-			<!-- ###ADD_NEW_CANCEL### -->
+				###INSERT_HIDDEN_FIELDS###
+				<input type="submit" ###XAJAX_CLEAR### name="tx_wfqbe_pi1[###CONF_SUBMIT###]" value="###CONF_SUBMIT_LABEL###" />
+				<!-- ###ADD_NEW_CANCEL### -->
 				<input type="submit" ###XAJAX_CLEAR### name="tx_wfqbe_pi1[wfqbe_add_new]" value="###LABEL_CANCEL###" />
-			<!-- ###ADD_NEW_CANCEL### -->
-		</div>
+				<!-- ###ADD_NEW_CANCEL### -->
+			</td>
+		</tr>
 	</form>
-</div>
+</table>
 <!-- ###INSERT_TEMPLATE### -->
 
 
