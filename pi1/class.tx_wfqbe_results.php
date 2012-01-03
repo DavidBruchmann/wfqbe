@@ -408,11 +408,18 @@ class tx_wfqbe_results {
 				if ($this->pibase->piVars['orderby']['field']==$field->name && $this->pibase->piVars['orderby']['mode']=='ASC')
 					$mode = 'DESC';
 				$orderLink = array();
-				$orderLink['parameter'] = $GLOBALS['TSFE']->id;
+				if ($this->pibase->beMode==1)
+					$orderLink['parameter'] = t3lib_div::_GP('id');
+				else
+					$orderLink['parameter'] = $GLOBALS['TSFE']->id;
 				$orderLink['addQueryString'] = 1;
 				$orderLink['addQueryString.']['method'] = 'POST,GET';
 				$orderLink['addQueryString.']['exclude'] = 'id';
 				$orderLink['additionalParams'] = '&tx_wfqbe_pi1[orderby][mode]='.$mode.'&tx_wfqbe_pi1[orderby][field]='.$field->name;
+				if ($this->pibase->beMode==1)	{
+					$backend = t3lib_div::_GP('tx_wfqbe_backend');
+					$orderLink['additionalParams'] .= '&tx_wfqbe_backend[uid]='.$backend['uid'].'&tx_wfqbe_backend[mode]='.$backend['mode'];
+				}
 				$mA["###COLUMN_NAME###"] = $this->cObj->typolink($mA["###COLUMN_NAME###"], $orderLink);
 			}
 
@@ -590,17 +597,24 @@ class tx_wfqbe_results {
 				}	else	{
 					$mA["###HEADER_".$col."###"]= $col;
 				}
-
 				if ($enableOrderByHeaders && t3lib_div::_GP('type')!=181)	{
 					$mode = 'ASC';
 					if ($this->pibase->piVars['orderby']['field']==$col && $this->pibase->piVars['orderby']['mode']=='ASC')
 						$mode = 'DESC';
 					$orderLink = array();
-					$orderLink['parameter'] = $GLOBALS['TSFE']->id;
+					if ($this->pibase->beMode==1)
+						$orderLink['parameter'] = t3lib_div::_GP('id');
+					else
+						$orderLink['parameter'] = $GLOBALS['TSFE']->id;
 					$orderLink['addQueryString'] = 1;
 					$orderLink['addQueryString.']['method'] = 'POST,GET';
 					$orderLink['addQueryString.']['exclude'] = 'id';
 					$orderLink['additionalParams'] = '&tx_wfqbe_pi1[orderby][mode]='.$mode.'&tx_wfqbe_pi1[orderby][field]='.$col;
+					if ($this->pibase->beMode==1)	{
+						$backend = t3lib_div::_GP('tx_wfqbe_backend');
+						$orderLink['additionalParams'] .= '&tx_wfqbe_backend[uid]='.$backend['uid'].'&tx_wfqbe_backend[mode]='.$backend['mode'];
+					}
+					
 					$mA["###HEADER_".$col."###"] = $this->cObj->typolink($mA["###HEADER_".$col."###"], $orderLink);
 				}
 
