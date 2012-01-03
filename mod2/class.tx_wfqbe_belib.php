@@ -35,6 +35,7 @@ class tx_wfqbe_belib	{
 	var $title = 'DB Management';
 	var $page_id = 0;
 	var $mode = '';
+	var $piVars = '';
 	var $conf;
 	
 	
@@ -54,6 +55,7 @@ class tx_wfqbe_belib	{
 		
 		$this->page_id = intval(t3lib_div::_GP('id'));
 		$beVars = t3lib_div::_GP('tx_wfqbe_backend');
+		$this->piVars = t3lib_div::_GP('tx_wfqbe_pi1');
 		$query_id = intval($beVars['query']);
 		$backend_id = intval($beVars['uid']);
 		$this->mode = $beVars['mode'];
@@ -134,13 +136,11 @@ class tx_wfqbe_belib	{
 		$this->title = $backend['title'];
 		$content = '';
 		
-		if ($query>0)	{
-			if ($query==$backend['insertq'])	{
-				$PI1->conf['ff_data']['queryObject'] = $backend['insertq'];
-				$form_built = false;
-				$content .= $PI1->do_general('', $form_built);
-				$content .= '<br /><p><a href="index.php?&M=web_txwfqbeM2&id='.$this->page_id.'&tx_wfqbe_backend[uid]='.$backend['uid'].'"><img height="16" width="16" src="'.$BACK_PATH.'sysext/t3skin/icons/module_web_list.gif" title="'.$LANG->getLL('back_to_list').'" alt="'.$LANG->getLL('back_to_list').'"> '.$LANG->getLL('back_to_list').'</a></p>';
-			}
+		if (($query>0 && $query==$backend['insertq']) || $this->piVars['wfqbe_editing_mode']==1 || $this->piVars['wfqbe_deleting_mode']==1)	{
+			$PI1->conf['ff_data']['queryObject'] = $backend['insertq'];
+			$form_built = false;
+			$content .= $PI1->do_general('', $form_built);
+			$content .= '<br /><p><a href="index.php?&M=web_txwfqbeM2&id='.$this->page_id.'&tx_wfqbe_backend[uid]='.$backend['uid'].'"><img height="16" width="16" src="'.$BACK_PATH.'sysext/t3skin/icons/module_web_list.gif" title="'.$LANG->getLL('back_to_list').'" alt="'.$LANG->getLL('back_to_list').'"> '.$LANG->getLL('back_to_list').'</a></p>';
 		}	elseif ($this->mode=='details')	{
 			$PI1->conf['ff_data']['queryObject'] = $backend['detailsq'];
 			$form_built = false;
