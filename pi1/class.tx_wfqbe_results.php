@@ -712,6 +712,8 @@ class tx_wfqbe_results {
 	function showBrowser(&$mA, $numPages, $numRows, $actualPage, $uid)	{
 		if ($this->pibase->beMode==1)	{
 			$altPageId = t3lib_div::_GP('id');
+			$backend = t3lib_div::_GP('tx_wfqbe_backend');
+			$backendParams = '&tx_wfqbe_backend[uid]='.$backend['uid'].'&tx_wfqbe_backend[mode]='.$backend['mode'];
 		}	else	{
 			$altPageId = $GLOBALS['TSFE']->id;
 		}
@@ -726,10 +728,10 @@ class tx_wfqbe_results {
 		$mA['###PAGE_ACTUAL###'] = (int)$actualPage;
 		unset($this->pibase->piVars['wfqbe_results_query']);
 		$this->pibase->piVars['showpage'][$uid] = $actualPage-1>0 ? $actualPage-1 : 1;
-		$mA['###PAGE_PREV###'] = htmlentities($this->pibase->pi_linkTP_keepPIvars_url(array(),0,0,$altPageId));
+		$mA['###PAGE_PREV###'] = htmlentities($this->pibase->pi_linkTP_keepPIvars_url(array(),0,0,$altPageId).$backendParams);
 		$mA['###PAGE_PREV_TITLE###'] = 'title="'.$this->pibase->pi_getLL('prev').'"';
 		$this->pibase->piVars['showpage'][$uid] = $actualPage+1<$numPages ? $actualPage+1 : $numPages;
-		$mA['###PAGE_NEXT###'] = htmlentities($this->pibase->pi_linkTP_keepPIvars_url(array(),0,0,$altPageId));
+		$mA['###PAGE_NEXT###'] = htmlentities($this->pibase->pi_linkTP_keepPIvars_url(array(),0,0,$altPageId).$backendParams);
 		$mA['###PAGE_NEXT_TITLE###'] = 'title="'.$this->pibase->pi_getLL('next').'"';
 
 		$mA['###LABEL_NEXT_LINK###'] = $this->pibase->pi_getLL('next_link', '&gt;&gt;');
@@ -743,7 +745,7 @@ class tx_wfqbe_results {
 				$mA['###PAGE_LIST###'] .= ' '.$i.' - ';
 			else	{
 				$this->pibase->piVars['showpage'][$uid] = $i;
-				$mA['###PAGE_LIST###'] .= ' <a href="'.htmlentities($this->pibase->pi_linkTP_keepPIvars_url(array(),0,0,$altPageId)).'" title="'.$this->pibase->pi_getLL('go_to_page').' '.$i.'">'.$i.'</a> - ';
+				$mA['###PAGE_LIST###'] .= ' <a href="'.htmlentities($this->pibase->pi_linkTP_keepPIvars_url(array(),0,0,$altPageId).$backendParams).'" title="'.$this->pibase->pi_getLL('go_to_page').' '.$i.'">'.$i.'</a> - ';
 			}
 		}
 		if ($mA['###PAGE_LIST###']!='')
