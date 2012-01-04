@@ -1290,7 +1290,7 @@ class tx_wfqbe_queryform_generator{
 			$query.=$this->wfqbe[$numForm]['groupby']['custom'];
 
 			$query.=" ";
-
+			
 			//sezione having
 			if($this->wfqbe[$numForm]['having'][0]!=""){
 				$query.="HAVING ";
@@ -1305,31 +1305,34 @@ class tx_wfqbe_queryform_generator{
 				$query.=" ";
 			}
 
+			if ($this->wfqbe['setoperator'][$numForm]=='')	{
+				//sezione order by
+				if (is_array($piVars['orderby']) && $piVars['orderby']['field']!='' && t3lib_div::inList('ASC,DESC', $piVars['orderby']['mode']))	{
+					$query.="ORDER BY ".htmlspecialchars($piVars['orderby']['field'])." ".$piVars['orderby']['mode']." ";
+				}	else	{
+					if($this->wfqbe[$numForm]['orderby'][0]!="")	{
+						$query.="ORDER BY ";
+						for($j=0;$j<sizeof($this->wfqbe[$numForm]['orderby']);$j++){
+							if($this->wfqbe[$numForm]['orderby'][$j]=="")
+							break;
+							if($j != 0)
+							$query.=",";
+							$query.=$this->wfqbe[$numForm]['orderby'][$j];
+							if($this->wfqbe[$numForm]['ad'][$j]!=""){
+			
+								$query.=" ";
+								$query.=$this->wfqbe[$numForm]['ad'][$j];
+								$query.=" ";
+							}
+						}
+					}
+				}
+			}
+			
 			$query.=$this->wfqbe['setoperator'][$numForm];
 			$query.=" ";
 		}
-
-		//sezione order by
-		if (is_array($piVars['orderby']) && $piVars['orderby']['field']!='' && t3lib_div::inList('ASC,DESC', $piVars['orderby']['mode']))	{
-			$query.="ORDER BY ".htmlspecialchars($piVars['orderby']['field'])." ".$piVars['orderby']['mode']." ";
-		}	else	{
-			if($this->wfqbe[$numForm]['orderby'][0]!="")
-			$query.="ORDER BY ";
-			for($j=0;$j<sizeof($this->wfqbe[$numForm]['orderby']);$j++){
-				if($this->wfqbe[$numForm]['orderby'][$j]=="")
-				break;
-				if($j != 0)
-				$query.=",";
-				$query.=$this->wfqbe[$numForm]['orderby'][$j];
-				if($this->wfqbe[$numForm]['ad'][$j]!=""){
-
-					$query.=" ";
-					$query.=$this->wfqbe[$numForm]['ad'][$j];
-					$query.=" ";
-				}
-			}
-		}
-
+		
 		return $query;
 
 	}
