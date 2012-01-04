@@ -133,42 +133,51 @@
 
 
 <!-- ###INSERT_CONFIRMATION_TEMPLATE### -->
-<div id="###CONF_DIVID###">
+<table class="typo3-dblist">
 	<form id="###CONF_DIVID###_confirmation_form" method="post" enctype="multipart/form-data" ###XAJAX_SUBMIT### action="###CONF_INSERT###">
 		<!-- ###INSERT_BLOCK### -->
-		<div id="###INSERT_ID###" class="wfqbe_block">
-			<span style="font-weight: bold;">###INSERT_LABEL###</span>
-			###INSERT_VALUE###
-			###INSERT_FIELD###
-		</div>
+		<tr id="###INSERT_ID###" class="wfqbe_block">
+			<td><span style="font-weight: bold;">###INSERT_LABEL###</span></td>
+			<td>###INSERT_VALUE###
+			###INSERT_FIELD###</td>
+		</tr>
 		<!-- ###INSERT_BLOCK### -->
 
 		###INSERT_HIDDEN_FIELDS###
 
-		<div class="wfqbe_block">
+		<tr class="wfqbe_block">
+			<td></td>
+			<td>
 			<input id="###CONF_DIVID###_insert_confirm" type="submit" ###XAJAX_CLEAR_CONFIRM### name="tx_wfqbe_pi1[submit_insert]" value="###CONF_SUBMIT_LABEL###" />
 			<!-- ###MODIFY_BUTTON### -->
 			<input id="###CONF_DIVID###_insert_modify" type="submit" ###XAJAX_CLEAR_MODIFY### name="tx_wfqbe_pi1[submit_modify]" value="###LABEL_MODIFY###" />
 			<!-- ###MODIFY_BUTTON### -->
-		</div>
+			</td>
+		</tr>
 	</form>
-</div>
+</table>
 <!-- ###INSERT_CONFIRMATION_TEMPLATE### -->
 
 
 <!-- ###INSERT_FINAL_TEMPLATE### -->
+<table class="typo3-dblist">
 	<form id="###CONF_DIVID###_confirmation_form" method="post" enctype="multipart/form-data" ###XAJAX_SUBMIT### action="###CONF_INSERT###">
+		<tr>
+			<td colspan="2"><h2>Record inserted.</h2></td>
+		</tr>
 		<!-- ###INSERT_BLOCK### -->
-		<div id="###INSERT_ID###" class="wfqbe_block">
-			<span style="font-weight: bold;">###INSERT_LABEL###</span>
-			###INSERT_VALUE###
-		</div>
+		<tr id="###INSERT_ID###" class="wfqbe_block">
+			<td><span style="font-weight: bold;">###INSERT_LABEL###</span></td>
+			<td>###INSERT_VALUE###</td>
+		</tr>
 		<!-- ###INSERT_BLOCK### -->
 
-		<div class="wfqbe_block">
-			<input type="submit" ###XAJAX_CLEAR### name="tx_wfqbe_pi1[new]" value="###LABEL_NEW_RECORD###" />
-		</div>
+		<tr class="wfqbe_block">
+			<td></td>
+			<td><input type="submit" ###XAJAX_CLEAR### name="tx_wfqbe_pi1[new]" value="###LABEL_NEW_RECORD###" /></td>
+		</tr>
 	</form>
+</table>
 <!-- ###INSERT_FINAL_TEMPLATE### -->
 
 
