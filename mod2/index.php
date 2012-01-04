@@ -100,7 +100,7 @@ class  tx_wfqbe_module2 extends t3lib_SCbase {
                             // Draw the header.
                         $this->doc = t3lib_div::makeInstance('bigDoc');
                         $this->doc->backPath = $BACK_PATH;
-                        $this->doc->form='<form action="" method="POST" enctype="multipart/form-data">';
+                        $this->doc->form='<form action="" id="_form" method="post" enctype="multipart/form-data">';
 
                             // JavaScript
                         $this->doc->JScode = '
@@ -110,6 +110,12 @@ class  tx_wfqbe_module2 extends t3lib_SCbase {
                                     document.location = URL;
                                 }
                             </script>
+                            <script type="text/javascript">
+								function submitActions()	{
+									// RTE management
+									###ADDITIONALJS_SUBMIT###
+								}
+							</script>
                         ';
                         $this->doc->postCode='
                             <script language="javascript" type="text/javascript">

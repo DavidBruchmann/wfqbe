@@ -83,13 +83,6 @@
 
 <!-- ###INSERT_TEMPLATE### -->
 <table class="typo3-dblist">
-	<script type="text/javascript">
-		function submitActions()	{
-			// RTE management
-			###ADDITIONALJS_SUBMIT###
-		}
-	</script>
-	<form id="###CONF_DIVID###_form" method="post" enctype="multipart/form-data" ###XAJAX_SUBMIT### action="###CONF_INSERT###" onsubmit="submitActions();">
 		<input type="hidden" id="wfqbe_add_new" value="" name="tx_wfqbe_pi1[wfqbe_add_new]" />
 		<input type="hidden" id="wfqbe_select_wizard" value="" name="tx_wfqbe_pi1[wfqbe_select_wizard]" />
 		<input type="hidden" id="wfqbe_edit_subrecord" value="" name="tx_wfqbe_pi1[wfqbe_edit_subrecord]" />
@@ -98,14 +91,13 @@
 		<!-- ###INSERT_BLOCK### -->
 		<tr>
 			<!-- ###FIELD_BLOCK### -->
-			<td><label style="font-weight: bold;" for="field_###INSERT_ID###">###INSERT_LABEL###</label>
-			###INSERT_HELP_LINK###</td>
+			<td><label style="font-weight: bold;" for="field_###INSERT_ID###">###INSERT_LABEL###</label></td>
 			<td>###INSERT_FIELD### ###INSERT_SELECT_WIZARD### ###INSERT_ADD_NEW### ###INSERT_HELP###
 				<!-- ###REQUIRED_TEMPLATE### -->
-				<div class="wfqbe_required_field" id="wfqbe_required_###INSERT_ID###">###LABEL_REQUIRED###</div>
+				<div class="wfqbe_required_field" style="color: red;" id="wfqbe_required_###INSERT_ID###">###LABEL_REQUIRED###</div>
 				<!-- ###REQUIRED_TEMPLATE### -->
 				<!-- ###CUSTOM_VALIDATION_TEMPLATE### -->
-				<div id="wfqbe_custom_validation_###INSERT_ID###">###CUSTOM_VALIDATION_TEXT###</div>
+				<div style="color: red;" id="wfqbe_custom_validation_###INSERT_ID###">###CUSTOM_VALIDATION_TEXT###</div>
 				<!-- ###CUSTOM_VALIDATION_TEMPLATE### -->
 			</td>
 			<!-- ###FIELD_BLOCK### -->
@@ -127,14 +119,12 @@
 				<!-- ###ADD_NEW_CANCEL### -->
 			</td>
 		</tr>
-	</form>
 </table>
 <!-- ###INSERT_TEMPLATE### -->
 
 
 <!-- ###INSERT_CONFIRMATION_TEMPLATE### -->
 <table class="typo3-dblist">
-	<form id="###CONF_DIVID###_confirmation_form" method="post" enctype="multipart/form-data" ###XAJAX_SUBMIT### action="###CONF_INSERT###">
 		<!-- ###INSERT_BLOCK### -->
 		<tr id="###INSERT_ID###" class="wfqbe_block">
 			<td><span style="font-weight: bold;">###INSERT_LABEL###</span></td>
@@ -154,14 +144,12 @@
 			<!-- ###MODIFY_BUTTON### -->
 			</td>
 		</tr>
-	</form>
 </table>
 <!-- ###INSERT_CONFIRMATION_TEMPLATE### -->
 
 
 <!-- ###INSERT_FINAL_TEMPLATE### -->
 <table class="typo3-dblist">
-	<form id="###CONF_DIVID###_confirmation_form" method="post" enctype="multipart/form-data" ###XAJAX_SUBMIT### action="###CONF_INSERT###">
 		<tr>
 			<td colspan="2"><h2>Record inserted.</h2></td>
 		</tr>
@@ -176,7 +164,6 @@
 			<td></td>
 			<td><input type="submit" ###XAJAX_CLEAR### name="tx_wfqbe_pi1[new]" value="###LABEL_NEW_RECORD###" /></td>
 		</tr>
-	</form>
 </table>
 <!-- ###INSERT_FINAL_TEMPLATE### -->
 

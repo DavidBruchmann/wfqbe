@@ -450,6 +450,7 @@ class tx_wfqbe_insert {
 			$res = $this->checkIDRestricting($h, $this->blocks['ID_restricting'], $editing_record);
 //t3lib_div::debug(array('mode'=>$this->mode, 'query'=>$this->blocks['ID_restricting'], 'res'=>$res, 'piVars'=>$this->pibase->piVars, 'editingrecord'=>$editing_record));
 			if ($res['notAllowed']==1)	{
+t3lib_div::debug('not allowed');
 				return $res['content'];
 			}
 		}
@@ -1133,11 +1134,16 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 	 */
 	function uploadFiles($blocks)	{
 //t3lib_div::debug($blocks);
+//t3lib_div::debug($_FILES);
 		$content = '';
 		foreach	($_FILES['tx_wfqbe_pi1']['error'] as $field_key => $field)	{
 			foreach	($field as $key => $error)	{
 				switch ($error){
 		            case 0:
+						if ($this->pibase->beMode==1)	{
+			            	global $BACK_PATH;
+			            	$blocks['fields'][strtoupper($field_key)]['form']['basedir'] = $BACK_PATH.'../'.$blocks['fields'][strtoupper($field_key)]['form']['basedir'];
+			            }
 		            	$dirs = explode('/', $blocks['fields'][strtoupper($field_key)]['form']['basedir']);
 		            	$basedir = '';
 		            	foreach ($dirs as $dir)	{
@@ -1842,7 +1848,13 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 			$ris = $h->Execute($idRestrictQuery);
 			
 			if (!$ris)	{
-				return array("notAllowed"=>1, "content"=>$this->pibase->pi_getLL('not_allowed_idrestricting'));
+				if ($this->pibase->beMode==1)	{
+					global $LANG;
+					$content = $LANG->getLL('not_allowed_idrestricting');
+				}	else	{
+					$content = $this->pibase->pi_getLL('not_allowed_idrestricting');
+				}
+				return array("notAllowed"=>1, "content"=>$content);
 			}
 			
 			$i = 0;
@@ -1857,7 +1869,13 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 			if ($auth)	{
 				return true;
 			}	else	{
-				return array("notAllowed"=>1, "content"=>$this->pibase->pi_getLL('not_allowed_idrestricting'));
+			if ($this->pibase->beMode==1)	{
+					global $LANG;
+					$content = $LANG->getLL('not_allowed_idrestricting');
+				}	else	{
+					$content = $this->pibase->pi_getLL('not_allowed_idrestricting');
+				}
+				return array("notAllowed"=>1, "content"=>$content);
 			}
 	}
 	
