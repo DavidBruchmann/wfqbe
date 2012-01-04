@@ -967,7 +967,7 @@ class tx_wfqbe_queryform_generator{
 
 			$content.="&nbsp;&nbsp;&nbsp;&nbsp;";
 
-			$content.='Descendant ';
+			$content.='Descending ';
 			if($this->wfqbe[$numForm]['ad'][$num] == "DESC")
 			$content.='<input onChange="updateForm();" type="radio" name="wfqbe['.$numForm.'][ad]['.$num.']" value="DESC" checked="checked"/>';
 			else
