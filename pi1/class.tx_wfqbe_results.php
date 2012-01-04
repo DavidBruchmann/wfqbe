@@ -87,8 +87,11 @@ class tx_wfqbe_results {
 				$csv_query = $this->conf['customGlobalProcess.']['CSVquery'];
 			else
 				$csv_query = $row['uid'];
-			$mA["###CONF_CSV###"] = htmlentities($this->pibase->pi_linkTP_keepPIvars_url().'&type=181&tx_wfqbe_pi1[wfqbe_results_query]='.$csv_query);
-			$mA['###LABEL_CSV###'] = $this->pibase->pi_getLL('csv_link', 'Export in CSV');
+			
+			if ($this->conf['ff_data']['csvDownload']!=1)	{
+				$mA["###CONF_CSV###"] = htmlentities($this->pibase->pi_linkTP_keepPIvars_url().'&type=181&tx_wfqbe_pi1[wfqbe_results_query]='.$csv_query);
+				$mA['###LABEL_CSV###'] = $this->pibase->pi_getLL('csv_link', 'Export in CSV');
+			}
 			
 			$mA['###CONF_DIVID###'] = $this->conf['ff_data']['div_id'];
 		}
