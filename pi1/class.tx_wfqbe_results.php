@@ -165,6 +165,9 @@ class tx_wfqbe_results {
 				}	elseif ($this->conf['globalCustomQuery.'][$marker]) {
 					$confArray = $this->conf["globalCustomQuery."][$marker."."];
 					eval('$markerParametri["###".$marker."###"]=$this->cObj->'.$this->conf["globalCustomQuery."][$marker].'($confArray);');
+				}	elseif ($this->conf['customGlobalQuery.'][$marker]) {
+					$confArray = $this->conf["customGlobalQuery."][$marker."."];
+					eval('$markerParametri["###".$marker."###"]=$this->cObj->'.$this->conf["customGlobalQuery."][$marker].'($confArray);');
 				}
 
 				if (!$emptyCase && $this->conf['customQuery.'][$row['uid'].'.'][$marker.'.']!="" && $this->conf['customQuery.'][$row['uid'].'.'][$marker."."]["wfqbe."]['intval']==1)	{
