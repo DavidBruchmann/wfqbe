@@ -689,8 +689,22 @@ class tx_wfqbe_insertform_generator{
 			$html .= '<br />Table: '.$this->showSelectTable($h, $form['table'], "wfqbe[fields][$key][form][table]");
 			
 			if ($form['table']!='')	{
-				$html .= '<br />Field - View: '.$this->showSelectField($h, $form['field_view'], $form['table'], "wfqbe[fields][$key][form][field_view]");
-				$html .= ' # Field - Insert: '.$this->showSelectField($h, $form['field_insert'], $form['table'], "wfqbe[fields][$key][form][field_insert]");
+				//$html .= '<br />Field - View: '.$this->showSelectField($h, $form['field_view'], $form['table'], "wfqbe[fields][$key][form][field_view]");
+				//$html .= ' # Field - Insert: '.$this->showSelectField($h, $form['field_insert'], $form['table'], "wfqbe[fields][$key][form][field_insert]");
+				
+				$html .= '<br />Field - Insert: '.$this->showSelectField($h, $form['field_insert'], $form['table'], "wfqbe[fields][$key][form][field_insert]");
+				$html .= ' # Field - View: '.$this->showSelectField($h, $form['field_view'], $form['table'], "wfqbe[fields][$key][form][field_view]",1);
+				if ($form['field_view']!='')	{
+					$html .= ' - Separator: <input size="3" type="text" name="wfqbe[fields]['.$key.'][form][field_view_sub][0][sep]" value="'.$form['field_view_sub'][0]['sep'].'" />';
+					$html .= ' - View 2: '.$this->showSelectField($h, $form['field_view_sub'][0]['field'], $form['table'], "wfqbe[fields][$key][form][field_view_sub][0][field]",1);
+					$i = 0;
+					while ($form['field_view_sub'][$i]['field']!='')	{
+						$i++;
+						$html .= ' - Separator: <input size="3" type="text" name="wfqbe[fields]['.$key.'][form][field_view_sub]['.$i.'][sep]" value="'.$form['field_view_sub'][$i]['sep'].'" />';
+						$html .= ' - View '.($i+2).': '.$this->showSelectField($h, $form['field_view_sub'][$i]['field'], $form['table'], "wfqbe[fields][$key][form][field_view_sub][$i][field]",1);
+					}
+				}
+				
 				$html .= '<br />Field - Where: <input size="80" type="text" name="wfqbe[fields]['.$key.'][form][where]" value="'.$form['where'].'" />';
 				$html .= ' # Field - Order by: '.$this->showSelectField($h, $form['field_orderby'], $form['table'], "wfqbe[fields][$key][form][field_orderby]");
 				$html .= '<select name="wfqbe[fields]['.$key.'][form][field_orderby_mod]"><option value=""></option><option value="ASC"'.($form['field_orderby_mod']=='ASC' ? ' selected="selected"' : '').'>ASC</option><option value="DESC"'.($form['field_orderby_mod']=='DESC' ? ' selected="selected"' : '').'>DESC</option></select>';

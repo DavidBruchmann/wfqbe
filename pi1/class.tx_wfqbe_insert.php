@@ -1051,16 +1051,34 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 			if ($value['form']['where']!="")	{
 				$where = 'WHERE '.$this->substituteInsertMarkers($value['form']['where'])." ";
 			}
+			
+			if (is_array($value['form']['field_view_sub']))	{
+				foreach ($value['form']['field_view_sub'] as $subkey => $subview)	{
+					if ($subview['field']!='')
+						$select .= ','.$subview['field'];
+				}
+			}
+			
 			$orderby = $value['form']['field_orderby']!='' ? ($value['form']['field_orderby'].' '.$value['form']['field_orderby_mod']) : $value['form']['field_view'];
-			$query = 'SELECT '.$value['form']['field_view'].', '.$value['form']['field_insert'].' FROM '.$value['form']['table'].' '.$where.'ORDER BY '.$orderby;
+			$query = 'SELECT '.$value['form']['field_view'].', '.$value['form']['field_insert'].$select.' FROM '.$value['form']['table'].' '.$where.'ORDER BY '.$orderby;
 			$ris = $h->Execute($query);
 			
 			if ($ris!==false)	{
 				while($array = $ris -> FetchRow()){
+					$label = $array[$value['form']['field_view']];
+					if (is_array($value['form']['field_view_sub']))	{
+						foreach ($value['form']['field_view_sub'] as $subkey => $subview)	{
+							if ($subview['sep']!='')
+								$label .= $subview['sep'];
+							if ($subview['field']!='')
+								$label .= $array[$subview['field']];
+						}
+					}
+					
 					if (is_array($this->pibase->piVars[$name]) && in_array($array[1],$this->pibase->piVars[$name]))
-						$listaSelect .= '<option selected="selected" value="'.$array[1].'"> '.$array[0].'</option>';
+						$listaSelect .= '<option selected="selected" value="'.$array[1].'"> '.$label.'</option>';
 					else
-						$listaSelect .= '<option value="'.$array[1].'"> '.$array[0].'</option>';
+						$listaSelect .= '<option value="'.$array[1].'"> '.$label.'</option>';
 				}
 			}	else	{
 				return '<div id="'.$id.'">Query failed: '.$query.'</div>';
