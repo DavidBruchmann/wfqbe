@@ -492,7 +492,7 @@ class tx_wfqbe_results {
 		if ($numPages<2)
 			$content = $this->cObj->substituteSubpart($content, '###BROWSE_TEMPLATE###', '', 1,0);
 		else	{
-			$this->showBrowser($mA, $numPages, $numRows, $actualPage, $row['uid']);
+			$content = $this->showBrowser($content, $mA, $numPages, $numRows, $actualPage, $row['uid']);
 		}
 
 		if ($this->conf['ff_data']['csvDownload']!=1)
@@ -654,7 +654,7 @@ class tx_wfqbe_results {
 		if ($numPages<2)
 			$listaRighe = $this->cObj->substituteSubpart($listaRighe, '###BROWSE_TEMPLATE###', '', 1,0);
 		else	{
-			$this->showBrowser($mA, $numPages, $numRows, $actualPage, $row['uid']);
+			$content = $this->showBrowser($content, $mA, $numPages, $numRows, $actualPage, $row['uid']);
 		}
 
 		$listaRighe =$this->cObj->substituteMarkerArray($listaRighe, $mA);
@@ -738,13 +738,34 @@ class tx_wfqbe_results {
 	/**
 	 * This function is used to show the page browser
 	 */
-	function showBrowser(&$mA, $numPages, $numRows, $actualPage, $uid)	{
+	function showBrowser($content, &$mA, $numPages, $numRows, $actualPage, $uid)	{
 		if ($this->pibase->beMode==1)	{
 			$altPageId = t3lib_div::_GP('id');
 			$backend = t3lib_div::_GP('tx_wfqbe_backend');
 			$backendParams = '&tx_wfqbe_backend[uid]='.$backend['uid'].'&tx_wfqbe_backend[mode]='.$backend['mode'];
 		}	else	{
 			$altPageId = $GLOBALS['TSFE']->id;
+		}
+		
+		$pageLimit = $this->conf['ff_data']['pageLimit']>0 ? $this->conf['ff_data']['pageLimit'] : ($this->conf['pageLimit']>0 ? $this->conf['pageLimit'] : -1);
+		if ($pageLimit>0)	{
+			$start = intval($actualPage / $pageLimit);
+			if($start == 0){
+				$start = 1;
+			}
+			elseif(is_int($actualPage / $pageLimit)){
+				$start = ($start * $pageLimit)-($pageLimit-1);
+			}
+			else{
+				$start = ($start * $pageLimit)+1;
+			}
+			
+			$end = $start + $pageLimit - 1;
+			$next = $start + $pageLimit;
+			$prev= $start - 1;
+		}	else	{
+			$start = 1;
+			$end = $numPages;
 		}
 		
 		$lA = array();
@@ -756,12 +777,22 @@ class tx_wfqbe_results {
 		$mA['###PAGE_TOTAL###'] = $numPages;
 		$mA['###PAGE_ACTUAL###'] = (int)$actualPage;
 		unset($this->pibase->piVars['wfqbe_results_query']);
-		$this->pibase->piVars['showpage'][$uid] = $actualPage-1>0 ? $actualPage-1 : 1;
-		$mA['###PAGE_PREV###'] = htmlentities($this->pibase->pi_linkTP_keepPIvars_url(array(),0,0,$altPageId).$backendParams);
-		$mA['###PAGE_PREV_TITLE###'] = 'title="'.$this->pibase->pi_getLL('prev').'"';
-		$this->pibase->piVars['showpage'][$uid] = $actualPage+1<$numPages ? $actualPage+1 : $numPages;
-		$mA['###PAGE_NEXT###'] = htmlentities($this->pibase->pi_linkTP_keepPIvars_url(array(),0,0,$altPageId).$backendParams);
-		$mA['###PAGE_NEXT_TITLE###'] = 'title="'.$this->pibase->pi_getLL('next').'"';
+		
+		if ($pageLimit>0 && $actualPage<$pageLimit)	{
+			$content = $this->cObj->substituteSubpart($content, '###SUBPART_PREV###');
+		}	else	{
+			$this->pibase->piVars['showpage'][$uid] = $actualPage-1>0 ? $actualPage-1 : 1;
+			$mA['###PAGE_PREV###'] = htmlentities($this->pibase->pi_linkTP_keepPIvars_url(array(),0,0,$altPageId).$backendParams);
+			$mA['###PAGE_PREV_TITLE###'] = 'title="'.$this->pibase->pi_getLL('prev').'"';
+		}
+		
+		if ($pageLimit>0 && $end>=$numPages)	{
+			$content = $this->cObj->substituteSubpart($content, '###SUBPART_NEXT###');
+		}	else	{
+			$this->pibase->piVars['showpage'][$uid] = $actualPage+1<$numPages ? $actualPage+1 : $numPages;
+			$mA['###PAGE_NEXT###'] = htmlentities($this->pibase->pi_linkTP_keepPIvars_url(array(),0,0,$altPageId).$backendParams);
+			$mA['###PAGE_NEXT_TITLE###'] = 'title="'.$this->pibase->pi_getLL('next').'"';
+		}
 
 		$mA['###LABEL_NEXT_LINK###'] = $this->pibase->pi_getLL('next_link', '&gt;&gt;');
 		$mA['###LABEL_PREV_LINK###'] = $this->pibase->pi_getLL('prev_link', '&lt;&lt;');
@@ -769,9 +800,10 @@ class tx_wfqbe_results {
 		$mA['###LABEL_OF###'] = $this->pibase->pi_getLL('of', 'of');
 
 		$mA['###PAGE_LIST###'] = '';
-		for ($i=1; $i<=$numPages; $i++)	{
+		//for ($i=1; $i<=$numPages; $i++)	{
+		for ($i=$start; $i<=$numPages && $i<=$end; $i++)	{
 			if ($i==$actualPage)
-				$mA['###PAGE_LIST###'] .= ' '.$i.' - ';
+				$mA['###PAGE_LIST###'] .= ' <span class="wfqbe_actualPage">'.$i.'</span> - ';
 			else	{
 				$this->pibase->piVars['showpage'][$uid] = $i;
 				$mA['###PAGE_LIST###'] .= ' <a href="'.htmlentities($this->pibase->pi_linkTP_keepPIvars_url(array(),0,0,$altPageId).$backendParams).'" title="'.$this->pibase->pi_getLL('go_to_page').' '.$i.'">'.$i.'</a> - ';
@@ -779,6 +811,8 @@ class tx_wfqbe_results {
 		}
 		if ($mA['###PAGE_LIST###']!='')
 			$mA['###PAGE_LIST###'] = substr($mA['###PAGE_LIST###'], 0, -3);
+			
+		return $content;
 	}
 
 
