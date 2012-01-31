@@ -428,7 +428,7 @@ class tx_wfqbe_results {
 
 			if ($enableOrderByHeaders && t3lib_div::_GP('type')!=181)	{
 				$mode = 'ASC';
-				if ($this->pibase->piVars['orderby']['field']==$field->name && $this->pibase->piVars['orderby']['mode']=='ASC')
+				if ($this->pibase->piVars['orderby'][$row['uid']]['field']==$field->name && $this->pibase->piVars['orderby'][$row['uid']]['mode']=='ASC')
 					$mode = 'DESC';
 				$orderLink = array();
 				if ($this->pibase->beMode==1)
@@ -438,7 +438,7 @@ class tx_wfqbe_results {
 				$orderLink['addQueryString'] = 1;
 				$orderLink['addQueryString.']['method'] = 'POST,GET';
 				$orderLink['addQueryString.']['exclude'] = 'id';
-				$orderLink['additionalParams'] = '&tx_wfqbe_pi1[orderby][mode]='.$mode.'&tx_wfqbe_pi1[orderby][field]='.$field->name;
+				$orderLink['additionalParams'] = '&tx_wfqbe_pi1[orderby]['.$row['uid'].'][mode]='.$mode.'&tx_wfqbe_pi1[orderby]['.$row['uid'].'][field]='.$field->name;
 				if ($this->pibase->beMode==1)	{
 					$backend = t3lib_div::_GP('tx_wfqbe_backend');
 					$orderLink['additionalParams'] .= '&tx_wfqbe_backend[uid]='.$backend['uid'].'&tx_wfqbe_backend[mode]='.$backend['mode'];
@@ -622,7 +622,7 @@ class tx_wfqbe_results {
 				}
 				if ($enableOrderByHeaders && t3lib_div::_GP('type')!=181)	{
 					$mode = 'ASC';
-					if ($this->pibase->piVars['orderby']['field']==$col && $this->pibase->piVars['orderby']['mode']=='ASC')
+					if ($this->pibase->piVars['orderby'][$row['uid']]['field']==$col && $this->pibase->piVars['orderby'][$row['uid']]['mode']=='ASC')
 						$mode = 'DESC';
 					$orderLink = array();
 					if ($this->pibase->beMode==1)
@@ -632,7 +632,7 @@ class tx_wfqbe_results {
 					$orderLink['addQueryString'] = 1;
 					$orderLink['addQueryString.']['method'] = 'POST,GET';
 					$orderLink['addQueryString.']['exclude'] = 'id';
-					$orderLink['additionalParams'] = '&tx_wfqbe_pi1[orderby][mode]='.$mode.'&tx_wfqbe_pi1[orderby][field]='.$col;
+					$orderLink['additionalParams'] = '&tx_wfqbe_pi1[orderby]['.$row['uid'].'][mode]='.$mode.'&tx_wfqbe_pi1[orderby]['.$row['uid'].'][field]='.$col;
 					if ($this->pibase->beMode==1)	{
 						$backend = t3lib_div::_GP('tx_wfqbe_backend');
 						$orderLink['additionalParams'] .= '&tx_wfqbe_backend[uid]='.$backend['uid'].'&tx_wfqbe_backend[mode]='.$backend['mode'];
