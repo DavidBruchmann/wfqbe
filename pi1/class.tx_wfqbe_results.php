@@ -40,6 +40,18 @@ class tx_wfqbe_results {
 	var $executionTime;
 
 	function main($conf, $cObj, $pibase)	{
+		
+		// retrocompatibility with previous wrong naming
+		if (is_array($conf['customGlobalProcess.'])) {
+			if (is_array($conf['globalCustomProcess.'])) {
+				$conf['globalCustomProcess.'] = t3lib_div::array_merge_recursive_overrule($conf['customGlobalProcess.'],$conf['globalCustomProcess.']);
+			} else {
+				$conf['globalCustomProcess.'] = $conf['customGlobalProcess.'];
+			}
+			unset($conf['customGlobalProcess.']);			
+		}
+		
+		  	 
 		$this->conf=$conf;
 		$this->cObj = $cObj;
 		$this->pibase = $pibase;
@@ -83,8 +95,8 @@ class tx_wfqbe_results {
 
 			if ($this->conf['customProcess.'][$row['uid'].'.']['CSVquery']!='')
 				$csv_query = $this->conf['customProcess.'][$row['uid'].'.']['CSVquery'];
-			if ($this->conf['customGlobalProcess.']['CSVquery']!='')
-				$csv_query = $this->conf['customGlobalProcess.']['CSVquery'];
+			if ($this->conf['globalCustomProcess.']['CSVquery']!='')
+				$csv_query = $this->conf['globalCustomProcess.']['CSVquery'];
 			else
 				$csv_query = $row['uid'];
 			
@@ -329,7 +341,7 @@ class tx_wfqbe_results {
 							$confArray = $this->parseTypoScriptConfiguration($confArray, $wfqbeArray);
 							eval('$mA["###COLUMN_DATA###"]=$this->cObj->'.$confFunc.'($confArray);');
 						}	elseif ($this->conf['globalCustomProcess.'][$keys[$i]]) {
-							$mergedConf = $this->manageTyposcriptAlternatives($flag, 'customProcess', $row['uid'], $keys[$i]);
+							$mergedConf = $this->manageTyposcriptAlternatives($flag, 'globalCustomProcess', $row['uid'], $keys[$i]);
 							$confArray = $mergedConf['config'];
 							$confFunc = $mergedConf['func'];
 							$confArray = $this->parseTypoScriptConfiguration($confArray, $wfqbeArray);
@@ -685,23 +697,28 @@ class tx_wfqbe_results {
 	 * @param string $key: field to be managed
 	 */
 	function manageTyposcriptAlternatives($flag, $mode, $code, $key)	{
-		if ($flag==0 && $this->conf[$mode."."][$code."."][$key."."]['wfqbeFirst']!='')	{
-			$func = $this->conf[$mode."."][$code."."][$key."."]['wfqbeFirst'];
-			$config = $this->conf[$mode."."][$code."."][$key."."]['wfqbeFirst.'];
-		}	elseif (($flag==($this->conf['ff_data']['recordsForPage']-1) || $flag==($this->conf['wf_data']['queryNumRows']-1)) && $this->conf[$mode."."][$code."."][$key."."]['wfqbeLast']!='')	{
-			$func = $this->conf[$mode."."][$code."."][$key."."]['wfqbeLast'];
-			$config = $this->conf[$mode."."][$code."."][$key."."]['wfqbeLast.'];
-		}	elseif ($flag%2==0 && $this->conf[$mode."."][$code."."][$key."."]['wfqbeEven']!='')	{
-			$func = $this->conf[$mode."."][$code."."][$key."."]['wfqbeEven'];
-			$config = $this->conf[$mode."."][$code."."][$key."."]['wfqbeEven.'];
-		}	elseif ($flag%2==1 && $this->conf[$mode."."][$code."."][$key."."]['wfqbeOdd']!='')	{
-			$func = $this->conf[$mode."."][$code."."][$key."."]['wfqbeOdd'];
-			$config = $this->conf[$mode."."][$code."."][$key."."]['wfqbeOdd.'];
-		}	else	{
-			$func = $this->conf[$mode."."][$code."."][$key];
-			$config = $this->conf[$mode."."][$code."."][$key.'.'];
-		}
 		
+		if ($mode =='globalCustomProcess') {
+			$conf = $this->conf[$mode."."];
+		} else {
+			$conf = $this->conf[$mode."."][$code."."];
+		}
+		if ($flag==0 && $conf[$key."."]['wfqbeFirst']!='')	{
+			$func = $conf[$key."."]['wfqbeFirst'];
+			$config = $conf[$key."."]['wfqbeFirst.'];
+		}	elseif (($flag==($this->conf['ff_data']['recordsForPage']-1) || $flag==($this->conf['wf_data']['queryNumRows']-1)) && $conf[$key."."]['wfqbeLast']!='')	{
+			$func = $conf[$key."."]['wfqbeLast'];
+			$config = $conf[$key."."]['wfqbeLast.'];
+		}	elseif ($flag%2==0 && $conf[$key."."]['wfqbeEven']!='')	{
+			$func = $conf[$key."."]['wfqbeEven'];
+			$config = $conf[$key."."]['wfqbeEven.'];
+		}	elseif ($flag%2==1 && $conf[$key."."]['wfqbeOdd']!='')	{
+			$func = $conf[$key."."]['wfqbeOdd'];
+			$config = $conf[$key."."]['wfqbeOdd.'];
+		}	else	{
+			$func = $conf[$key];
+			$config = $conf[$key."."];
+		}
 		return array('config' => $config, 'func' => $func);
 	}
 
