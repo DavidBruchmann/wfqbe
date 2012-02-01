@@ -779,7 +779,7 @@ class tx_wfqbe_results {
 		unset($this->pibase->piVars['wfqbe_results_query']);
 		
 		if ($pageLimit>0 && $actualPage<$pageLimit)	{
-			$content = $this->cObj->substituteSubpart($content, '###SUBPART_PREV###');
+			$content = $this->cObj->substituteSubpart($content, '###SUBPART_PREV###', '');
 		}	else	{
 			$this->pibase->piVars['showpage'][$uid] = $actualPage-1>0 ? $actualPage-1 : 1;
 			$mA['###PAGE_PREV###'] = htmlentities($this->pibase->pi_linkTP_keepPIvars_url(array(),0,0,$altPageId).$backendParams);
@@ -787,7 +787,7 @@ class tx_wfqbe_results {
 		}
 		
 		if ($pageLimit>0 && $end>=$numPages)	{
-			$content = $this->cObj->substituteSubpart($content, '###SUBPART_NEXT###');
+			$content = $this->cObj->substituteSubpart($content, '###SUBPART_NEXT###', '');
 		}	else	{
 			$this->pibase->piVars['showpage'][$uid] = $actualPage+1<$numPages ? $actualPage+1 : $numPages;
 			$mA['###PAGE_NEXT###'] = htmlentities($this->pibase->pi_linkTP_keepPIvars_url(array(),0,0,$altPageId).$backendParams);
