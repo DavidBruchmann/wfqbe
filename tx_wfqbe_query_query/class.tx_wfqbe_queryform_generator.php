@@ -1307,8 +1307,8 @@ class tx_wfqbe_queryform_generator{
 
 			if ($this->wfqbe['setoperator'][$numForm]=='')	{
 				//sezione order by
-				if (is_array($piVars['orderby']) && $piVars['orderby']['field']!='' && t3lib_div::inList('ASC,DESC', $piVars['orderby']['mode']))	{
-					$query.="ORDER BY ".htmlspecialchars($piVars['orderby']['field'])." ".$piVars['orderby']['mode']." ";
+				if (is_array($piVars['orderby']) && $piVars['orderby'][$query_uid]['field']!='' && t3lib_div::inList('ASC,DESC', $piVars['orderby'][$query_uid]['mode']))	{
+					$query.="ORDER BY ".htmlspecialchars($piVars['orderby'][$query_uid]['field'])." ".$piVars['orderby'][$query_uid]['mode']." ";
 				}	else	{
 					if($this->wfqbe[$numForm]['orderby'][0]!="")	{
 						$query.="ORDER BY ";
