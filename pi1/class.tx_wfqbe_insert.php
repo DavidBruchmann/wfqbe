@@ -1322,6 +1322,7 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 			$params['parameter'] = $GLOBALS['TSFE']->id;
 			$mA['###CONF_INSERT###'] = $this->cObj->typoLink_URL($params);
 			$mA['###CONF_SUBMIT_LABEL###'] = $this->pibase->pi_getLL('insert_confirm', 'Insert');
+			$mA['###LABEL_PLEASE_CONFIRM###'] = $this->pibase->pi_getLL('please_confirm', 'Please confirm');
 			
 			
 			$mA['###INSERT_HIDDEN_FIELDS###'] = '';
@@ -1345,8 +1346,12 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 			}	else	{
 				if ($this->mode=='edit')	{
 					$mA['###CONF_SUBMIT_LABEL###'] = $this->pibase->pi_getLL('update_confirm', 'Update');
+					
+					$mA['###LABEL_COMMIT_RESULT###'] = $this->pibase->pi_getLL('commit_result_'.$this->mode, 'Record updated');
+					
 				}	elseif ($this->mode=='delete')	{
 					$mA['###CONF_SUBMIT_LABEL###'] = $this->pibase->pi_getLL('delete_confirm', 'Delete');
+					$mA['###LABEL_COMMIT_RESULT###'] = $this->pibase->pi_getLL('commit_result_'.$this->mode, 'Record deleted');
 					if ($this->blocks['ID_field']=='')
 						return "";
 					else	{
@@ -1359,6 +1364,7 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 					}
 				}	else	{
 					$mA['###CONF_SUBMIT_LABEL###'] = $this->pibase->pi_getLL('insert_confirm', 'Insert');
+					$mA['###LABEL_COMMIT_RESULT###'] = $this->pibase->pi_getLL('commit_result_'.$this->mode, 'Record inserted');
 				}
 			}
 

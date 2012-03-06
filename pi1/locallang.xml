@@ -29,6 +29,10 @@
 			<label index="select">Select</label>
 			<label index="no_value">No value</label>
 			<label index="not_allowed_idrestricting">Not allowed due to restriction in action</label>
+			<label index="commit_result_edit">Record updated</label>
+			<label index="commit_result_delete">Record deleted</label>
+			<label index="commit_result_insert">Record inserted</label>
+			<label index="please_confirm">Confirm operation</label>
 		</languageKey>
 		<languageKey index="it" type="array">
 			<label index="prev">Pagina precedente</label>
