@@ -141,7 +141,10 @@ class tx_wfqbe_results {
 					foreach ($value as $sel)	{
 						if ($i>0)
 							$markerParametri["###WFQBE_".strtoupper($key)."###"] .= "'";
-						$markerParametri["###WFQBE_".strtoupper($key)."###"] .= addslashes(strip_tags($sel));
+						if (is_array($sel))
+							$markerParametri["###WFQBE_".strtoupper($key)."###"] .= addslashes(strip_tags($sel[0]));
+						else
+							$markerParametri["###WFQBE_".strtoupper($key)."###"] .= addslashes(strip_tags($sel));
 						if ($i<sizeof($value)-1)
 							$markerParametri["###WFQBE_".strtoupper($key)."###"] .= "',";
 						$i++;
