@@ -200,8 +200,8 @@ class tx_wfqbe_queryform_generator{
 	 */
 
 	function showForm($h){
-		$content="";
-		$content.=$this->showMenu();
+		$content='<table style="font-size: 0.9em" class="typo3-dblist">';
+		$content.='<tr class="db_list_normal"><td>'.$this->showMenu().'</td></tr>';
 
 		//visualizzo il form classico la prima volta(quando non ho salvato niente) oppure quando � stata selezionata la modalit� QBE e
 		//la text area di inserimento a mano della query � vuota(e cio� quando rawwfqbe[invalidqbe] � vuoto )
@@ -212,36 +212,36 @@ class tx_wfqbe_queryform_generator{
 				$this->leftOn="";
 				$this->rightOn="";
 				if($numForm%2==0)
-				$backgroundColor='bgColor5';
+				$backgroundColor='db_list_normal';
 				else
-				$backgroundColor='bgColor3-20';
+				$backgroundColor='db_list_normal';
 				//$tabelle � un array che contiene le tabelle presenti nel database selezionato
 				$tabelle=$h->MetaTables(false,true);
 
-				$content.='<div class="'.$backgroundColor.'" >';
+				$content.='<tr class="'.$backgroundColor.'" ><td>';
 				for($i=0;$i<sizeof($this->wfqbe[$numForm]['table'])+1;$i++){
 					$content.= $this->showSelectTable($h,$i,$this->wfqbe[$numForm]['table'][$i],$this->wfqbe[$numForm]['table'][$i+1]=="",$tabelle,$numForm);
 					if($this->wfqbe[$numForm]['table'][$i]=="")
 					break;
 				}
-				$content.='</div>';
+				$content.='</td></tr>';
 
 				//se non � stata selezionata nessuna tabella non presento gli elementi
 				if($this->wfqbe[$numForm]['table'][0]!=""){
 
-					$content.='<div class="'.$backgroundColor.'" >';
+					$content.='<tr class="'.$backgroundColor.'" ><td>';
 					$content.=$this->showDistinctAll($numForm);
-					$content.='</div>';
+					$content.='</td></tr>';
 
-					$content.='<div class="'.$backgroundColor.'" >';
+					$content.='<tr class="'.$backgroundColor.'" ><td>';
 					$content.=$this->showFields($h,$numForm);
-					$content.='</div>';
+					$content.='</td></tr>';
 
-					$content.='<div class="'.$backgroundColor.'" >';
+					$content.='<tr class="'.$backgroundColor.'" ><td>';
 					$content.= $this->showWhere($h,$numForm);
-					$content.='</div>';
+					$content.='</td></tr>';
 
-					$content.='<div class="'.$backgroundColor.'" id="groupby">';
+					$content.='<tr class="'.$backgroundColor.'" id="groupby"><td>';
 					for($i=0;$i<sizeof($this->wfqbe[$numForm]['groupby'])+1;$i++){//richiamo la funzione showGroupBy tante volte quanto � grande l'array
 						$content.= $this->showGroupBy($h,$i,$this->wfqbe[$numForm]['groupby'][$i+1]=="",$numForm);	//wfqbe['groupby'] pi� una volta perch� si possono specificare molti
 						if($this->wfqbe[$numForm]['groupby'][$i]=="")				//attributi di raggruppamento e perci� quando l'utente ne seleziona uno
@@ -249,37 +249,32 @@ class tx_wfqbe_queryform_generator{
 					}
 
 					$content.='<br /><br /><strong>Custom group by:</strong> <input type="text" name="wfqbe['.$numForm.'][groupby][custom]" value="'.$this->wfqbe[$numForm]['groupby']['custom'].'" size="80" />';
-					$content.='</div>';
+					$content.='</td></tr>';
 
 					if($this->wfqbe[$numForm]['groupby'][0]!=""){
-						$content.='<div class="'.$backgroundColor.'" id="having">';
+						$content.='<tr class="'.$backgroundColor.'" id="having"><td>';
 						$content.= $this->showHaving($h,$numForm);
-						$content.='</div>';
-						$content.='<br/>';
+						$content.='</td></tr>';
 					}
 
-					$content.='<div class="'.$backgroundColor.'" id="orderby">';
+					$content.='<tr class="'.$backgroundColor.'" id="orderby"><td>';
 					for($i=0;$i<sizeof($this->wfqbe[$numForm]['orderby'])+1;$i++){
 						$content.=$this->showOrderBy($h,$i,$this->wfqbe[$numForm]['orderby'][$i+1]=="",$numForm);
 						if($this->wfqbe[$numForm]['orderby'][$i]=="")
 						break;
 					}
-					$content.='</div>';
+					$content.='</td></tr>';
 
-					$content.='<br/><br/>';
-
-					$content.='<div class="'.$backgroundColor.'" id="setOparations">';
+					$content.='<tr class="'.$backgroundColor.'" id="setOparations"><td>';
 					$content.=$this->showSetOperations($numForm);
-					$content.='</div>';
-
-					$content.='<br/><br/>';
+					$content.='</td></tr>';
 
 					$content.="<input type='hidden' value='".str_replace("'", '"', $this->hiddenraw)."'  name='pass[hiddenraw]'/>";
 
 				}
 
 			}
-			$content.='<br/><br/>';
+			$content.='</table>';
 
 			$content.='<div>';
 			$content.=$this->showQuery($i);
@@ -289,20 +284,21 @@ class tx_wfqbe_queryform_generator{
 		//uguale a 1) allora visualizzo un ,assaggio di errore
 		elseif($this->wfqbefunction=="QBE" && $this->rawwfqbe['invalidwfqbe']==1){
 
-			$content.='<br/><br/><br/>';
+			$content.='<tr class="db_list_normal"><td>';
 			$content.='<strong>Not available.</strong><br/><br/>You are using the RAW method. If you want to create a query with QBE functions, you have to reset the RAWQUERY function with the reset button.<br/>';
 			$content.="<input type='hidden' value='".str_replace("'", '"', $this->hiddenraw)."'  name='pass[hiddenraw]'/>";
 			//salvo anche il contenuto del campo pass[hiddenqbe] che cotiene l'html del form creato fino a questo momento. Se non lo faccio
 			//quando ritorno nella modalit� RAW QUERY perdo l'array wfqbe e non potrei pi� riscostruire la query  fatta fino a quel
 			//momento tramite  il form
 			$content.="<input type='hidden' value='".$this->pass['hiddenqbe']."'  name='pass[hiddenqbe]'/>";
+			$content.='</td></tr></table>';
 
 		}
 		//Qunado � stata selezionata la modalit� RAW QUERY visualizzo l'area di inserimento quary a mano.
 		else{
-			$content.='<div class="bgColor5" >';
+			$content.='<tr class="db_list_normal"><td>';
 			$content.=$this->showInsertQuery();
-			$content.='</div>';
+			$content.='</td></tr></table>';
 		}
 
 		return $content;
@@ -594,7 +590,7 @@ class tx_wfqbe_queryform_generator{
 		$content.='</select>';
 
 		$content.='<br/><br/>';
-		$content.='<table><tr valign="top"><td><strong>Fields : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong></td>';
+		$content.='<table style="font-size:1em"><tr valign="top"><td><strong>Fields : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong></td>';
 		$content.='<td>';
 		$content.='<select   onChange="insertField(\'field'.$numForm.$index.'\',\'selectedfields'.$numForm.$index.'\');updateForm()" id="field'.$numForm.$index.'" name="wfqbe['.$numForm.'][field]" title="fields" multiple="multiple" size="10" >';
 		$content.='<option value="*">*</option>';

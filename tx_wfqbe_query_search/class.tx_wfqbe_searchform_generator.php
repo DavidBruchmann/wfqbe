@@ -76,7 +76,7 @@ class tx_wfqbe_searchform_generator{
  	*/
 	
 	function showForm($h, $link){
-		$content="";
+		$content='<table style="font-size: 0.9em" class="typo3-dblist">';
 		$numForm = 0;
 				
 		$content .= '<input id="wfqbe_up" type="hidden" name="wfqbe[up]" value="" />';
@@ -126,8 +126,8 @@ class tx_wfqbe_searchform_generator{
 		$this->markers = $this->getMarkers();
 		
 		if (!is_array($this->markers))	{
-			$content = '<div class="bgColor5">No marker has been used in the query.</div>';
-			return $content;
+			$content = '<tr class="db_list_normal"><td>No marker has been used in the query.</td></tr>';
+			return $content.'</tabl>';
 		}
 		
 		$this->markers[] = 'CUSTOM';
@@ -144,7 +144,7 @@ class tx_wfqbe_searchform_generator{
 		
 		$content .= $this->newEmptyField($numForm);
 		
-		return $content;
+		return $content.'</table>';
 	}
 	
 	
@@ -156,11 +156,11 @@ class tx_wfqbe_searchform_generator{
 		$content = '';
 		$numForm = $key;
 		if($numForm%2==0)
-			$backgroundColor='bgColor5';
+			$backgroundColor='db_list_normal';
 		else
-			$backgroundColor='bgColor3-20';
+			$backgroundColor='db_list_normal';
 		
-		$content.='<div class="'.$backgroundColor.'" id="field-'.$numForm.'" >'.$numForm.' - ';
+		$content.='<tr class="'.$backgroundColor.'" id="field-'.$numForm.'" ><td>'.$numForm.' - ';
 		$content.= $this->showSelectMarkers($key, $value['marker']);
 		
 		if ($numForm > 0)
@@ -197,7 +197,7 @@ class tx_wfqbe_searchform_generator{
 				break;		
 		} 
 		
-		$content.='</div><hr />';
+		$content.='<hr style="border: 1px;" /></td></tr>';
 		
 		return $content;
 	}
@@ -211,12 +211,12 @@ class tx_wfqbe_searchform_generator{
 	function newEmptyField($numForm)	{
 		$content = '';
 		if($numForm%2==0)
-			$backgroundColor='bgColor5';
+			$backgroundColor='db_list_normal';
 		else
-			$backgroundColor='bgColor3-20';
-		$content.='<div class="'.$backgroundColor.'" id="field-'.(++$numForm).'">';
+			$backgroundColor='db_list_normal';
+		$content.='<tr class="'.$backgroundColor.'" id="field-'.(++$numForm).'"><td>';
 		$content.= $this->showSelectMarkers(++$numForm, "");
-		$content.='</div>';
+		$content.='</td></tr>';
 		
 		return $content;
 	}
@@ -628,7 +628,7 @@ class tx_wfqbe_searchform_generator{
 		$API = t3lib_div::makeInstance("tx_wfqbe_api_xml2array");
 		
 		$var=t3lib_div::_GP('P');
-		//estraggo la query salvata dal database (modalità xml) e la converto in array  
+		//estraggo la query salvata dal database (modalitï¿½ xml) e la converto in array  
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('search', 'tx_wfqbe_query', 'tx_wfqbe_query.uid='.$var['uid'].' AND tx_wfqbe_query.deleted!=1', '', '','');
 		$row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
 		$saveXml = $API->xml2array($row["search"]);
