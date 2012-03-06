@@ -39,6 +39,8 @@ class tx_wfqbe_insertform_generator{
 	var $blocks;
 	var $markers;
 	
+	var $RAW_MODE = false;
+	
 	// Elenco dei tipi di input disponibili
 	var $types = array ('display only', 'input', 'datetype', 'calendar', 'password', 'radio', 'select', 'textarea', 'checkbox', 'hidden', 'upload', 'relation', 'PHP function');
 	var $calendarDateFormats = array(
@@ -89,7 +91,11 @@ class tx_wfqbe_insertform_generator{
  	*/
 	
 	function showForm($h){
+		if ($this->blocks['RAW_MODE']==1)
+			$this->RAW_MODE = true;
+		
 		$content="<h1>Insert/Edit Module</h1>";
+		$content.='<table style="font-size: 0.9em" class="typo3-dblist">';
 		
 		// Hook that can be used to add custom field types 
 		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['wfqbe']['customFieldTypesWizard']))    {
@@ -139,21 +145,21 @@ class tx_wfqbe_insertform_generator{
 			unset($this->blocks['fields']['temp']);
 		
 		// Visualizza la selezione delle tabelle
-		$content.='<div class="bgColor5"><strong>Select Table:</strong> ';
+		$content.='<tr class="db_list_normal"><td><strong>Select Table:</strong> ';
 		$content.= $this->showSelectTable($h, $this->blocks['table']);
-		$content.='</div><hr />';
+		$content.='</td></tr>';
 		
 		if ($this->blocks['table']!="")	{
-			$content.='<div class="bgColor3-20" >';
+			$content.='<tr class="db_list_normal"><td>';
 			$content.= '<strong style="color: red;">For editing functionality:</strong>';
 			$content.= '<br />ID field: '.$this->showSelectField($h, $this->blocks['ID_field'], $this->blocks['table'], 'wfqbe[ID_field]', false);
-			$content.='</div><hr />';
+			$content.='</td></tr>';
 			
-			$content.='<div class="bgColor3-20" >';
+			$content.='<tr class="db_list_normal"><td>';
 			$content.= '<strong>Restricting access:</strong>';
 			$content.= '<br />ID IN:<br /><textarea rows="3" cols="90" name="wfqbe[ID_restricting]">'.$this->blocks['ID_restricting'].'</textarea>';
 			$content.='<br />ex. ID IN: select uid FROM fe_users WHERE pid=123 AND usergroup=5';
-			$content.='</div><hr />';
+			$content.='</td></tr>';
 		}
 		
 		$form_positions = '<option value=""></option>';
@@ -170,11 +176,11 @@ class tx_wfqbe_insertform_generator{
 			if (is_array($this->blocks['fields']))	{
 				foreach($this->blocks['fields'] as $key => $value)	{
 					if($numForm%2==0)
-						$backgroundColor='bgColor5';
+						$backgroundColor='db_list_normal';
 					else
-						$backgroundColor='bgColor3-20';
+						$backgroundColor='db_list_normal';
 					
-					$content.='<div class="'.$backgroundColor.'" >'.$numForm.' ---- ';
+					$content.='<tr class="'.$backgroundColor.'" ><td>'.$numForm.' ---- ';
 					
 					$content.= '<strong>Select the field to insert/edit:</strong> '.$this->showSelectField($h, $this->blocks['fields'][$key]['field'], $this->blocks['table'], 'wfqbe[fields]['.$numForm.'][field]', true, true);
 					if ($numForm > 0)
@@ -249,26 +255,32 @@ class tx_wfqbe_insertform_generator{
 						$content .= $this->helpInput($numForm, $this->blocks['fields'][$key]['help']);
 					}
 					
-					$content.='</div><hr />';
+					$content.='</td></tr>';
 					
 					$numForm++;
 				}
 			}
 
 			if($numForm%2==0)
-				$backgroundColor='bgColor5';
+				$backgroundColor='db_list_normal';
 			else
-				$backgroundColor='bgColor3-20';
+				$backgroundColor='db_list_normal';
 			
-			$content.='<div class="'.$backgroundColor.'" >';
+			$content.='<tr class="'.$backgroundColor.'" ><td>';
 			$content.= '<strong>Select the field to insert/edit:</strong> '.$this->showSelectField($h, "", $this->blocks['table'], 'wfqbe[fields]['.$numForm.'][field]', true, true);
-			$content.='</div>';
+			$content.='</td></tr>';
 			
 		}
 		
+		$content.='<tr class="db_list_normal"><td>';
+		$content.= '<strong>Convert dropdowns to input fields:</strong> ';
+		$content.= '<input type="checkbox" onchange="updateForm()" name="wfqbe[RAW_MODE]" value="1" '.($this->blocks['RAW_MODE']==1 ? 'checked="checked"' : '').' />';
+		$content.='<br />Switch from dropdowns to input fields if your db user doesn\'t have permissions to list tables and fields.';
+		$content.='</td></tr>';
+		
 		//$content .= t3lib_div::view_array($this->blocks);
 
-		return $content;
+		return $content.'</table>';
 	}
 	
 	
@@ -818,18 +830,24 @@ class tx_wfqbe_insertform_generator{
  	*/
 	
 	function showSelectTable($h,$selectedTable, $name="wfqbe[table]"){
-		$html='<select onChange="updateForm();"  name="'.$name.'">';
-		$html.='<option value=""></option>';
-
-		$tabelle = $h->MetaTables(false, true);
-		
-		for($i=0;$i<sizeof($tabelle);$i++){
-			if($selectedTable==$tabelle[$i])
-				$html.='<option value="'.$tabelle[$i].'" selected="selected">'.$tabelle[$i].'</option>';
-			else
-				$html.='<option value="'.$tabelle[$i].'">'.$tabelle[$i].'</option>';
+		if ($this->RAW_MODE)	{
+			$html = '<input type="text" name="'.$name.'" value="'.$selectedTable.'" />';
+			$html .= ' <a href="#" onclick="updateForm();"><img title="refresh document" src="img/refresh_n.gif" class="c-inputButton"></a>';
+			
+		}	else	{
+			$html='<select onChange="updateForm();"  name="'.$name.'">';
+			$html.='<option value=""></option>';
+	
+			$tabelle = $h->MetaTables(false, true);
+			
+			for($i=0;$i<sizeof($tabelle);$i++){
+				if($selectedTable==$tabelle[$i])
+					$html.='<option value="'.$tabelle[$i].'" selected="selected">'.$tabelle[$i].'</option>';
+				else
+					$html.='<option value="'.$tabelle[$i].'">'.$tabelle[$i].'</option>';
+			}
+			$html.='</select>';
 		}
-		$html.='</select>';
 		
 		return $html;
 	}
@@ -847,29 +865,34 @@ class tx_wfqbe_insertform_generator{
  	*/
 	
 	function showSelectField($h,$selectedField, $selectedTable, $name, $onchange=false, $custom=false){
-		if ($onchange)
-			$html='<select onchange="updateForm()" name="'.$name.'">';
-		else
-			$html='<select name="'.$name.'">';
-		$html.='<option  value=""></option>';
-		
-		$columns=$h->MetaColumnNames($selectedTable);
-
-		foreach ($columns as $key => $value){
-			if($selectedField==$value)
-				$html.='<option  value="'.$value.'" selected="selected">'.$value.'</option>';
+		if ($this->RAW_MODE)	{
+			$html = '<input type="text" name="'.$name.'" value="'.$selectedField.'" />';
+			$html .= ' <a href="#" onclick="updateForm();"><img title="refresh document" src="img/refresh_n.gif" class="c-inputButton"></a>';
+		}	else	{
+			if ($onchange)
+				$html='<select onchange="updateForm()" name="'.$name.'">';
 			else
-				$html.='<option  value="'.$value.'">'.$value.'</option>';
+				$html='<select name="'.$name.'">';
+			$html.='<option  value=""></option>';
+			
+			$columns=$h->MetaColumnNames($selectedTable);
+	
+			foreach ($columns as $key => $value){
+				if($selectedField==$value)
+					$html.='<option  value="'.$value.'" selected="selected">'.$value.'</option>';
+				else
+					$html.='<option  value="'.$value.'">'.$value.'</option>';
+			}
+			
+			if ($custom)	{
+				if($selectedField=='wfqbe_custom')
+					$html.='<option  value="wfqbe_custom" selected="selected">WFQBE custom field</option>';
+				else
+					$html.='<option  value="wfqbe_custom">WFQBE custom field</option>';
+			}
+			
+			$html.='</select>';
 		}
-		
-		if ($custom)	{
-			if($selectedField=='wfqbe_custom')
-				$html.='<option  value="wfqbe_custom" selected="selected">WFQBE custom field</option>';
-			else
-				$html.='<option  value="wfqbe_custom">WFQBE custom field</option>';
-		}
-		
-		$html.='</select>';
 			
 		return $html;
 	
