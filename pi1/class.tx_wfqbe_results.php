@@ -170,18 +170,19 @@ class tx_wfqbe_results {
 		if (is_array($tsMarkers))	{
 			foreach ($tsMarkers as $marker)	{
 				$emptyCase = false;
-
-				if ($this->conf['customQuery.'][$row['uid'].'.'][$marker]!="" && (($markerParametri["###".$marker."###"]=='' && $this->conf['customQuery.'][$row['uid'].'.'][$marker."."]["overrideIfEmpty"]==1) || $this->conf['customQuery.'][$row['uid'].'.'][$marker."."]["overrideAlways"]==1))	{
+				if ($this->conf['customQuery.'][$row['uid'].'.'][$marker]!="" && (($markerParametri["###".$marker."###"]=='' && $this->conf['customQuery.'][$row['uid'].'.'][$marker."."]["overrideIfEmpty"]==1) || ($markerParametri["###".$marker."###"]!='' && $this->conf['customQuery.'][$row['uid'].'.'][$marker."."]["overrideIfNotEmpty"]==1) || $this->conf['customQuery.'][$row['uid'].'.'][$marker."."]["overrideAlways"]==1))	{
 					if ($markerParametri["###".$marker."###"]=='' && $this->conf['customQuery.'][$row['uid'].'.'][$marker."."]["overrideIfEmpty"]==1)
 						$emptyCase = true;
 					$confArray = $this->conf["customQuery."][$row['uid']."."][$marker."."];
-					//$confArray = $this->parseTypoScriptConfiguration($confArray, $wfqbeArray);
+					$confArray = $this->parseTypoScriptConfiguration($confArray, $markerParametri);
 					eval('$markerParametri["###".$marker."###"]=$this->cObj->'.$this->conf["customQuery."][$row["uid"]."."][$marker].'($confArray);');
 				}	elseif ($this->conf['globalCustomQuery.'][$marker]) {
 					$confArray = $this->conf["globalCustomQuery."][$marker."."];
+					$confArray = $this->parseTypoScriptConfiguration($confArray, $markerParametri);
 					eval('$markerParametri["###".$marker."###"]=$this->cObj->'.$this->conf["globalCustomQuery."][$marker].'($confArray);');
 				}	elseif ($this->conf['customGlobalQuery.'][$marker]) {
 					$confArray = $this->conf["customGlobalQuery."][$marker."."];
+					$confArray = $this->parseTypoScriptConfiguration($confArray, $markerParametri);
 					eval('$markerParametri["###".$marker."###"]=$this->cObj->'.$this->conf["customGlobalQuery."][$marker].'($confArray);');
 				}
 
@@ -679,6 +680,9 @@ class tx_wfqbe_results {
 				elseif (strpos($value, "###WFQBE_FIELD_")!==false)	{
 					$value = $this->cObj->substituteMarkerArray($value, $wfqbeArray);
 				}	
+				elseif (strpos($value, "###WFQBE_")!==false)	{
+					$value = $this->cObj->substituteMarkerArray($value, $wfqbeArray);
+				}
 				
 				if ($this->pibase->beMode==1 && $k=='additionalParams')	{
 					$value = $value.'&tx_wfqbe_backend[mode]=details&tx_wfqbe_backend[uid]='.$backend['uid'];
