@@ -77,6 +77,23 @@ class tx_wfqbe_pi1 extends tslib_pibase {
 		$this->initFF();
 		if ($this->conf['recordsForPage']!='')
 			$this->conf['ff_data']['recordsForPage'] = $this->conf['recordsForPage'];
+		
+		// Disable output if required parameter is not set
+		if ($this->conf['ff_data']['parameterCheck']!='')	{
+			$check = explode('|', $this->conf['ff_data']['parameterCheck']);
+			if (is_array($check))	{
+				$var = t3lib_div::_GP($check[0]);
+				if ($var=='')
+					return '';
+				if (count($check)>1)	{
+					for ($i=1; $i<count($check); $i++)	{
+						$var = $var[$check[$i]];
+						if ($var=='')
+							return '';
+					}
+				}
+			}
+		}
 
 		//controllo se � stato definito un css. Se si lo utilizzo altrimenti prendo quello di default
 		if($this->conf['style']!="")	{

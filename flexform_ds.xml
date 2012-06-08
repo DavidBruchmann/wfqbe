@@ -35,6 +35,17 @@
 			</config>
 		</TCEforms>
 	</queryObject>
+	<parameterCheck>
+       <TCEforms>
+        <label>LLL:EXT:wfqbe/locallang_db.xml:parameterCheck</label>
+        <config>
+	     		<type>input</type>
+	     		<size>45</size>
+	     		<max>45</max>
+	     		<eval>trim</eval>
+        </config>
+       </TCEforms>
+      </parameterCheck>
 	<templateFile>
 		<TCEforms>
 			<label>LLL:EXT:wfqbe/locallang_db.xml:templateFile</label>
