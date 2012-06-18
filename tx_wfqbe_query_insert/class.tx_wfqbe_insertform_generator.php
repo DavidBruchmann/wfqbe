@@ -509,6 +509,18 @@ class tx_wfqbe_insertform_generator{
 		$html .= '<br />Max File Size: <input type="text" name="wfqbe[fields]['.$key.'][form][maxfilesize]" value="'.$form['maxfilesize'].'" />';
 		$html .= '<br />Directory: <input type="text" name="wfqbe[fields]['.$key.'][form][basedir]" value="'.$form['basedir'].'" /> <em>(e.g. fileadmin/wfqbe/)</em>';
 		$html .= '<br />Number of uploads: <input type="text" size="3" name="wfqbe[fields]['.$key.'][form][numofuploads]" value="'.$form['numofuploads'].'" />';
+		if ($form['donotrename']==1)
+			$checked = 'checked="checked" ';
+		else
+			$checked = '';
+		$html .= '<br />Don\'t rename file: <input onchange="javascript:updateForm();" '.$checked.'type="checkbox" name="wfqbe[fields]['.$key.'][form][donotrename]" value="1" />';
+		if ($form['donotrename']==1)	{
+			if ($form['overwrite']==1)
+				$checked = 'checked="checked" ';
+			else
+				$checked = '';
+			$html .= ' - Overwrite existing file: <input '.$checked.'type="checkbox" name="wfqbe[fields]['.$key.'][form][overwrite]" value="1" />';
+		}
 		return $html;
 	}
 	

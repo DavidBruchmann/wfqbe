@@ -1176,7 +1176,31 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 			            	}
 		            	}
 		            	if (is_dir($upDir))	{
-			            	$upFile = $upDir.time()."_".$_FILES['tx_wfqbe_pi1']['name'][$field_key][$key];
+			            	if ( $blocks['fields'][strtoupper($field_key)]['form']['donotrename']==1)	{
+			            		$upFile = $upDir.$_FILES['tx_wfqbe_pi1']['name'][$field_key][$key];
+			            		if ($blocks['fields'][strtoupper($field_key)]['form']['overwrite']==1)	{
+			            			if (file_exists($upFile))	{
+			            				unlink($upFile);
+			            			}
+			            		}	else	{
+				            		if (file_exists($upFile))	{
+				            			$i = 1;
+				            			do {
+				            				$fileParts = explode('.',$_FILES['tx_wfqbe_pi1']['name'][$field_key][$key]);
+				            				if (count($fileParts)==1)
+				            					$filename = $fileParts[0].'_'.($i<10?'0'.$i:$i);
+				            				else	{
+				            					$fileParts[count($fileParts)-2] .= '_'.($i<10?'0'.$i:$i);
+				            					$filename = implode('.', $fileParts);
+				            				}
+				            				$upFile = $upDir.$filename;
+				            				$i++;
+				            			}	while (file_exists($upFile));
+				            		}
+			            		}
+			            	}	else	{
+		            			$upFile = $upDir.time()."_".$_FILES['tx_wfqbe_pi1']['name'][$field_key][$key];
+			            	}
 			            	if (move_uploaded_file($_FILES['tx_wfqbe_pi1']['tmp_name'][$field_key][$key], $upFile))	{
 			            		//$content .= '<br />File '.$_FILES['tx_wfqbe_pi1']['name'][$field_key][$key].' has been uploaded correctly';
 			            		$this->pibase->piVars[$field_key][] = str_replace($blocks['fields'][strtoupper($field_key)]['form']['basedir'],"",$upFile);
