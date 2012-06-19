@@ -37,6 +37,7 @@ class tx_wfqbe_belib	{
 	var $mode = '';
 	var $piVars = '';
 	var $conf;
+	var $beDoc = null;
 	
 	
 	/**
@@ -52,6 +53,8 @@ class tx_wfqbe_belib	{
 		if (t3lib_div::_GP('id')=='' || t3lib_div::_GP('id')<0)	{
 			$content = $LANG->getLL('not_allowed');
 		}
+		
+		$this->beDoc = $caller->doc;
 		
 		$this->page_id = intval(t3lib_div::_GP('id'));
 		$beVars = t3lib_div::_GP('tx_wfqbe_backend');
@@ -139,12 +142,12 @@ class tx_wfqbe_belib	{
 		if (($query>0 && $query==$backend['insertq']) || $this->piVars['wfqbe_editing_mode']==1 || $this->piVars['wfqbe_deleting_mode']==1)	{
 			$PI1->conf['ff_data']['queryObject'] = $backend['insertq'];
 			$form_built = false;
-			$content .= $PI1->do_general('', $form_built);
+			$content .= $PI1->do_general('', $form_built, $this);
 			$content .= '<br /><p><a href="index.php?&M=web_txwfqbeM2&id='.$this->page_id.'&tx_wfqbe_backend[uid]='.$backend['uid'].'"><img height="16" width="16" src="'.$BACK_PATH.'sysext/t3skin/icons/module_web_list.gif" title="'.$LANG->getLL('back_to_list').'" alt="'.$LANG->getLL('back_to_list').'"> '.$LANG->getLL('back_to_list').'</a></p>';
 		}	elseif ($this->mode=='details')	{
 			$PI1->conf['ff_data']['queryObject'] = $backend['detailsq'];
 			$form_built = false;
-			$content .= $PI1->do_general('', $form_built);
+			$content .= $PI1->do_general('', $form_built, $this);
 			
 			$content .= '<br /><p><a href="index.php?&M=web_txwfqbeM2&id='.$this->page_id.'&tx_wfqbe_backend[uid]='.$backend['uid'].'"><img height="16" width="16" src="'.$BACK_PATH.'sysext/t3skin/icons/module_web_list.gif" title="'.$LANG->getLL('back_to_list').'" alt="'.$LANG->getLL('back_to_list').'"> '.$LANG->getLL('back_to_list').'</a></p>';
 		}	else	{
@@ -153,13 +156,13 @@ class tx_wfqbe_belib	{
 				if ($backend['recordsforpage']>0)
 					$PI1->conf['ff_data']['recordsForPage'] = $backend['recordsforpage'];
 				$form_built = false;
-				$content .= $PI1->do_general('', $form_built);
+				$content .= $PI1->do_general('', $form_built, $this);
 			}
 			
 			if ($backend['searchq']>0)	{
 				$PI1->conf['ff_data']['queryObject'] = $backend['searchq'];
 				$form_built = false;
-				$content .= $PI1->do_general('do_sGetForm', $form_built);
+				$content .= $PI1->do_general('do_sGetForm', $form_built, $this);
 			}
 			
 			if ($backend['insertq']>0)	{
@@ -234,7 +237,8 @@ class tx_wfqbe_belib	{
         //t3lib_div::debug($result);
         return $result;
     }
-	
+    
+    
 	
 }
 

@@ -11,6 +11,7 @@
 			<label index="nlp">Show help text?</label>
 			<label index="format">Date format</label>
 			<label index="convert_timestamp">Convert to timestamp?</label>
+			<label index="date2cal">Use old date2cal datepicker?</label>
 		</languageKey>
 		<languageKey index="it" type="array">
 			<label index="title">Wizard la creazione di form di inserimento e modifica</label>

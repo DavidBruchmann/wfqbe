@@ -44,19 +44,27 @@ class tx_wfqbe_insertform_generator{
 	// Elenco dei tipi di input disponibili
 	var $types = array ('display only', 'input', 'datetype', 'calendar', 'password', 'radio', 'select', 'textarea', 'checkbox', 'hidden', 'upload', 'relation', 'PHP function');
 	var $calendarDateFormats = array(
-		'%d/%m/%Y',
-		'%d-%m-%Y',
-		'%d.%m.%Y',
-		'%m/%d/%Y',
-		'%m-%d-%Y',
-		'%m.%d.%Y',
-		'%Y-%m-%d',
-		'%H:%M %d/%m/%Y',
-		'%H:%M %d-%m-%Y',
-		'%H:%M %d.%m.%Y',
-		'%H:%M %m/%d/%Y',
-		'%H:%M %m-%d-%Y',
-		'%H:%M %m.%d.%Y',
+		'datetocal' => array(
+			'%d/%m/%Y',
+			'%d-%m-%Y',
+			'%d.%m.%Y',
+			'%m/%d/%Y',
+			'%m-%d-%Y',
+			'%m.%d.%Y',
+			'%Y-%m-%d',
+			'%H:%M %d/%m/%Y',
+			'%H:%M %d-%m-%Y',
+			'%H:%M %d.%m.%Y',
+			'%H:%M %m/%d/%Y',
+			'%H:%M %m-%d-%Y',
+			'%H:%M %m.%d.%Y',
+		),
+		'jquery_datepicker' => array(
+			'dd-mm-yy',
+			'dd/mm/yy',
+			'mm-dd-yy',
+			'mm/dd/yy'
+		)
 	);
 	
 	
@@ -445,38 +453,65 @@ class tx_wfqbe_insertform_generator{
 	function showCalendar($key, $form)	{
 		$html = $this->labelInput($key, $form['label']);
 		
-		if ($form['time']=="si")	{
-			$html .= ' - '.$GLOBALS['LANG']->getLL('time').': <input type="checkbox" name="wfqbe[fields]['.$key.'][form][time]" value="si" checked="checked" />';
-		}	else	{
-			$html .= ' - '.$GLOBALS['LANG']->getLL('time').': <input type="checkbox" name="wfqbe[fields]['.$key.'][form][time]" value="si" />';
-		}
-		
-		if ($form['format']=='')
-			$format = '%d-%m-%Y';
-		else
-			$format = $form['format'];
-		
-		$html .= ' - '.$GLOBALS['LANG']->getLL('format').': <select name="wfqbe[fields]['.$key.'][form][format]" />';
-		foreach ($this->calendarDateFormats as $value)	{
-			if ($value==$format)
-				$html .= '<option selected="selected" value="'.$value.'">'.$value.'</option>';
+		if ($form['date2cal']=="si")	{
+			// Deprecated old date2cal mode
+			$html .= ' - '.$GLOBALS['LANG']->getLL('date2cal').': <input type="checkbox" onchange="javascript:updateForm();" name="wfqbe[fields]['.$key.'][form][date2cal]" value="si" checked="checked" />';
+			if ($form['nlp']=="si")	{
+				$html .= ' - '.$GLOBALS['LANG']->getLL('nlp').': <input type="checkbox" name="wfqbe[fields]['.$key.'][form][nlp]" value="si" checked="checked" />';
+			}	else	{
+				$html .= ' - '.$GLOBALS['LANG']->getLL('nlp').': <input type="checkbox" name="wfqbe[fields]['.$key.'][form][nlp]" value="si" />';
+			}
+			
+			if ($form['time']=="si")	{
+				$html .= ' - '.$GLOBALS['LANG']->getLL('time').': <input type="checkbox" name="wfqbe[fields]['.$key.'][form][time]" value="si" checked="checked" />';
+			}	else	{
+				$html .= ' - '.$GLOBALS['LANG']->getLL('time').': <input type="checkbox" name="wfqbe[fields]['.$key.'][form][time]" value="si" />';
+			}
+			
+			if ($form['format']=='')
+				$format = '%d-%m-%Y';
 			else
-				$html .= '<option value="'.$value.'">'.$value.'</option>';
-		}
-		$html .= '</select>';
-		
-		
-		if ($form['nlp']=="si")	{
-			$html .= ' - '.$GLOBALS['LANG']->getLL('nlp').': <input type="checkbox" name="wfqbe[fields]['.$key.'][form][nlp]" value="si" checked="checked" />';
+				$format = $form['format'];
+			
+			$html .= ' - '.$GLOBALS['LANG']->getLL('format').': <select name="wfqbe[fields]['.$key.'][form][format]" />';
+			foreach ($this->calendarDateFormats['date2cal'] as $value)	{
+				if ($value==$format)
+					$html .= '<option selected="selected" value="'.$value.'">'.$value.'</option>';
+				else
+					$html .= '<option value="'.$value.'">'.$value.'</option>';
+			}
+			$html .= '</select>';
+			
 		}	else	{
-			$html .= ' - '.$GLOBALS['LANG']->getLL('nlp').': <input type="checkbox" name="wfqbe[fields]['.$key.'][form][nlp]" value="si" />';
+			// jQuery datepicker mode
+			$html .= ' - '.$GLOBALS['LANG']->getLL('date2cal').': <input type="checkbox" onchange="javascript:updateForm();" name="wfqbe[fields]['.$key.'][form][date2cal]" value="si" />';
+			
+			if ($form['format']=='')
+				$format = 'dd-mm-yy';
+			else
+				$format = $form['format'];
+			
+			$html .= ' - '.$GLOBALS['LANG']->getLL('format').': <select name="wfqbe[fields]['.$key.'][form][format]" />';
+			foreach ($this->calendarDateFormats['jquery_datepicker'] as $value)	{
+				if ($value==$format)
+					$html .= '<option selected="selected" value="'.$value.'">'.$value.'</option>';
+				else
+					$html .= '<option value="'.$value.'">'.$value.'</option>';
+			}
+			$html .= '</select>';
+			
+			$html .= '<br />Min Date: <input type="text" name="wfqbe[fields]['.$key.'][form][min_date]" value="'.$form['min_date'].'" /> (e.g. new Date(2005, 1, 1), see jQuery datepicker documentation for the right format)';
+			$html .= '<br />Max Date: <input type="text" name="wfqbe[fields]['.$key.'][form][max_date]" value="'.$form['max_date'].'" /> (e.g. \'+1y\', see jQuery datepicker documentation for the right format)';
+			
 		}
 		
 		if ($form['convert_timestamp']=="si")	{
-			$html .= ' - '.$GLOBALS['LANG']->getLL('convert_timestamp').': <input type="checkbox" name="wfqbe[fields]['.$key.'][form][convert_timestamp]" value="si" checked="checked" />';
+			$html .= '<br />'.$GLOBALS['LANG']->getLL('convert_timestamp').': <input type="checkbox" name="wfqbe[fields]['.$key.'][form][convert_timestamp]" value="si" checked="checked" />';
 		}	else	{
-			$html .= ' - '.$GLOBALS['LANG']->getLL('convert_timestamp').': <input type="checkbox" name="wfqbe[fields]['.$key.'][form][convert_timestamp]" value="si" />';
+			$html .= '<br />'.$GLOBALS['LANG']->getLL('convert_timestamp').': <input type="checkbox" name="wfqbe[fields]['.$key.'][form][convert_timestamp]" value="si" />';
 		}
+		
+		$html.= '<br /><br /><strong>If you don\'t use the (deprecated) date2cal extension, in order to get the calendar to work in the frontend you need the jQuery datepicker plugin. In the backend it is rendered based on the standard extjs TYPO3 calendar.</strong><br />';
 		
 		return $html;
 	}

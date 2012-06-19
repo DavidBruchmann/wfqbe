@@ -543,6 +543,7 @@ t3lib_div::debug('not allowed');
 	function showInsertField($key, $value, $h, $blockTemplate, $hiddenTemplate, $show_required=false, $odd=0, $custom_validation="")	{
 		
 		$blockList = "";
+		
 
 		$name = strtolower($value['field'])."_".$key;
 		$rA['###INSERT_ID###'] = $name;
@@ -727,7 +728,7 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 	
 	
 	function showCalendar($value, $name, $id, &$blockTemplate)	{
-		if (t3lib_extMgm::isLoaded('date2cal'))	{
+		if ($value['form']['date2cal']=='si' && t3lib_extMgm::isLoaded('date2cal'))	{
 			include_once(t3lib_extMgm::siteRelPath('date2cal') . '/src/class.jscalendar.php');
 			// init jscalendar class
 			$JSCalendar = JSCalendar::getInstance();
@@ -758,8 +759,60 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 		
 			return $field;
 			
-		}	else	{
-			return '<br />ERROR: date2cal extension is not loaded!<br />';
+		}	elseif ($value['form']['date2cal']=='si' && !t3lib_extMgm::isLoaded('date2cal'))	{
+			return '<br />ERROR: date2cal extension is not loaded! Please install it or switch to jQuery datepicker.<br />';
+			
+		}	elseif ($value['form']['date2cal']!='si')	{
+			if (!$this->pibase->beMode)	{
+				// Uses jQuery datepicker
+				$format = ($value['form']['format']!='' ? $value['form']['format'] : 'dd-mm-yy');
+				$jsCode = '<script>
+							jQuery(function() {
+								jQuery( "#'.$id.'" ).datepicker({"dateFormat": "'.$format.'", "defaultDate": jQuery.datepicker.parseDate("'.$format.'",jQuery("#'.$id.'").attr(\'value\'))});
+								//alert ("'.$id.': "+jQuery("#'.$id.'").attr(\'value\'));
+								//jQuery( "#'.$id.'" ).datepicker( "option", "dateFormat", "'.$format.'" );
+								
+								jQuery( "#'.$id.'" ).datepicker( "option", "changeYear", true );
+								jQuery( "#'.$id.'" ).datepicker( "option", "constrainInput", false );
+							';
+				if ($value['form']['min_date']!='')	{
+					$jsCode .= 'jQuery( "#'.$id.'" ).datepicker( "option", "minDate", '.$value['form']['min_date'].' );';
+				}
+				if ($value['form']['max_date']!='')	{
+					$jsCode .= 'jQuery( "#'.$id.'" ).datepicker( "option", "maxDate", '.$value['form']['max_date'].' );';
+				}
+					
+				$jsCode .= '});
+							</script>';
+				$GLOBALS['TSFE']->additionalHeaderData['wfqbe_datepicker'] = $jsCode;
+				
+				return '<input id="'.$id.'" type="text" name="tx_wfqbe_pi1['.$name.']" value="'.$this->charToEntity($this->pibase->piVars[$name]).'" />';
+				
+			}	elseif ($this->pibase->beMode)	{
+				// Uses extbase calendar
+				
+				$format = str_replace('dd', 'j', $value['form']['format']);
+				$format = str_replace('mm', 'n', $format);
+				$format = str_replace('yy', 'Y', $format);
+				
+				$JScode = '<script type="text/javascript">
+					TYPO3.settings = {
+						"datePickerUSmode":0,
+						"dateFormat":["'.$format.'","'.$format.'"],
+						"dateFormatUS":["'.$format.'","'.$format.'"]
+						};
+				</script>';
+				
+				return $JScode.'<input name="tx_wfqbe_pi1['.$name.']" type="text" id="tceforms-datetimefield-'.$id.'" value="' . $this->charToEntity($this->pibase->piVars[$name]) . '" />' .
+					   	t3lib_iconWorks::getSpriteIcon(
+							'actions-edit-pick-date',
+							array(
+								'style' => 'cursor:pointer;',
+								'id' => 'picker-tceforms-datetimefield-'.$id
+							)
+						);
+				
+			}
 		}
 	}
 	
@@ -866,6 +919,30 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 		$content = "<textarea id='".$id."' name='tx_wfqbe_pi1[".$name."]' rows='".$value['form']['rows']."' cols='".$value['form']['cols']."'>".$this->pibase->piVars[$name]."</textarea>";
 		if ($value['form']['rte']==1 && t3lib_extMgm::isLoaded('rtehtmlarea'))	{
 			if ($this->RTEObj->isAvailable()) {
+				if ($this->pibase->beMode)	{
+					// JavaScript
+					$this->pibase->beObj->beDoc->JScode .= '
+						<script language="javascript" type="text/javascript">
+						script_ended = 0;
+						function jumpToUrl(URL)    {
+						document.location = URL;
+						}
+						</script>
+						<script type="text/javascript">
+						function submitActions()	{
+						// RTE management
+						###ADDITIONALJS_SUBMIT###
+						}
+						</script>
+						';
+					$this->pibase->beObj->beDoc->postCode.='
+						<script language="javascript" type="text/javascript">
+						script_ended = 1;
+						if (top.fsMod) top.fsMod.recentIds["web"] = 0;
+						</script>
+					';
+				}
+				
 				$this->RTEcounter++;
 				$this->table = 'tx_wfqbe_pi1';
 				$this->field = $name;
@@ -1796,6 +1873,9 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 			$format = 'd.m.Y';
 		else	{
 			$format = str_replace('%M', '%i', $form['form']['format']);
+			$format = str_replace('dd', 'd', $format);
+			$format = str_replace('mm', 'm', $format);
+			$format = str_replace('yy', 'Y', $format);
 			$format = str_replace('%', '', $format);
 		}
 		
@@ -1829,6 +1909,10 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 			'%m-%d-%Y',
 			'%m.%d.%Y',
 			'%Y-%m-%d',
+			'dd-mm-yy',
+			'dd/mm/yy',
+			'mm-dd-yy',
+			'mm/dd/yy'
 		);
 		$calendarDateTimeFormats = array(
 			'%H:%M %d/%m/%Y',
@@ -1851,6 +1935,22 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 		}
 		
 		switch ($format)	{
+			case 'dd/mm/yy':
+				$temp = explode('/', $date);
+				$array['day']=$temp[0];$array['month']=$temp[1];$array['year']=$temp[2];
+				break;
+			case 'dd-mm-yy':
+				$temp = explode('-', $date);
+				$array['day']=$temp[0];$array['month']=$temp[1];$array['year']=$temp[2];
+				break;
+			case 'mm/dd/yy':
+				$temp = explode('/', $date);
+				$array['day']=$temp[1];$array['month']=$temp[0];$array['year']=$temp[2];
+				break;
+			case 'mm-dd-yy':
+				$temp = explode('-', $date);
+				$array['day']=$temp[1];$array['month']=$temp[0];$array['year']=$temp[2];
+				break;
 			case '%d/%m/%Y':
 				$temp = explode('/', $date);
 				$array['day']=$temp[0];$array['month']=$temp[1];$array['year']=$temp[2];

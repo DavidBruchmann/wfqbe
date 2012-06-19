@@ -52,6 +52,7 @@ class tx_wfqbe_pi1 extends tslib_pibase {
 	var $insertBlocks = ''; // This parameter contains the original insert form while using insert wizards
 	
 	var $beMode = false;
+	var $beObj = null;
 	
 	
 	/**
@@ -285,12 +286,17 @@ class tx_wfqbe_pi1 extends tslib_pibase {
 	
 	
 	
-	function do_general($to_function, &$form_built)	{
+	function do_general($to_function, &$form_built, $beObj = null)	{
 		$content='';
+		
+		if (!is_null($beObj))	{
+			$this->beObj = $beObj;
+		}
 		
 		if (!is_object($this->cObj))	{
 			$this->cObj = t3lib_div::makeInstance('tslib_cObj');
 		}
+		
 
 		if ($this->piVars['wfqbe_add_new']!='' && intval($this->piVars['wfqbe_add_new'])>0)	{
 			$where = 'tx_wfqbe_query.uid='.intval($this->conf['ff_data']['queryObject']).' AND ';

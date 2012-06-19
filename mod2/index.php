@@ -102,27 +102,20 @@ class  tx_wfqbe_module2 extends t3lib_SCbase {
                         $this->doc->backPath = $BACK_PATH;
                         $this->doc->form='<form action="" id="_form" method="post" enctype="multipart/form-data">';
 
-                            // JavaScript
-                        $this->doc->JScode = '
-                            <script language="javascript" type="text/javascript">
-                                script_ended = 0;
-                                function jumpToUrl(URL)    {
-                                    document.location = URL;
-                                }
-                            </script>
-                            <script type="text/javascript">
-								function submitActions()	{
-									// RTE management
-									###ADDITIONALJS_SUBMIT###
-								}
-							</script>
-                        ';
-                        $this->doc->postCode='
-                            <script language="javascript" type="text/javascript">
-                                script_ended = 1;
-                                if (top.fsMod) top.fsMod.recentIds["web"] = 0;
-                            </script>
-                        ';
+                        global $BACK_PATH;
+                        
+                        //$pageRenderer = $this->pibase->beObj->beDoc->getPageRenderer();
+                        $pageRenderer = $this->doc->getPageRenderer();
+                        $pageRenderer->loadExtJS();
+                        $pageRenderer->addJsFile($BACK_PATH . '../t3lib/js/extjs/tceforms.js', 'text/javascript', false);
+                        $pageRenderer->addJsFile($BACK_PATH . '../t3lib/js/extjs/ux/Ext.ux.DateTimePicker.js', 'text/javascript', false);
+                        
+                        $typo3Settings = array(
+                        		'datePickerUSmode' => $GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat'] ? 1 : 0,
+                        		'dateFormat'       => array('j-n-Y', 'G:i j-n-Y'),
+                        		'dateFormatUS'     => array('n-j-Y', 'G:i n-j-Y'),
+                        );
+                        //$pageRenderer->addInlineSettingArray('', $typo3Settings);
 
                         //$headerSection = $this->doc->getHeader('pages',$this->pageinfo,$this->pageinfo['_thePath']).'<br />'.$LANG->sL('LLL:EXT:lang/locallang_core.xml:labels.path').': '.t3lib_div::fixed_lgd_cs($this->pageinfo['_thePath'],50);
 
@@ -174,7 +167,7 @@ class  tx_wfqbe_module2 extends t3lib_SCbase {
                  */
                 function moduleContent()    {
                     $BELIB = t3lib_div::makeInstance('tx_wfqbe_belib');
-                	$content = $BELIB->getContent($this);
+                    $content = $BELIB->getContent($this);
                     $title = $BELIB->getTitle();
 					$this->content.=$this->doc->section($title,$content,0,1);
                 }
