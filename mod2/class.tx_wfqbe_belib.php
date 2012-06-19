@@ -207,7 +207,8 @@ class tx_wfqbe_belib	{
      * as the parameter $pageId.
      */
     function retrievePageConfig($pageId) {
-        require_once(PATH_t3lib.'class.t3lib_page.php');
+        global $BE_USER;
+    	require_once(PATH_t3lib.'class.t3lib_page.php');
         
         if (!is_object($GLOBALS['TT']))	{
         	require_once(PATH_t3lib . 'class.t3lib_timetrack.php');
@@ -224,7 +225,10 @@ class tx_wfqbe_belib	{
         $GLOBALS['TSFE']->sys_page = t3lib_div::makeInstance('t3lib_pageSelect');
         // Finds the selected page in the BE exactly as in t3lib_SCbase::init().
         $rootline = $GLOBALS['TSFE']->sys_page->getRootLine($pageId);
-        //t3lib_div::debug(array($rootline,$sys_page->error_getRootLine, $sys_page->error_getRootLine_failPid, $pageId));
+		
+        // Disable sys_page to allow BE workspace_OL
+        unset ($GLOBALS['TSFE']->sys_page);
+        
           // Generates the constants/config and hierarchy info for the template.
         $GLOBALS['TSFE']->tmpl->runThroughTemplates($rootline, 0);
         $GLOBALS['TSFE']->tmpl->generateConfig();
@@ -234,6 +238,10 @@ class tx_wfqbe_belib	{
         } else {
             $result = array();
         }
+        
+        // Re-create sys_page for Typoscript stdWrap calls
+        $GLOBALS['TSFE']->sys_page = t3lib_div::makeInstance('t3lib_pageSelect');
+        
         //t3lib_div::debug($result);
         return $result;
     }
