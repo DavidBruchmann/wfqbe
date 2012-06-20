@@ -131,26 +131,7 @@ class tx_wfqbe_results {
 		$markerParametri = array();
 //t3lib_div::debug($parametri);
 		if (is_array($parametri))	{
-			foreach ($parametri as $key => $value)	{
-				if (!is_array($value))	{
-					$markerParametri["###WFQBE_".strtoupper($key)."###"] = addslashes(strip_tags($value));
-				}	elseif (sizeof($value)==1)	{
-					$markerParametri["###WFQBE_".strtoupper($key)."###"] = addslashes(strip_tags($value[0]));
-				}	else	{
-					$i=0;
-					foreach ($value as $sel)	{
-						if ($i>0)
-							$markerParametri["###WFQBE_".strtoupper($key)."###"] .= "'";
-						if (is_array($sel))
-							$markerParametri["###WFQBE_".strtoupper($key)."###"] .= addslashes(strip_tags($sel[0]));
-						else
-							$markerParametri["###WFQBE_".strtoupper($key)."###"] .= addslashes(strip_tags($sel));
-						if ($i<sizeof($value)-1)
-							$markerParametri["###WFQBE_".strtoupper($key)."###"] .= "',";
-						$i++;
-					}
-				}
-			}
+			$markerParametri = $this->parametersToMarkers($mparametri, $markerParametri);
 			/*
 			// Hook that can be used to pre-process a parameter (from a search form) before makeing the query
 			if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['wfqbe']['processSubstituteSearchParametersClass']))    {
@@ -163,6 +144,30 @@ class tx_wfqbe_results {
 			$query = $this->cObj->substituteMarkerArray($query, $markerParametri); */
 		}
 		//unset($markerParametri);
+		
+		
+		// If TYPO3_MODE = BE then it will be possible to provide addition parameters through the User TSConfig field
+		/*
+		 * The sintax is the following:
+		 * 
+		 * Page TS Config:
+		 * mod.wfqbe.filter.parameter1 = value1
+		 * mod.wfqbe.filter.parameter2 = value2
+		 * 
+		 * User TS Config (takes precedence):
+		 * page.mod.wfqbe.filter.parameter1 = value1
+		 * page.mod.wfqbe.filter.parameter2 = value2
+		 */
+		if ($this->pibase->beMode)	{
+			$modTSconfig = $GLOBALS['BE_USER']->getTSConfig(
+					'mod.wfqbe',
+					t3lib_BEfunc::getPagesTSconfig(t3lib_div::_GP('id'))
+			);
+			if (is_array($modTSconfig) && is_array($modTSconfig['properties']) && is_array($modTSconfig['properties']['filter.']))	{
+				$markerParametri = $this->parametersToMarkers($modTSconfig['properties']['filter.'], $markerParametri);
+			}
+		}
+		
 
 		// This is used to parse the query and to retrieve the TS markers (like ###TS_WFQBE_xxx###) and non-substituted markers (like ###WFQBE_xxx###)
 		// This markers are replaced with the output of TS objects defined in your TS template
@@ -216,6 +221,37 @@ class tx_wfqbe_results {
 		$this->executionTime = ($stop - $start).' sec';
 
 		return $ris;
+	}
+	
+	
+	
+	/**
+	 * Function used to convert parameters (piVars or UserTSconfig) into a markerArray to be used in queries
+	 * @param unknown_type $parametri
+	 * @param unknown_type $markerParametri
+	 */
+	function parametersToMarkers($parametri, $markerParametri)	{
+		foreach ($parametri as $key => $value)	{
+			if (!is_array($value))	{
+				$markerParametri["###WFQBE_".strtoupper($key)."###"] = addslashes(strip_tags($value));
+			}	elseif (sizeof($value)==1)	{
+				$markerParametri["###WFQBE_".strtoupper($key)."###"] = addslashes(strip_tags($value[0]));
+			}	else	{
+				$i=0;
+				foreach ($value as $sel)	{
+					if ($i>0)
+						$markerParametri["###WFQBE_".strtoupper($key)."###"] .= "'";
+					if (is_array($sel))
+						$markerParametri["###WFQBE_".strtoupper($key)."###"] .= addslashes(strip_tags($sel[0]));
+					else
+						$markerParametri["###WFQBE_".strtoupper($key)."###"] .= addslashes(strip_tags($sel));
+					if ($i<sizeof($value)-1)
+						$markerParametri["###WFQBE_".strtoupper($key)."###"] .= "',";
+					$i++;
+				}
+			}
+		}
+		return $markerParametri;
 	}
 
 
