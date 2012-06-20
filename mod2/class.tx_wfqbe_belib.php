@@ -227,7 +227,8 @@ class tx_wfqbe_belib	{
         $rootline = $GLOBALS['TSFE']->sys_page->getRootLine($pageId);
 		
         // Disable sys_page to allow BE workspace_OL
-        unset ($GLOBALS['TSFE']->sys_page);
+        if (t3lib_div::int_from_ver(TYPO3_version)>4007000)
+        	unset ($GLOBALS['TSFE']->sys_page);
         
           // Generates the constants/config and hierarchy info for the template.
         $GLOBALS['TSFE']->tmpl->runThroughTemplates($rootline, 0);
