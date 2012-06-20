@@ -131,7 +131,7 @@ class tx_wfqbe_results {
 		$markerParametri = array();
 //t3lib_div::debug($parametri);
 		if (is_array($parametri))	{
-			$markerParametri = $this->parametersToMarkers($mparametri, $markerParametri);
+			$markerParametri = $this->parametersToMarkers($parametri, $markerParametri);
 			/*
 			// Hook that can be used to pre-process a parameter (from a search form) before makeing the query
 			if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['wfqbe']['processSubstituteSearchParametersClass']))    {
@@ -164,7 +164,7 @@ class tx_wfqbe_results {
 					t3lib_BEfunc::getPagesTSconfig(t3lib_div::_GP('id'))
 			);
 			if (is_array($modTSconfig) && is_array($modTSconfig['properties']) && is_array($modTSconfig['properties']['filter.']))	{
-				$markerParametri = $this->parametersToMarkers($modTSconfig['properties']['filter.'], $markerParametri);
+				$markerParametri = $this->parametersToMarkers($modTSconfig['properties']['filter.'], $markerParametri, 0);
 			}
 		}
 		
@@ -230,21 +230,21 @@ class tx_wfqbe_results {
 	 * @param unknown_type $parametri
 	 * @param unknown_type $markerParametri
 	 */
-	function parametersToMarkers($parametri, $markerParametri)	{
+	function parametersToMarkers($parametri, $markerParametri, $clearInput=1)	{
 		foreach ($parametri as $key => $value)	{
 			if (!is_array($value))	{
-				$markerParametri["###WFQBE_".strtoupper($key)."###"] = addslashes(strip_tags($value));
+				$markerParametri["###WFQBE_".strtoupper($key)."###"] = ($clearInput ? addslashes(strip_tags($value)) : $value);
 			}	elseif (sizeof($value)==1)	{
-				$markerParametri["###WFQBE_".strtoupper($key)."###"] = addslashes(strip_tags($value[0]));
+				$markerParametri["###WFQBE_".strtoupper($key)."###"] = ($clearInput ? addslashes(strip_tags($value[0])) : $value);
 			}	else	{
 				$i=0;
 				foreach ($value as $sel)	{
 					if ($i>0)
 						$markerParametri["###WFQBE_".strtoupper($key)."###"] .= "'";
 					if (is_array($sel))
-						$markerParametri["###WFQBE_".strtoupper($key)."###"] .= addslashes(strip_tags($sel[0]));
+						$markerParametri["###WFQBE_".strtoupper($key)."###"] .= ($clearInput ? addslashes(strip_tags($sel[0])) : $value);
 					else
-						$markerParametri["###WFQBE_".strtoupper($key)."###"] .= addslashes(strip_tags($sel));
+						$markerParametri["###WFQBE_".strtoupper($key)."###"] .= ($clearInput ? addslashes(strip_tags($sel)) : $value);
 					if ($i<sizeof($value)-1)
 						$markerParametri["###WFQBE_".strtoupper($key)."###"] .= "',";
 					$i++;
