@@ -74,6 +74,7 @@ CREATE TABLE tx_wfqbe_backend (
 	insertq text NOT NULL,
 	typoscript text NOT NULL,
 	recordsforpage int(5) DEFAULT '0' NOT NULL,
+	searchq_position varchar(6) DEFAULT '' NOT NULL,
 		
 	PRIMARY KEY (uid),
 	KEY parent (pid)

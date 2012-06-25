@@ -84,6 +84,8 @@
 			<label index="tx_wfqbe_backend.insertq">Insert query</label>
 			<label index="tx_wfqbe_backend.typoscript">Typoscript configuration</label>
 			<label index="tx_wfqbe_backend.recordsforpage">Records for page</label>
+			<label index="tx_wfqbe_backend.searchq_position.I.0">Bottom</label>
+			<label index="tx_wfqbe_backend.searchq_position.I.1">Top</label>
 		</languageKey>
 		<languageKey index="it" type="array">
 			<label index="tx_wfqbe_credentials">Credenziali utente</label>

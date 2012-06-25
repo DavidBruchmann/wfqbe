@@ -151,6 +151,17 @@ class tx_wfqbe_belib	{
 			
 			$content .= '<br /><p><a href="index.php?&M=web_txwfqbeM2&id='.$this->page_id.'&tx_wfqbe_backend[uid]='.$backend['uid'].'"><img height="16" width="16" src="'.$BACK_PATH.'sysext/t3skin/icons/module_web_list.gif" title="'.$LANG->getLL('back_to_list').'" alt="'.$LANG->getLL('back_to_list').'"> '.$LANG->getLL('back_to_list').'</a></p>';
 		}	else	{
+			
+			$contentSearchQ = '';
+			if ($backend['searchq']>0)	{
+				$PI1->conf['ff_data']['queryObject'] = $backend['searchq'];
+				$form_built = false;
+				$contentSearchQ .= $PI1->do_general('do_sGetForm', $form_built, $this);
+			}
+			
+			if ($contentSearchQ!='' && $backend['searchq_position']=='top')
+				$content .= $contentSearchQ;
+			
 			if ($backend['listq']>0)	{
 				$PI1->conf['ff_data']['queryObject'] = $backend['listq'];
 				if ($backend['recordsforpage']>0)
@@ -159,11 +170,8 @@ class tx_wfqbe_belib	{
 				$content .= $PI1->do_general('', $form_built, $this);
 			}
 			
-			if ($backend['searchq']>0)	{
-				$PI1->conf['ff_data']['queryObject'] = $backend['searchq'];
-				$form_built = false;
-				$content .= $PI1->do_general('do_sGetForm', $form_built, $this);
-			}
+			if ($contentSearchQ!='' && ($backend['searchq_position']=='bottom' || $backend['searchq_position']==''))
+				$content .= $contentSearchQ;
 			
 			if ($backend['insertq']>0)	{
 				$content .= '<br /><p><a href="index.php?&M=web_txwfqbeM2&id='.$this->page_id.'&tx_wfqbe_backend[uid]='.$backend['uid'].'&tx_wfqbe_backend[query]='.$backend['insertq'].'"><span class="t3-icon t3-icon-actions t3-icon-actions-document t3-icon-document-new">&nbsp;</span>'.$LANG->getLL('new_record').'</a></p>';

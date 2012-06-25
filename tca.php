@@ -388,9 +388,22 @@ $TCA["tx_wfqbe_backend"] = Array (
 				"eval" => "int",
 			)
 		),
+		"searchq_position" => Array (
+			"exclude" => 1,
+			"label" => "LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_backend.searchq_position",
+			"config" => Array (
+				"type" => "select",
+				"items" => Array (
+					Array("LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_backend.searchq_position.I.0", "bottom"),
+					Array("LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_backend.searchq_position.I.1", "top"),
+				),
+				"size" => 1,
+				"maxitems" => 1,
+			)
+		),
 	),
 	"types" => Array (
-		"0" => Array("showitem" => "hidden;;1;;1-1-1, title,description,--div--;Listing,listq, recordsforpage,--div--;Details,detailsq,--div--;Search,searchq,--div--;Insert,insertq,--div--;Config,typoscript"),
+		"0" => Array("showitem" => "hidden;;1;;1-1-1, title,description,--div--;Listing,listq, recordsforpage,--div--;Details,detailsq,--div--;Search,searchq,searchq_position,--div--;Insert,insertq,--div--;Config,typoscript"),
 	),
 	"palettes" => Array (
 	)
