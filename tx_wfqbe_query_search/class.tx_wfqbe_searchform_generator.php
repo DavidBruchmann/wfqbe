@@ -43,6 +43,30 @@ class tx_wfqbe_searchform_generator{
 	// Elenco dei tipi di input disponibili
 	var $types = array ('input', 'radio', 'select', 'check', 'calendar');
 	
+	var $calendarDateFormats = array(
+			'datetocal' => array(
+					'%d/%m/%Y',
+					'%d-%m-%Y',
+					'%d.%m.%Y',
+					'%m/%d/%Y',
+					'%m-%d-%Y',
+					'%m.%d.%Y',
+					'%Y-%m-%d',
+					'%H:%M %d/%m/%Y',
+					'%H:%M %d-%m-%Y',
+					'%H:%M %d.%m.%Y',
+					'%H:%M %m/%d/%Y',
+					'%H:%M %m-%d-%Y',
+					'%H:%M %m.%d.%Y',
+			),
+			'jquery_datepicker' => array(
+					'dd-mm-yy',
+					'dd/mm/yy',
+					'mm-dd-yy',
+					'mm/dd/yy'
+			)
+	);
+	
 	
 	
 	function init(){
@@ -521,20 +545,46 @@ class tx_wfqbe_searchform_generator{
 	function showCalendar($key, $form)	{
 		$html = $this->labelInput($key, $form['label']);
 		
-		if ($form['time']=="si")	{
-			$html .= ' - '.$GLOBALS['LANG']->getLL('time').': <input type="checkbox" name="wfqbe[fields]['.$key.'][form][time]" value="si" checked="checked" />';
+		if ($form['date2cal']=="si")	{
+			$html .= ' - Use old date2cal ext: <input type="checkbox" onchange="javascript:updateForm();" name="wfqbe[fields]['.$key.'][form][date2cal]" value="si" checked="checked" />';
+			if ($form['time']=="si")	{
+				$html .= ' - '.$GLOBALS['LANG']->getLL('time').': <input type="checkbox" name="wfqbe[fields]['.$key.'][form][time]" value="si" checked="checked" />';
+			}	else	{
+				$html .= ' - '.$GLOBALS['LANG']->getLL('time').': <input type="checkbox" name="wfqbe[fields]['.$key.'][form][time]" value="si" />';
+			}
+		
+			$html .= ' - '.$GLOBALS['LANG']->getLL('format').': <input type="text" name="wfqbe[fields]['.$key.'][form][format]" value="'.$form['format'].'" size="25" />';
+		
+		
+			if ($form['nlp']=="si")	{
+				$html .= ' - '.$GLOBALS['LANG']->getLL('nlp').': <input type="checkbox" name="wfqbe[fields]['.$key.'][form][nlp]" value="si" checked="checked" />';
+			}	else	{
+				$html .= ' - '.$GLOBALS['LANG']->getLL('nlp').': <input type="checkbox" name="wfqbe[fields]['.$key.'][form][nlp]" value="si" />';
+			}
 		}	else	{
-			$html .= ' - '.$GLOBALS['LANG']->getLL('time').': <input type="checkbox" name="wfqbe[fields]['.$key.'][form][time]" value="si" />';
+			// jQuery datepicker mode
+			$html .= ' - Use old date2cal ext: <input type="checkbox" onchange="javascript:updateForm();" name="wfqbe[fields]['.$key.'][form][date2cal]" value="si" />';
+			
+			if ($form['format']=='')
+				$format = 'dd-mm-yy';
+			else
+				$format = $form['format'];
+			
+			$html .= ' - '.$GLOBALS['LANG']->getLL('format').': <select name="wfqbe[fields]['.$key.'][form][format]" />';
+			foreach ($this->calendarDateFormats['jquery_datepicker'] as $value)	{
+				if ($value==$format)
+					$html .= '<option selected="selected" value="'.$value.'">'.$value.'</option>';
+				else
+					$html .= '<option value="'.$value.'">'.$value.'</option>';
+			}
+			$html .= '</select>';
+			
+			$html .= '<br />Min Date: <input type="text" name="wfqbe[fields]['.$key.'][form][min_date]" value="'.$form['min_date'].'" /> (e.g. new Date(2005, 1, 1), see jQuery datepicker documentation for the right format)';
+			$html .= '<br />Max Date: <input type="text" name="wfqbe[fields]['.$key.'][form][max_date]" value="'.$form['max_date'].'" /> (e.g. \'+1y\', see jQuery datepicker documentation for the right format)';
+			
 		}
 		
-		$html .= ' - '.$GLOBALS['LANG']->getLL('format').': <input type="text" name="wfqbe[fields]['.$key.'][form][format]" value="'.$form['format'].'" size="25" />';
-		
-		
-		if ($form['nlp']=="si")	{
-			$html .= ' - '.$GLOBALS['LANG']->getLL('nlp').': <input type="checkbox" name="wfqbe[fields]['.$key.'][form][nlp]" value="si" checked="checked" />';
-		}	else	{
-			$html .= ' - '.$GLOBALS['LANG']->getLL('nlp').': <input type="checkbox" name="wfqbe[fields]['.$key.'][form][nlp]" value="si" />';
-		}
+		$html.= '<br /><br /><strong>If you don\'t use the (deprecated) date2cal extension, in order to get the calendar to work in the frontend you need the jQuery datepicker plugin. In the backend it is rendered based on the standard extjs TYPO3 calendar.</strong><br />';
 		
 		
 		return $html;

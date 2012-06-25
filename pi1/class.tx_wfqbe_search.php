@@ -452,7 +452,7 @@ class tx_wfqbe_search {
 	function showCalendar($value, $name, $id, &$blockTemplate)	{
 		$wfqbe = t3lib_div::_GP('tx_wfqbe_pi1');
 		
-		if (t3lib_extMgm::isLoaded('date2cal'))	{
+		if ($value['form']['date2cal']=='si' && t3lib_extMgm::isLoaded('date2cal'))	{
 			include_once(t3lib_extMgm::siteRelPath('date2cal') . '/src/class.jscalendar.php');
 			// init jscalendar class
 			$JSCalendar = JSCalendar::getInstance();
@@ -484,8 +484,60 @@ class tx_wfqbe_search {
 			
 			return $field;
 			
-		}	else	{
+		}	elseif ($value['form']['date2cal']=='si' && !t3lib_extMgm::isLoaded('date2cal'))	{
 			return '<br />ERROR: date2cal extension is not loaded!<br />';
+			
+		}	elseif ($value['form']['date2cal']!='si')	{
+			if (!$this->pibase->beMode)	{
+				// Uses jQuery datepicker
+				$format = ($value['form']['format']!='' ? $value['form']['format'] : 'dd-mm-yy');
+				$jsCode = '<script>
+							jQuery(function() {
+								jQuery( "#'.$id.'" ).datepicker({"dateFormat": "'.$format.'", "defaultDate": jQuery.datepicker.parseDate("'.$format.'",jQuery("#'.$id.'").attr(\'value\'))});
+								//alert ("'.$id.': "+jQuery("#'.$id.'").attr(\'value\'));
+								//jQuery( "#'.$id.'" ).datepicker( "option", "dateFormat", "'.$format.'" );
+								
+								jQuery( "#'.$id.'" ).datepicker( "option", "changeYear", true );
+								jQuery( "#'.$id.'" ).datepicker( "option", "constrainInput", false );
+							';
+				if ($value['form']['min_date']!='')	{
+					$jsCode .= 'jQuery( "#'.$id.'" ).datepicker( "option", "minDate", '.$value['form']['min_date'].' );';
+				}
+				if ($value['form']['max_date']!='')	{
+					$jsCode .= 'jQuery( "#'.$id.'" ).datepicker( "option", "maxDate", '.$value['form']['max_date'].' );';
+				}
+					
+				$jsCode .= '});
+							</script>';
+				$GLOBALS['TSFE']->additionalHeaderData['wfqbe_datepicker'] = $jsCode;
+				
+				return '<input id="'.$id.'" type="text" name="tx_wfqbe_pi1['.$name.']" value="'.$this->pibase->piVars[$name].'" />';
+				
+			}	elseif ($this->pibase->beMode)	{
+				// Uses extbase calendar
+				
+				$format = str_replace('dd', 'j', $value['form']['format']);
+				$format = str_replace('mm', 'n', $format);
+				$format = str_replace('yy', 'Y', $format);
+				
+				$JScode = '<script type="text/javascript">
+					TYPO3.settings = {
+						"datePickerUSmode":0,
+						"dateFormat":["'.$format.'","'.$format.'"],
+						"dateFormatUS":["'.$format.'","'.$format.'"]
+						};
+				</script>';
+				
+				return $JScode.'<input name="tx_wfqbe_pi1['.$name.']" type="text" id="tceforms-datetimefield-'.$id.'" value="' . $this->pibase->piVars[$name] . '" />' .
+					   	t3lib_iconWorks::getSpriteIcon(
+							'actions-edit-pick-date',
+							array(
+								'style' => 'cursor:pointer;',
+								'id' => 'picker-tceforms-datetimefield-'.$id
+							)
+						);
+				
+			}
 		}
 	}
 	
