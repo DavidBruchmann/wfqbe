@@ -622,6 +622,9 @@ t3lib_div::debug('not allowed');
 			case 'select':
 				$rA['###INSERT_FIELD###'] = $this->showSelect($value, $key, $h, $name);
 				break;
+			case 'Raw HTML':
+				$rA['###INSERT_FIELD###'] = $this->showRawHTML($value, $key, $name);
+				break;
 			case 'upload':
 				$rA['###INSERT_FIELD###'] = $this->showUpload($value, $key, $name);
 				break;
@@ -674,6 +677,7 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 		switch ($value['type'])	{
 			case 'hidden':
 			case 'PHP function':
+			case 'Raw HTML':
 				$blockList = $this->cObj->substituteMarkerArray($hiddenTemplate, $rA);
 				break;
 			default:
@@ -1167,6 +1171,12 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 	
 	
 	
+	function showRawHTML($value, $name, $id)	{
+		return $value['form']['code'];
+	}
+	
+	
+	
 	function substituteInsertMarkers($where)	{
 		// Query parameters management
 		// This function substitutes the markers like ###WFQBE_X### with t3lib_div::_GP('wfqbe[x]')
@@ -1333,7 +1343,7 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 			}
 			
 			foreach ($blocks['fields'] as $key => $config)	{
-				if ($blocks['fields'][$key]['type']!='PHP function')	{
+				if ($blocks['fields'][$key]['type']!='PHP function' && $blocks['fields'][$key]['type']!='Raw HTML')	{
 					
 					$value = $data[$key];
 					
@@ -1395,6 +1405,8 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 					}
 					
 					$blockList .= $this->cObj->substituteMarkerArray($blockTemplate, $mA);
+				}	elseif ($blocks['fields'][$key]['type']=='Raw HTML')	{
+					$blockList .= $blocks['fields'][$key]['form']['code'];
 				}
 			}
 			

@@ -42,7 +42,7 @@ class tx_wfqbe_insertform_generator{
 	var $RAW_MODE = false;
 	
 	// Elenco dei tipi di input disponibili
-	var $types = array ('display only', 'input', 'datetype', 'calendar', 'password', 'radio', 'select', 'textarea', 'checkbox', 'hidden', 'upload', 'relation', 'PHP function');
+	var $types = array ('display only', 'input', 'datetype', 'calendar', 'password', 'radio', 'select', 'textarea', 'checkbox', 'hidden', 'upload', 'relation', 'PHP function', 'Raw HTML');
 	var $calendarDateFormats = array(
 		'datetocal' => array(
 			'%d/%m/%Y',
@@ -240,6 +240,9 @@ class tx_wfqbe_insertform_generator{
 							break;
 						case 'PHP function':
 							$content .= $this->showPHPFunction($numForm, $this->blocks['fields'][$key]['form']);
+							break;
+						case 'Raw HTML':
+							$content .= $this->showRawHTML($numForm, $this->blocks['fields'][$key]['form']);
 							break;
 						default:
 							// Hook that can be used to manage custom field types 
@@ -858,6 +861,25 @@ class tx_wfqbe_insertform_generator{
 		//$html = 'require_once: <input type="text" name="wfqbe[fields]['.$key.'][form][require_once]" value="'.$form['require_once'].'" />';
 		//$html .= '<br />Function: <input type="text" name="wfqbe[fields]['.$key.'][form][function]" value="'.$form['function'].'" />';
 		$html = 'PHP Code: <textarea cols="60" rows="10" name="wfqbe[fields]['.$key.'][form][code]">'.$form['code'].'</textarea>';
+		return $html;
+	}
+	
+	
+	
+	
+	
+	
+	/**
+	 * Function that provides a textarea where to put the raw HTML content
+	 *
+	 * @param 	[int]			$key: indice dell'array del form attuale
+	 * @param 	[array]			$form: configurazione del campo
+	 * @return 	[string]		html contenente la configurazione
+	 */
+	function showRawHTML($key, $form)	{
+		//$html = 'require_once: <input type="text" name="wfqbe[fields]['.$key.'][form][require_once]" value="'.$form['require_once'].'" />';
+		//$html .= '<br />Function: <input type="text" name="wfqbe[fields]['.$key.'][form][function]" value="'.$form['function'].'" />';
+		$html = 'Raw HTML code: <textarea cols="60" rows="10" name="wfqbe[fields]['.$key.'][form][code]">'.$form['code'].'</textarea>';
 		return $html;
 	}
 	
