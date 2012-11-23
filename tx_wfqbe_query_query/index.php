@@ -38,7 +38,7 @@ require ($BACK_PATH.'init.php');
 require ($BACK_PATH.'template.php');
 $LANG->includeLLFile('EXT:wfqbe/tx_wfqbe_query_query/locallang.xml');
 require_once (PATH_t3lib.'class.t3lib_scbase.php');
-//includo il file form_generator.php. La prima parte dell'argomento mi dà il path della estensione
+//includo il file form_generator.php. La prima parte dell'argomento mi dï¿½ il path della estensione
 require_once(t3lib_extMgm::extPath('wfqbe')."tx_wfqbe_query_query/class.tx_wfqbe_queryform_generator.php");
 require_once(t3lib_extMgm::extPath('wfqbe')."lib/class.tx_wfqbe_connect.php");
 	// ....(But no access check here...)
@@ -71,6 +71,8 @@ class tx_wfqbe_tx_wfqbe_query_querywiz extends t3lib_SCbase {
  */
 				function main()	{
 					global $BE_USER,$LANG,$BACK_PATH,$TCA_DESCR,$TCA,$CLIENT,$TYPO3_CONF_VARS;
+					$this->P = t3lib_div::_GP('P');
+					$this->id = $this->P['pid'];
 					$this->qbe = t3lib_div::makeInstance("tx_wfqbe_queryform_generator");
 					$this->qbe->init();
 						// Draw the header.
@@ -220,7 +222,7 @@ class tx_wfqbe_tx_wfqbe_query_querywiz extends t3lib_SCbase {
 				$content='';
 					//switch((string)$this->MOD_SETTINGS['function'])	{
 						//case 1:
-								$var=t3lib_div::_GP('P');//P è l'array che contiene tutte le info passate dal plugin al wizard
+								$var=t3lib_div::_GP('P');//P ï¿½ l'array che contiene tutte le info passate dal plugin al wizard
 								//t3lib_div::debug($this->P);
 								$this->P=$var;
 								//t3lib_div::debug($var);
@@ -235,7 +237,7 @@ class tx_wfqbe_tx_wfqbe_query_querywiz extends t3lib_SCbase {
 									$this->content.=$this->doc->section('',$content,0,1);
 								}	else	{
 								
-									// Settaggio tag apertura form. Questo form è quello principale che contiene i vari tipi di campi per 
+									// Settaggio tag apertura form. Questo form ï¿½ quello principale che contiene i vari tipi di campi per 
 									//creare la query. La variabile $rUri contiene il path della pagina del wizard e viene utilizzata cona valore
 									// dell'attributo action del form
 									list($rUri) = explode('#',t3lib_div::getIndpEnv('REQUEST_URI'));
@@ -270,9 +272,9 @@ class tx_wfqbe_tx_wfqbe_query_querywiz extends t3lib_SCbase {
 	
 										$content.='<hr>';
 										
-										// If save command found, include tcemain. t3lib_tcemain.php è una classe per la manipolazione del database.
+										// If save command found, include tcemain. t3lib_tcemain.php ï¿½ una classe per la manipolazione del database.
 										// Se i parametri savedoc_x e saveandclose_x sono passati tramite post allora includi la classe sopra specificata 
-										// che servirà per fare dei salvataggi.
+										// che servirï¿½ per fare dei salvataggi.
 										if ($_POST['savedok_x'] || $_POST['saveandclosedok_x'])	{
 											require_once (PATH_t3lib.'class.t3lib_tcemain.php');
 										}
@@ -284,7 +286,7 @@ class tx_wfqbe_tx_wfqbe_query_querywiz extends t3lib_SCbase {
 											$tce = t3lib_div::makeInstance('t3lib_TCEmain');
 											$tce->stripslashes_values=0;
 	
-											// Creo un array di nome data e inserisco la query che verrà salvata nella tabella table(query),nella
+											// Creo un array di nome data e inserisco la query che verrï¿½ salvata nella tabella table(query),nella
 											//tupla con valore uid uguale a uid e nel campo query.
 											//table,uid e field sono parametri passati dal plugin al wizard tramite la variabile P 
 											$data=array();
@@ -297,7 +299,7 @@ class tx_wfqbe_tx_wfqbe_query_querywiz extends t3lib_SCbase {
 											$tce->start($data,array());
 											$tce->process_datamap();
 	
-											// Se è stato premuto il tasto salvataggio/uscita ,oltre a fare tutto il lavoro che si fà per il pulsante
+											// Se ï¿½ stato premuto il tasto salvataggio/uscita ,oltre a fare tutto il lavoro che si fï¿½ per il pulsante
 											//salvataggio, bisogna tornare nella pagina di inserimento nuovo record
 											if ($_POST['saveandclosedok_x'])	{
 												header('Location: '.t3lib_div::locationHeaderUrl($this->P['returnUrl']));
