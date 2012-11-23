@@ -145,10 +145,16 @@ class tx_wfqbe_belib	{
 			$content .= $PI1->do_general('', $form_built, $this);
 			$content .= '<br /><p><a href="index.php?&M=web_txwfqbeM2&id='.$this->page_id.'&tx_wfqbe_backend[uid]='.$backend['uid'].'"><img height="16" width="16" src="'.$BACK_PATH.'sysext/t3skin/icons/module_web_list.gif" title="'.$LANG->getLL('back_to_list').'" alt="'.$LANG->getLL('back_to_list').'"> '.$LANG->getLL('back_to_list').'</a></p>';
 		}	elseif ($this->mode=='details')	{
-			$PI1->conf['ff_data']['queryObject'] = $backend['detailsq'];
-			$form_built = false;
-			$content .= $PI1->do_general('', $form_built, $this);
-			
+			if ($backend['detailsq']!='')	{
+				$detailsq = explode(',', $backend['detailsq']);
+				if (is_array($detailsq))	{
+					foreach ($detailsq as $dquid)	{
+						$PI1->conf['ff_data']['queryObject'] = $dquid;
+						$form_built = false;
+						$content .= $PI1->do_general('', $form_built, $this);
+					}
+				}
+			}
 			$content .= '<br /><p><a href="index.php?&M=web_txwfqbeM2&id='.$this->page_id.'&tx_wfqbe_backend[uid]='.$backend['uid'].'"><img height="16" width="16" src="'.$BACK_PATH.'sysext/t3skin/icons/module_web_list.gif" title="'.$LANG->getLL('back_to_list').'" alt="'.$LANG->getLL('back_to_list').'"> '.$LANG->getLL('back_to_list').'</a></p>';
 		}	else	{
 			

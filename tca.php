@@ -341,9 +341,9 @@ $TCA["tx_wfqbe_backend"] = Array (
 				"type" => "group",	
 				"internal_type" => "db",	
 				"allowed" => "tx_wfqbe_query",	
-				"size" => 1,	
+				"size" => 5,	
 				"minitems" => 0,
-				"maxitems" => 1,
+				"maxitems" => 100,
 			)
 		),
 		"searchq" => Array (		
