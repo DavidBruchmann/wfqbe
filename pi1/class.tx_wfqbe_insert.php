@@ -116,6 +116,7 @@ class tx_wfqbe_insert {
 			$file = @file_get_contents(PATH_site.$GLOBALS['TSFE']->tmpl->getFileName($this->conf['template']));
 		else
 			$file = $this->cObj->fileResource($this->conf['template']);
+		$this->row = $row;
 		$this->blocks = $this->getBlocks($row);
 		$this->blocks['query_row'] = $row;
 		
@@ -2005,7 +2006,50 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 	 * @param unknown_type $editing_record
 	 */
 	function checkIDRestricting($h, $idRestrictQuery, $editing_record)	{
-			$ris = $h->Execute($idRestrictQuery);
+		require_once t3lib_extMgm::extPath('wfqbe').'/pi1/class.tx_wfqbe_results.php';
+		$API = t3lib_div::makeInstance('tx_wfqbe_results');
+		$tsMarkers = $API->getTSMarkers($idRestrictQuery);
+		if (is_array($tsMarkers))	{
+			foreach ($tsMarkers as $marker)	{
+				$emptyCase = false;
+				if ($this->conf['customRestrictingQuery.'][$this->row['uid'].'.'][$marker]!="" && (($markerParametri["###".$marker."###"]=='' && $this->conf['customRestrictingQuery.'][$this->row['uid'].'.'][$marker."."]["overrideIfEmpty"]==1) || ($markerParametri["###".$marker."###"]!='' && $this->conf['customRestrictingQuery.'][$this->row['uid'].'.'][$marker."."]["overrideIfNotEmpty"]==1) || $this->conf['customRestrictingQuery.'][$this->row['uid'].'.'][$marker."."]["overrideAlways"]==1))	{
+					if ($markerParametri["###".$marker."###"]=='' && $this->conf['customRestrictingQuery.'][$this->row['uid'].'.'][$marker."."]["overrideIfEmpty"]==1)
+						$emptyCase = true;
+					$confArray = $this->conf["customRestrictingQuery."][$this->row['uid']."."][$marker."."];
+					$confArray = $API->parseTypoScriptConfiguration($confArray, $markerParametri);
+					eval('$markerParametri["###".$marker."###"]=$this->cObj->'.$this->conf["customRestrictingQuery."][$this->row["uid"]."."][$marker].'($confArray);');
+				}	elseif ($this->conf['globalcustomRestrictingQuery.'][$marker]) {
+					$confArray = $this->conf["globalcustomRestrictingQuery."][$marker."."];
+					$confArray = $API->parseTypoScriptConfiguration($confArray, $markerParametri);
+					eval('$markerParametri["###".$marker."###"]=$this->cObj->'.$this->conf["globalcustomRestrictingQuery."][$marker].'($confArray);');
+				}	elseif ($this->conf['customGlobalQuery.'][$marker]) {
+					$confArray = $this->conf["customGlobalQuery."][$marker."."];
+					$confArray = $API->parseTypoScriptConfiguration($confArray, $markerParametri);
+					eval('$markerParametri["###".$marker."###"]=$this->cObj->'.$this->conf["customGlobalQuery."][$marker].'($confArray);');
+				}
+		
+				if (!$emptyCase && $this->conf['customRestrictingQuery.'][$this->row['uid'].'.'][$marker.'.']!="" && $this->conf['customRestrictingQuery.'][$this->row['uid'].'.'][$marker."."]["wfqbe."]['intval']==1)	{
+					$markerParametri["###".$marker."###"] = intval($markerParametri["###".$marker."###"]);
+				}	elseif (!$emptyCase && $this->conf['customRestrictingQuery.'][$this->row['uid'].'.'][$marker.'.']!="" && $this->conf['customRestrictingQuery.'][$this->row['uid'].'.'][$marker."."]["wfqbe."]['floatval']==1)	{
+					$markerParametri["###".$marker."###"] = floatval($markerParametri["###".$marker."###"]);
+				}
+			}
+			//$query = $this->cObj->substituteMarkerArray($query, $markerParametri);
+		}
+		
+		if (sizeof($markerParametri)>0)	{
+			// Hook that can be used to pre-process a parameter (from a search form) before makeing the query
+			if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['wfqbe']['processSubstituteSearchParametersClass']))    {
+				foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['wfqbe']['processSubstituteSearchParametersClass'] as $_classRef)    {
+					$_procObj = &t3lib_div::getUserObj($_classRef);
+					$markerParametri = $_procObj->parse_search_markers($markerParametri, $parametri, $this);
+				}
+			}
+			$idRestrictQuery = $this->cObj->substituteMarkerArray($idRestrictQuery, $markerParametri);
+		}	
+		
+		
+		$ris = $h->Execute($idRestrictQuery);
 			
 			if (!$ris)	{
 				if ($this->pibase->beMode==1)	{
