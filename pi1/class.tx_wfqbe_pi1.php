@@ -73,9 +73,21 @@ class tx_wfqbe_pi1 extends tslib_pibase {
 	 */
 	 
 	function main($content,$conf)	{
+		// Initialize extension configuration
 		$this->conf=$conf;
-		
 		$this->initFF();
+		
+		// Hook that can be used to customize the extension configuration programmatically
+		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['wfqbe']['customizeConfiguration']))    {
+			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['wfqbe']['customizeConfiguration'] as $_classRef)    {
+				$_procObj = &t3lib_div::getUserObj($_classRef);
+				$_params = array('conf' => $this->conf);
+				$this->conf = $_procObj->customizeConfiguration($_params, $this);
+			}
+		}
+		
+		
+		
 		if ($this->conf['recordsForPage']!='')
 			$this->conf['ff_data']['recordsForPage'] = $this->conf['recordsForPage'];
 		
