@@ -694,7 +694,7 @@ class tx_wfqbe_results {
 		if ($numPages<2)
 			$listaRighe = $this->cObj->substituteSubpart($listaRighe, '###BROWSE_TEMPLATE###', '', 1,0);
 		else	{
-			$content = $this->showBrowser($content, $mA, $numPages, $numRows, $actualPage, $row['uid']);
+			$listaRighe = $this->showBrowser($listaRighe, $mA, $numPages, $numRows, $actualPage, $row['uid']);
 		}
 
 		$listaRighe =$this->cObj->substituteMarkerArray($listaRighe, $mA);
