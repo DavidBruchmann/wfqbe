@@ -67,7 +67,7 @@ class tx_wfqbe_results {
 		$ris = $this->getResultQuery($row, $h);
 		$mA = array();
 
-		if ($this->conf['debugQuery'])
+		if ($this->conf['debugQuery'] || $this->conf['customProcess.'][$row['uid'].'.']['debugQuery'])
 			$content .= '<br /><strong>Query constructed:</strong><br />'.$this->query.'<br /><strong>Execution time:</strong>'.$this->executionTime.'<br /><br />';
 
 		if($ris === false)	{
