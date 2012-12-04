@@ -200,8 +200,20 @@ class tx_wfqbe_pi1 extends tslib_pibase {
 		  foreach ( $value as $key => $val )
 		   $this->conf['ff_data'][$key] = $this->pi_getFFvalue($piFlexForm, $key, $sheet);
 		
-		if ($this->conf['ff_data']['templateFile']!='')
-			$this->conf['template'] = $this->conf['ff_data']['templateFile'];
+		if ($this->conf['ff_data']['templateFile']!='')	{
+			if (strpos($this->conf['ff_data']['templateFile'], 'media:')!==false)	{
+				$file = explode(':', $this->conf['ff_data']['templateFile']);
+				if (t3lib_div::testInt($file[1]))	{
+					$resDam = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', 'tx_dam', 'uid='.$file[1].$this->cObj->enableFields('tx_dam'));
+					if ($resDam!==false && $GLOBALS['TYPO3_DB']->sql_num_rows($resDam)==1)	{
+						$rowDam = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($resDam);
+						$this->conf['template'] = $rowDam['file_path'].$rowDam['file_name'];
+					}
+				}
+			}	else	{
+				$this->conf['template'] = $this->conf['ff_data']['templateFile'];
+			}
+		}
 		if ($this->conf['ff_data']['debugQuery']!='')
 			$this->conf['debugQuery'] = $this->conf['ff_data']['debugQuery'];
 		if ($this->conf['ff_data']['customTemplate']!='')
