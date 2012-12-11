@@ -171,12 +171,13 @@ class tx_wfqbe_belib	{
 			// LIST MODE
 			// Setting backtolist value
 			$backurl = 'index.php?&M=web_txwfqbeM2&id='.t3lib_div::_GP('id');
+			$searchParams = '';
 			$wfqbeParams = t3lib_div::_GP('tx_wfqbe_pi1');
 			if (is_array($wfqbeParams))	{
 				foreach ($wfqbeParams as $key => $value)
-					$backurl .= '&tx_wfqbe_pi1['.$key.']='.$value;
+					$searchParams .= '&tx_wfqbe_pi1['.$key.']='.$value;
 			}
-			$sessionData['backurl'] = $backurl;
+			$sessionData['backurl'] = $backurl.$searchParams;
 			$GLOBALS['BE_USER']->setAndSaveSessionData('tx_wfqbe_backend_sessiondata', $sessionData);
 			
 			$contentSearchQ = '';
@@ -201,7 +202,7 @@ class tx_wfqbe_belib	{
 				$content .= $contentSearchQ;
 			
 			if ($backend['insertq']>0)	{
-				$content .= '<br /><p><a href="index.php?&M=web_txwfqbeM2&id='.$this->page_id.'&tx_wfqbe_backend[uid]='.$backend['uid'].'&tx_wfqbe_backend[query]='.$backend['insertq'].'"><span class="t3-icon t3-icon-actions t3-icon-actions-document t3-icon-document-new">&nbsp;</span>'.$LANG->getLL('new_record').'</a></p>';
+				$content .= '<br /><p><a href="index.php?&M=web_txwfqbeM2&id='.$this->page_id.'&tx_wfqbe_backend[uid]='.$backend['uid'].'&tx_wfqbe_backend[query]='.$backend['insertq'].$searchParams.'"><span class="t3-icon t3-icon-actions t3-icon-actions-document t3-icon-document-new">&nbsp;</span>'.$LANG->getLL('new_record').'</a></p>';
 			}
 		}
 		

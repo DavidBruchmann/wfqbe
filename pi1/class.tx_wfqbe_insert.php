@@ -717,7 +717,8 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 			$attributes .= ' size="'.$value['form']['size'].'"';
 		if ($value['form']['maxlength']!='')
 			$attributes .= ' maxlength="'.$value['form']['maxlength'].'"';
-		return '<input'.$attributes.' id="'.$id.'" type="text" name="tx_wfqbe_pi1['.$name.']" value="'.$this->charToEntity($this->pibase->piVars[$name]).'" />';
+		$fieldValue = $this->pibase->piVars[$name]!='' ? $this->pibase->piVars[$name] : ($this->pibase->piVars[$value['field']]!='' ? $this->pibase->piVars[$value['field']] : '');
+		return '<input'.$attributes.' id="'.$id.'" type="text" name="tx_wfqbe_pi1['.$name.']" value="'.$this->charToEntity($fieldValue).'" />';
 	}
 	
 	
@@ -728,7 +729,8 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 			$attributes .= ' size="'.$value['form']['size'].'"';
 			//if ($value['form']['maxlength']!='')
 			$attributes .= ' maxlength="10"';
-		return '<input'.$attributes.' id="'.$id.'" type="text" name="tx_wfqbe_pi1['.$name.']" value="'.$this->charToEntity($this->pibase->piVars[$name]).'" />';
+			$fieldValue = $this->pibase->piVars[$name]!='' ? $this->pibase->piVars[$name] : ($this->pibase->piVars[$value['field']]!='' ? $this->pibase->piVars[$value['field']] : '');
+		return '<input'.$attributes.' id="'.$id.'" type="text" name="tx_wfqbe_pi1['.$name.']" value="'.$this->charToEntity($fieldValue).'" />';
 	}
 	
 	
@@ -754,7 +756,8 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 			else
 				$JSCalendar->setNLP(false);
 			
-			$field = $JSCalendar->render($this->charToEntity($this->pibase->piVars[$name]), 'tx_wfqbe_pi1['.$name.']');
+			$fieldValue = $this->pibase->piVars[$name]!='' ? $this->pibase->piVars[$name] : ($this->pibase->piVars[$value['field']]!='' ? $this->pibase->piVars[$value['field']] : '');
+			$field = $JSCalendar->render($this->charToEntity($fieldValue), 'tx_wfqbe_pi1['.$name.']');
 			//$field = str_replace('name="tx_wfqbe_pi1['.$name.']_hr"', 'name="tx_wfqbe_pi1['.$name.']"', $field);
 
 			// get initialisation code of the calendar
@@ -790,8 +793,9 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 				$jsCode .= '});
 							</script>';
 				$GLOBALS['TSFE']->additionalHeaderData['wfqbe_datepicker'] = $jsCode;
+				$fieldValue = $this->pibase->piVars[$name]!='' ? $this->pibase->piVars[$name] : ($this->pibase->piVars[$value['field']]!='' ? $this->pibase->piVars[$value['field']] : '');
 				
-				return '<input id="'.$id.'" type="text" name="tx_wfqbe_pi1['.$name.']" value="'.$this->charToEntity($this->pibase->piVars[$name]).'" />';
+				return '<input id="'.$id.'" type="text" name="tx_wfqbe_pi1['.$name.']" value="'.$this->charToEntity($fieldValue).'" />';
 				
 			}	elseif ($this->pibase->beMode)	{
 				// Uses extbase calendar
@@ -808,7 +812,9 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 						};
 				</script>';
 				
-				return $JScode.'<input name="tx_wfqbe_pi1['.$name.']" type="text" id="tceforms-datetimefield-'.$id.'" value="' . $this->charToEntity($this->pibase->piVars[$name]) . '" />' .
+				$fieldValue = $this->pibase->piVars[$name]!='' ? $this->pibase->piVars[$name] : ($this->pibase->piVars[$value['field']]!='' ? $this->pibase->piVars[$value['field']] : '');
+				
+				return $JScode.'<input name="tx_wfqbe_pi1['.$name.']" type="text" id="tceforms-datetimefield-'.$id.'" value="' . $this->charToEntity($fieldValue) . '" />' .
 					   	t3lib_iconWorks::getSpriteIcon(
 							'actions-edit-pick-date',
 							array(
@@ -823,7 +829,8 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 	
 	
 	function showPassword($value, $name, $id)	{
-		return '<input id="'.$id.'" type="password" name="tx_wfqbe_pi1['.$name.']" value="'.$this->pibase->piVars[$name].'" />';
+		$fieldValue = $this->pibase->piVars[$name]!='' ? $this->pibase->piVars[$name] : ($this->pibase->piVars[$value['field']]!='' ? $this->pibase->piVars[$value['field']] : '');
+		return '<input id="'.$id.'" type="password" name="tx_wfqbe_pi1['.$name.']" value="'.$fieldValue.'" />';
 	}
 	
 	
@@ -921,7 +928,8 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 		if ($value['form']['cols']=="")
 			$value['form']['cols'] = 50;
 		
-		$content = "<textarea id='".$id."' name='tx_wfqbe_pi1[".$name."]' rows='".$value['form']['rows']."' cols='".$value['form']['cols']."'>".$this->pibase->piVars[$name]."</textarea>";
+		$fieldValue = $this->pibase->piVars[$name]!='' ? $this->pibase->piVars[$name] : ($this->pibase->piVars[$value['field']]!='' ? $this->pibase->piVars[$value['field']] : '');
+		$content = "<textarea id='".$id."' name='tx_wfqbe_pi1[".$name."]' rows='".$value['form']['rows']."' cols='".$value['form']['cols']."'>".$fieldValue."</textarea>";
 		if ($value['form']['rte']==1 && t3lib_extMgm::isLoaded('rtehtmlarea'))	{
 			if ($this->RTEObj->isAvailable()) {
 				if ($this->pibase->beMode)	{
@@ -953,7 +961,7 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 				$this->field = $name;
 				$this->formName = $this->conf['ff_data']['div_id'].'_form';
 				$this->PA['itemFormElName'] = 'tx_wfqbe_pi1['.$name.']';
-				$this->PA['itemFormElValue'] = $this->pibase->piVars[$name];
+				$this->PA['itemFormElValue'] = $fieldValue;
 				$RTEItem = $this->RTEObj->drawRTE($this, 'tx_wfqbe_pi1', $name, $row = array(), $this->PA, $this->specConf, $this->thisConfig, $this->RTEtypeVal, '', $this->thePidValue);
 				$content = $this->additionalJS_initial.'
 					<script type="text/javascript">'. implode(chr(10), $this->additionalJS_pre).'
@@ -1008,7 +1016,7 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 					$idi=' id="'.$id.'"';
 				else
 					$idi = '';
-				if ($value['form'][$i]['value']==$this->pibase->piVars[$name])
+				if ($value['form'][$i]['value']==$this->pibase->piVars[$name] || ($this->pibase->piVars[$name]=='' && $value['form'][$i]['value']==$this->pibase->piVars[$value['field']]))
 					$listaRadio .= '<input'.$idi.' checked="checked" type="radio" name="tx_wfqbe_pi1['.$name.']" value="'.$value['form'][$i]['value'].'" /> '.$value['form'][$i]['label'];
 				else
 					$listaRadio .= '<input'.$idi.' type="radio" name="tx_wfqbe_pi1['.$name.']" value="'.$value['form'][$i]['value'].'" /> '.$value['form'][$i]['label'];
@@ -1035,7 +1043,7 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 					$idi=' id="'.$id.'"';
 				else
 					$idi = '';
-				if ($array[1]==$this->pibase->piVars[$name])
+				if ($array[1]==$this->pibase->piVars[$name] || ($this->pibase->piVars[$name]=='' && $array[1]==$this->pibase->piVars[$value['field']]))
 					$listaRadio .= '<input'.$idi.' checked="checked" type="radio" name="tx_wfqbe_pi1['.$name.']" value="'.$array[1].'" /> '.$array[0].'<br />';
 				else
 					$listaRadio .= '<input'.$idi.' type="radio" name="tx_wfqbe_pi1['.$name.']" value="'.$array[1].'" /> '.$array[0].'<br />';
@@ -1059,7 +1067,7 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 					$idi=' id="'.$id.'"';
 				else
 					$idi='';
-				if (is_array($this->pibase->piVars[$name]) && in_array($value['form'][$i]['value'],$this->pibase->piVars[$name]))
+				if ((is_array($this->pibase->piVars[$name]) && in_array($value['form'][$i]['value'],$this->pibase->piVars[$name])) || (!is_array($this->pibase->piVars[$name]) && is_array($this->pibase->piVars[$value['field']]) && in_array($value['form'][$i]['value'],$this->pibase->piVars[$value['field']])))
 					$listaRadio .= '<input'.$idi.' checked="checked" type="checkbox" name="tx_wfqbe_pi1['.$name.'][]" value="'.$value['form'][$i]['value'].'" /> '.$value['form'][$i]['label'];
 				else
 					$listaRadio .= '<input'.$idi.' type="checkbox" name="tx_wfqbe_pi1['.$name.'][]" value="'.$value['form'][$i]['value'].'" /> '.$value['form'][$i]['label'];
@@ -1081,7 +1089,7 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 					$idi=' id="'.$id.'"';
 				else
 					$idi='';
-				if (is_array($this->pibase->piVars[$name]) && in_array($array[1],$this->pibase->piVars[$name]))
+				if ((is_array($this->pibase->piVars[$name]) && in_array($array[1],$this->pibase->piVars[$name])) || (!is_array($this->pibase->piVars[$name]) && is_array($this->pibase->piVars[$value['field']]) && in_array($array[1],$this->pibase->piVars[$value['field']])))
 					$listaRadio .= '<input'.$idi.' checked="checked" type="checkbox" name="tx_wfqbe_pi1['.$name.'][]" value="'.$array[1].'" /> '.$array[0];
 				else
 					$listaRadio .= '<input'.$idi.' type="checkbox" name="tx_wfqbe_pi1['.$name.'][]" value="'.$array[1].'" /> '.$array[0];
@@ -1122,7 +1130,7 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 		
 		if ($value['form']['source']=='static')	{
 			for ($i=0; $i<$value['form']['numValues']; $i++)	{
-				if (is_array($this->pibase->piVars[$name]) && in_array($value['form'][$i]['value'], $this->pibase->piVars[$name]))
+				if ((is_array($this->pibase->piVars[$name]) && in_array($value['form'][$i]['value'], $this->pibase->piVars[$name])) || (!is_array($this->pibase->piVars[$name]) && is_array($this->pibase->piVars[$value['field']]) && in_array($value['form'][$i]['value'], $this->pibase->piVars[$value['field']])))
 					$listaSelect .= '<option selected="selected" value="'.$value['form'][$i]['value'].'"> '.$value['form'][$i]['label'].'</option>';
 				else
 					$listaSelect .= '<option value="'.$value['form'][$i]['value'].'"> '.$value['form'][$i]['label'].'</option>';
@@ -1157,7 +1165,7 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 						}
 					}
 					
-					if (is_array($this->pibase->piVars[$name]) && in_array($array[1],$this->pibase->piVars[$name]))
+					if ((is_array($this->pibase->piVars[$name]) && in_array($array[1],$this->pibase->piVars[$name])) || (!is_array($this->pibase->piVars[$name]) && is_array($this->pibase->piVars[$value['field']]) && in_array($array[1],$this->pibase->piVars[$value['field']])))
 						$listaSelect .= '<option selected="selected" value="'.$array[1].'"> '.$label.'</option>';
 					else
 						$listaSelect .= '<option value="'.$array[1].'"> '.$label.'</option>';
