@@ -233,20 +233,28 @@ class tx_wfqbe_results {
 	function parametersToMarkers($parametri, $markerParametri, $clearInput=1)	{
 		foreach ($parametri as $key => $value)	{
 			if (!is_array($value))	{
+				$markerParametri["###WFQBE_".($key)."###"] = ($clearInput ? addslashes(strip_tags($value)) : $value);
 				$markerParametri["###WFQBE_".strtoupper($key)."###"] = ($clearInput ? addslashes(strip_tags($value)) : $value);
 			}	elseif (sizeof($value)==1)	{
+				$markerParametri["###WFQBE_".($key)."###"] = ($clearInput ? addslashes(strip_tags($value[0])) : $value);
 				$markerParametri["###WFQBE_".strtoupper($key)."###"] = ($clearInput ? addslashes(strip_tags($value[0])) : $value);
 			}	else	{
 				$i=0;
 				foreach ($value as $sel)	{
-					if ($i>0)
+					if ($i>0)	{
+						$markerParametri["###WFQBE_".($key)."###"] .= "'";
 						$markerParametri["###WFQBE_".strtoupper($key)."###"] .= "'";
-					if (is_array($sel))
+					}
+					if (is_array($sel))	{
+						$markerParametri["###WFQBE_".($key)."###"] .= ($clearInput ? addslashes(strip_tags($sel[0])) : $value);
 						$markerParametri["###WFQBE_".strtoupper($key)."###"] .= ($clearInput ? addslashes(strip_tags($sel[0])) : $value);
-					else
+					}	else	{
+						$markerParametri["###WFQBE_".($key)."###"] .= ($clearInput ? addslashes(strip_tags($sel)) : $value);
 						$markerParametri["###WFQBE_".strtoupper($key)."###"] .= ($clearInput ? addslashes(strip_tags($sel)) : $value);
-					if ($i<sizeof($value)-1)
-						$markerParametri["###WFQBE_".strtoupper($key)."###"] .= "',";
+					}
+					if ($i<sizeof($value)-1)	{
+						$markerParametri["###WFQBE_".($key)."###"] .= "',";
+					}
 					$i++;
 				}
 			}
@@ -721,7 +729,10 @@ class tx_wfqbe_results {
 				}
 				
 				if ($this->pibase->beMode==1 && $k=='additionalParams')	{
-					$value = $value.'&tx_wfqbe_backend[mode]=details&tx_wfqbe_backend[uid]='.$backend['uid'];
+					if (strpos($value, 'tx_wfqbe_backend[uid]')===false)
+						$value = $value.'&tx_wfqbe_backend[uid]='.$backend['uid'];
+					if (strpos($value, 'tx_wfqbe_backend[mode]')===false)
+						$value = $value.'&tx_wfqbe_backend[mode]=details';
 				}
 				
 				$confArray[$k] = $value;
