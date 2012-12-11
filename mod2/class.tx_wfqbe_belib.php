@@ -131,6 +131,7 @@ class tx_wfqbe_belib	{
 		*/
 		// Initialize typoscript configuration
 		$this->initConfig($backend['typoscript']);
+		$sessionData = $GLOBALS['BE_USER']->getSessionData('tx_wfqbe_backend_sessiondata');
 		
 		$PI1 = t3lib_div::makeInstance('tx_wfqbe_pi1');
 		$PI1->conf = $this->conf;
@@ -140,11 +141,18 @@ class tx_wfqbe_belib	{
 		$content = '';
 		
 		if (($query>0 && $query==$backend['insertq']) || $this->piVars['wfqbe_editing_mode']==1 || $this->piVars['wfqbe_deleting_mode']==1)	{
+			// EDIT MODE
+			
 			$PI1->conf['ff_data']['queryObject'] = $backend['insertq'];
 			$form_built = false;
 			$content .= $PI1->do_general('', $form_built, $this);
-			$content .= '<br /><p><a href="index.php?&M=web_txwfqbeM2&id='.$this->page_id.'&tx_wfqbe_backend[uid]='.$backend['uid'].'"><img height="16" width="16" src="'.$BACK_PATH.'sysext/t3skin/icons/module_web_list.gif" title="'.$LANG->getLL('back_to_list').'" alt="'.$LANG->getLL('back_to_list').'"> '.$LANG->getLL('back_to_list').'</a></p>';
+			if (is_array($sessionData) && $sessionData['backurl']!='')
+				$content .= '<br /><p><a href="'.$sessionData['backurl'].'"><img height="16" width="16" src="'.$BACK_PATH.'sysext/t3skin/icons/module_web_list.gif" title="'.$LANG->getLL('back_to_list').'" alt="'.$LANG->getLL('back_to_list').'"> '.$LANG->getLL('back_to_list').'</a></p>';
+			else
+				$content .= '<br /><p><a href="index.php?&M=web_txwfqbeM2&id='.$this->page_id.'&tx_wfqbe_backend[uid]='.$backend['uid'].'"><img height="16" width="16" src="'.$BACK_PATH.'sysext/t3skin/icons/module_web_list.gif" title="'.$LANG->getLL('back_to_list').'" alt="'.$LANG->getLL('back_to_list').'"> '.$LANG->getLL('back_to_list').'</a></p>';
 		}	elseif ($this->mode=='details')	{
+			// DETAILS MODE
+			
 			if ($backend['detailsq']!='')	{
 				$detailsq = explode(',', $backend['detailsq']);
 				if (is_array($detailsq))	{
@@ -155,8 +163,21 @@ class tx_wfqbe_belib	{
 					}
 				}
 			}
-			$content .= '<br /><p><a href="index.php?&M=web_txwfqbeM2&id='.$this->page_id.'&tx_wfqbe_backend[uid]='.$backend['uid'].'"><img height="16" width="16" src="'.$BACK_PATH.'sysext/t3skin/icons/module_web_list.gif" title="'.$LANG->getLL('back_to_list').'" alt="'.$LANG->getLL('back_to_list').'"> '.$LANG->getLL('back_to_list').'</a></p>';
+			if (is_array($sessionData) && $sessionData['backurl']!='')
+				$content .= '<br /><p><a href="'.$sessionData['backurl'].'"><img height="16" width="16" src="'.$BACK_PATH.'sysext/t3skin/icons/module_web_list.gif" title="'.$LANG->getLL('back_to_list').'" alt="'.$LANG->getLL('back_to_list').'"> '.$LANG->getLL('back_to_list').'</a></p>';
+			else
+				$content .= '<br /><p><a href="index.php?&M=web_txwfqbeM2&id='.$this->page_id.'&tx_wfqbe_backend[uid]='.$backend['uid'].'"><img height="16" width="16" src="'.$BACK_PATH.'sysext/t3skin/icons/module_web_list.gif" title="'.$LANG->getLL('back_to_list').'" alt="'.$LANG->getLL('back_to_list').'"> '.$LANG->getLL('back_to_list').'</a></p>';
 		}	else	{
+			// LIST MODE
+			// Setting backtolist value
+			$backurl = 'index.php?&M=web_txwfqbeM2&id='.t3lib_div::_GP('id');
+			$wfqbeParams = t3lib_div::_GP('tx_wfqbe_pi1');
+			if (is_array($wfqbeParams))	{
+				foreach ($wfqbeParams as $key => $value)
+					$backurl .= '&tx_wfqbe_pi1['.$key.']='.$value;
+			}
+			$sessionData['backurl'] = $backurl;
+			$GLOBALS['BE_USER']->setAndSaveSessionData('tx_wfqbe_backend_sessiondata', $sessionData);
 			
 			$contentSearchQ = '';
 			if ($backend['searchq']>0)	{
