@@ -251,7 +251,7 @@ class tx_wfqbe_search {
 					$idi=' id="'.$id.'"';
 				else
 					$idi = '';
-				if ($value['form'][$i]['value']==$wfqbe[$name])
+				if ($value['form'][$i]['value']==$wfqbe[$name] || $value['form'][$i]['value']==$this->pibase->piVars[$name])
 					$listaRadio .= '<input'.$idi.' checked="checked" type="radio" name="tx_wfqbe_pi1['.$name.']" value="'.$value['form'][$i]['value'].'" /> '.$value['form'][$i]['label'];
 				else
 					$listaRadio .= '<input'.$idi.' type="radio" name="tx_wfqbe_pi1['.$name.']" value="'.$value['form'][$i]['value'].'" /> '.$value['form'][$i]['label'];
@@ -271,7 +271,7 @@ class tx_wfqbe_search {
 			while($array = $ris -> FetchRow()){
 				if ($array[1]=="")
 					$emptyOption = true;
-				if ($array[1]==$wfqbe[$name])
+				if ($array[1]==$wfqbe[$name] || $array[1]==$this->pibase->piVars[$name])
 					$listaRadio .= '<input'.$update.' checked="checked" type="radio" name="tx_wfqbe_pi1['.$name.']" value="'.$array[1].'" /> '.$array[0].'<br />';
 				else
 					$listaRadio .= '<input'.$update.' type="radio" name="tx_wfqbe_pi1['.$name.']" value="'.$array[1].'" /> '.$array[0].'<br />';
@@ -315,7 +315,7 @@ class tx_wfqbe_search {
 					$idi=' id="'.$id.'"';
 				else
 					$idi = '';
-				if (is_array($wfqbe[$name]) && in_array($value['form'][$i]['value'], $wfqbe[$name]))
+				if ((is_array($wfqbe[$name]) && in_array($value['form'][$i]['value'], $wfqbe[$name])) || $value['form'][$i]['value']==$this->pibase->piVars[$name])
 					$listCheck .= '<input'.$idi.' checked="checked" type="checkbox" name="tx_wfqbe_pi1['.$name.'][]" value="'.$value['form'][$i]['value'].'" /> '.$value['form'][$i]['label'];
 				else
 					$listCheck .= '<input'.$idi.' type="checkbox" name="tx_wfqbe_pi1['.$name.'][]" value="'.$value['form'][$i]['value'].'" /> '.$value['form'][$i]['label'];
@@ -337,7 +337,7 @@ class tx_wfqbe_search {
 			while($array = $ris -> FetchRow()){
 				//if ($array[1]=="")
 					//$emptyOption = true;
-				if (is_array($wfqbe[$name]) && in_array($array[1], $wfqbe[$name]))
+				if ((is_array($wfqbe[$name]) && in_array($array[1], $wfqbe[$name])) || $array[1]==$this->pibase->piVars[$name])
 					$listCheck .= '<input'.$update.' checked="checked" type="checkbox" name="tx_wfqbe_pi1['.$name.'][]" value="'.$array[1].'" /> '.$array[0].'<br />';
 				else
 					$listCheck .= '<input'.$update.' type="checkbox" name="tx_wfqbe_pi1['.$name.'][]" value="'.$array[1].'" /> '.$array[0].'<br />';
@@ -382,7 +382,7 @@ class tx_wfqbe_search {
 		
 		if ($value['form']['source']=='static')	{
 			for ($i=0; $i<$value['form']['numValues']; $i++)	{
-				if (is_array($wfqbe[$name]) && in_array($value['form'][$i]['value'], $wfqbe[$name]))
+				if ((is_array($wfqbe[$name]) && in_array($value['form'][$i]['value'], $wfqbe[$name])) || $value['form'][$i]['value']==$this->pibase->piVars[$name])
 					$listaSelect .= '<option selected="selected" value="'.$value['form'][$i]['value'].'" />'.$value['form'][$i]['label'].'</option>';
 				else
 					$listaSelect .= '<option value="'.$value['form'][$i]['value'].'" />'.$value['form'][$i]['label'].'</option>';
@@ -433,7 +433,7 @@ class tx_wfqbe_search {
 						$array[0]=$array[0];
 					}
 					
-					if ((is_array($wfqbe[$name]) && in_array($array[1],$wfqbe[$name])) || $array[1]==$wfqbe[$name])
+					if ((is_array($wfqbe[$name]) && in_array($array[1],$wfqbe[$name])) || $array[1]==$wfqbe[$name] || $array[1]==$this->pibase->piVars[$name])
 						$listaSelect .= '<option selected="selected" value="'.$array[1].'">'.$array[0].'</option>';
 					else
 						$listaSelect .= '<option value="'.$array[1].'">'.$array[0].'</option>';

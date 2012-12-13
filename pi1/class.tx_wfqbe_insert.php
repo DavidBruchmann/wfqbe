@@ -1067,7 +1067,7 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 					$idi=' id="'.$id.'"';
 				else
 					$idi='';
-				if ((is_array($this->pibase->piVars[$name]) && in_array($value['form'][$i]['value'],$this->pibase->piVars[$name])) || (!is_array($this->pibase->piVars[$name]) && is_array($this->pibase->piVars[$value['field']]) && in_array($value['form'][$i]['value'],$this->pibase->piVars[$value['field']])))
+				if ((is_array($this->pibase->piVars[$name]) && in_array($value['form'][$i]['value'],$this->pibase->piVars[$name])) || (!is_array($this->pibase->piVars[$name]) && $this->pibase->piVars[$value['field']]!='' && in_array($value['form'][$i]['value'],explode(',',$this->pibase->piVars[$value['field']]))))
 					$listaRadio .= '<input'.$idi.' checked="checked" type="checkbox" name="tx_wfqbe_pi1['.$name.'][]" value="'.$value['form'][$i]['value'].'" /> '.$value['form'][$i]['label'];
 				else
 					$listaRadio .= '<input'.$idi.' type="checkbox" name="tx_wfqbe_pi1['.$name.'][]" value="'.$value['form'][$i]['value'].'" /> '.$value['form'][$i]['label'];
@@ -1089,7 +1089,7 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 					$idi=' id="'.$id.'"';
 				else
 					$idi='';
-				if ((is_array($this->pibase->piVars[$name]) && in_array($array[1],$this->pibase->piVars[$name])) || (!is_array($this->pibase->piVars[$name]) && is_array($this->pibase->piVars[$value['field']]) && in_array($array[1],$this->pibase->piVars[$value['field']])))
+				if ((is_array($this->pibase->piVars[$name]) && in_array($array[1],$this->pibase->piVars[$name])) || (!is_array($this->pibase->piVars[$name]) && $this->pibase->piVars[$value['field']]!='' && in_array($array[1],explode(',',$this->pibase->piVars[$value['field']]))))
 					$listaRadio .= '<input'.$idi.' checked="checked" type="checkbox" name="tx_wfqbe_pi1['.$name.'][]" value="'.$array[1].'" /> '.$array[0];
 				else
 					$listaRadio .= '<input'.$idi.' type="checkbox" name="tx_wfqbe_pi1['.$name.'][]" value="'.$array[1].'" /> '.$array[0];
@@ -1106,6 +1106,7 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 	
 	
 	function showSelect($value, $name, $h, $id)	{
+	
 		if ($value['form']['onchange']!="")	{
 			if (t3lib_extMgm::isLoaded('xajax') && $this->conf['enableXAJAX']==1)	{
 				$update = ' onchange="document.getElementById(\'wfqbe_destination_id\').value=\''.$value['form']['onchange'].'\'; '.$this->prefixId .'processInsertData(xajax.getFormValues(\''.$this->conf['ff_data']['div_id'].'_form\')); return false;"';
@@ -1130,7 +1131,7 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 		
 		if ($value['form']['source']=='static')	{
 			for ($i=0; $i<$value['form']['numValues']; $i++)	{
-				if ((is_array($this->pibase->piVars[$name]) && in_array($value['form'][$i]['value'], $this->pibase->piVars[$name])) || (!is_array($this->pibase->piVars[$name]) && is_array($this->pibase->piVars[$value['field']]) && in_array($value['form'][$i]['value'], $this->pibase->piVars[$value['field']])))
+				if ((is_array($this->pibase->piVars[$name]) && in_array($value['form'][$i]['value'], $this->pibase->piVars[$name])) || (!is_array($this->pibase->piVars[$name]) && $this->pibase->piVars[$value['field']]!='' && in_array($value['form'][$i]['value'], explode(',',$this->pibase->piVars[$value['field']]))))
 					$listaSelect .= '<option selected="selected" value="'.$value['form'][$i]['value'].'"> '.$value['form'][$i]['label'].'</option>';
 				else
 					$listaSelect .= '<option value="'.$value['form'][$i]['value'].'"> '.$value['form'][$i]['label'].'</option>';
@@ -1165,7 +1166,7 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 						}
 					}
 					
-					if ((is_array($this->pibase->piVars[$name]) && in_array($array[1],$this->pibase->piVars[$name])) || (!is_array($this->pibase->piVars[$name]) && is_array($this->pibase->piVars[$value['field']]) && in_array($array[1],$this->pibase->piVars[$value['field']])))
+					if ((is_array($this->pibase->piVars[$name]) && in_array($array[1],$this->pibase->piVars[$name])) || (!is_array($this->pibase->piVars[$name]) && $this->pibase->piVars[$value['field']]!='' && in_array($array[1],explode(',',$this->pibase->piVars[$value['field']]))))
 						$listaSelect .= '<option selected="selected" value="'.$array[1].'"> '.$label.'</option>';
 					else
 						$listaSelect .= '<option value="'.$array[1].'"> '.$label.'</option>';

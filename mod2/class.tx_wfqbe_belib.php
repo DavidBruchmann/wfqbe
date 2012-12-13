@@ -167,18 +167,12 @@ class tx_wfqbe_belib	{
 				$content .= '<br /><p><a href="'.$sessionData['backurl'].'"><img height="16" width="16" src="'.$BACK_PATH.'sysext/t3skin/icons/module_web_list.gif" title="'.$LANG->getLL('back_to_list').'" alt="'.$LANG->getLL('back_to_list').'"> '.$LANG->getLL('back_to_list').'</a></p>';
 			else
 				$content .= '<br /><p><a href="index.php?&M=web_txwfqbeM2&id='.$this->page_id.'&tx_wfqbe_backend[uid]='.$backend['uid'].'"><img height="16" width="16" src="'.$BACK_PATH.'sysext/t3skin/icons/module_web_list.gif" title="'.$LANG->getLL('back_to_list').'" alt="'.$LANG->getLL('back_to_list').'"> '.$LANG->getLL('back_to_list').'</a></p>';
+			
+			$searchParams = $this->saveBackToListUrl();
+			
 		}	else	{
 			// LIST MODE
-			// Setting backtolist value
-			$backurl = 'index.php?&M=web_txwfqbeM2&id='.t3lib_div::_GP('id');
-			$searchParams = '';
-			$wfqbeParams = t3lib_div::_GP('tx_wfqbe_pi1');
-			if (is_array($wfqbeParams))	{
-				foreach ($wfqbeParams as $key => $value)
-					$searchParams .= '&tx_wfqbe_pi1['.$key.']='.$value;
-			}
-			$sessionData['backurl'] = $backurl.$searchParams;
-			$GLOBALS['BE_USER']->setAndSaveSessionData('tx_wfqbe_backend_sessiondata', $sessionData);
+			$searchParams = $this->saveBackToListUrl();
 			
 			$contentSearchQ = '';
 			if ($backend['searchq']>0)	{
@@ -209,6 +203,25 @@ class tx_wfqbe_belib	{
 		return $content;
 	}
 	
+	
+	
+	function saveBackToListUrl()	{
+		// Setting backtolist value
+		$backurl = 'index.php?&M=web_txwfqbeM2&id='.t3lib_div::_GP('id');
+		$searchParams = '';
+		$wfqbeParams = t3lib_div::_GP('tx_wfqbe_pi1');
+		if (is_array($wfqbeParams))	{
+			foreach ($wfqbeParams as $key => $value)
+				if (is_array($value))
+					$searchParams .= '&tx_wfqbe_pi1['.$key.']='.implode(',',$value);
+				else
+					$searchParams .= '&tx_wfqbe_pi1['.$key.']='.$value;
+		}
+		$sessionData['backurl'] = $backurl.$searchParams;
+		$GLOBALS['BE_USER']->setAndSaveSessionData('tx_wfqbe_backend_sessiondata', $sessionData);
+		
+		return $searchParams;
+	}
 	
 	
 	/**
