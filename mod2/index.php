@@ -110,6 +110,15 @@ class  tx_wfqbe_module2 extends t3lib_SCbase {
                         $pageRenderer->addJsFile($BACK_PATH . '../t3lib/js/extjs/tceforms.js', 'text/javascript', false);
                         $pageRenderer->addJsFile($BACK_PATH . '../t3lib/js/extjs/ux/Ext.ux.DateTimePicker.js', 'text/javascript', false);
                         
+                        $modTSconfig = $GLOBALS['BE_USER']->getTSConfig(
+                        		'mod.tx_wfqbe_mod2',
+                        		t3lib_BEfunc::getPagesTSconfig($this->id)
+                        );
+                        
+                        if ($modTSconfig['properties']['customCSS']!='')	{
+                        	$pageRenderer->addCssFile($BACK_PATH . '../'.$modTSconfig['properties']['customCSS']);
+                        }
+                        
                         $typo3Settings = array(
                         		'datePickerUSmode' => $GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat'] ? 1 : 0,
                         		'dateFormat'       => array('j-n-Y', 'G:i j-n-Y'),
