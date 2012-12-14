@@ -1932,8 +1932,10 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 			'%m.%d.%Y',
 			'%Y-%m-%d',
 			'dd-mm-yy',
+			'dd.mm.yy',
 			'dd/mm/yy',
 			'mm-dd-yy',
+			'mm.dd.yy',
 			'mm/dd/yy'
 		);
 		$calendarDateTimeFormats = array(
@@ -1965,8 +1967,16 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 				$temp = explode('-', $date);
 				$array['day']=$temp[0];$array['month']=$temp[1];$array['year']=$temp[2];
 				break;
+			case 'dd.mm.yy':
+				$temp = explode('.', $date);
+				$array['day']=$temp[0];$array['month']=$temp[1];$array['year']=$temp[2];
+				break;
 			case 'mm/dd/yy':
 				$temp = explode('/', $date);
+				$array['day']=$temp[1];$array['month']=$temp[0];$array['year']=$temp[2];
+				break;
+			case 'mm.dd.yy':
+				$temp = explode('.', $date);
 				$array['day']=$temp[1];$array['month']=$temp[0];$array['year']=$temp[2];
 				break;
 			case 'mm-dd-yy':

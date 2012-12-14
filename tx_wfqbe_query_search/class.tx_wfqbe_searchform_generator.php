@@ -61,8 +61,10 @@ class tx_wfqbe_searchform_generator{
 			),
 			'jquery_datepicker' => array(
 					'dd-mm-yy',
+					'dd.mm.yy',
 					'dd/mm/yy',
 					'mm-dd-yy',
+					'mm.dd.yy',
 					'mm/dd/yy'
 			)
 	);
