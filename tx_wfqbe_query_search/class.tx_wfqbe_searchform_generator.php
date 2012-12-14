@@ -200,6 +200,8 @@ class tx_wfqbe_searchform_generator{
 		
 		$content .= ' - '.$GLOBALS['LANG']->getLL('update_change').': <input type="text" name="wfqbe[fields]['.$key.'][form][onchange]" value="'.$value['form']['onchange'].'" />';
 		
+		$content .= ' - '.$GLOBALS['LANG']->getLL('additional_attributes').': <input type="text" name="wfqbe[fields]['.$key.'][form][additional_attributes]" value="'.$value['form']['additional_attributes'].'" />';
+		
 		$content.= '<br />';
 		
 		switch ($value['type'])	{

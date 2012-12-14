@@ -221,6 +221,8 @@ class tx_wfqbe_search {
 			$additionalParams .= ' size="'.$value['form']['size'].'"';
 		if ($value['form']['maxlength']!='' && t3lib_div::testInt($value['form']['maxlength']))
 			$additionalParams .= ' maxlength="'.$value['form']['maxlength'].'"';
+		if ($value['form']['additional_attributes']!='')
+			$additionalParams .= ' '.$value['form']['additional_attributes'];
 		
 		return '<input'.$additionalParams.' id="'.$id.'" type="'.$type.'" name="tx_wfqbe_pi1['.$name.']" value="'.$wfqbe[$name].'"'.$update.' />';
 	}
@@ -244,6 +246,9 @@ class tx_wfqbe_search {
 		}	else	{
 			$update = '';
 		}
+		
+		if ($value['form']['additional_attributes']!='')
+			$update .= ' '.$value['form']['additional_attributes'];
 
 		if ($value['form']['source']=='static')	{
 			for ($i=0; $i<$value['form']['numValues']; $i++)	{
@@ -252,9 +257,9 @@ class tx_wfqbe_search {
 				else
 					$idi = '';
 				if ($value['form'][$i]['value']==$wfqbe[$name] || $value['form'][$i]['value']==$this->pibase->piVars[$name])
-					$listaRadio .= '<input'.$idi.' checked="checked" type="radio" name="tx_wfqbe_pi1['.$name.']" value="'.$value['form'][$i]['value'].'" /> '.$value['form'][$i]['label'];
+					$listaRadio .= '<input'.$idi.$update.' checked="checked" type="radio" name="tx_wfqbe_pi1['.$name.']" value="'.$value['form'][$i]['value'].'" /> '.$value['form'][$i]['label'];
 				else
-					$listaRadio .= '<input'.$idi.' type="radio" name="tx_wfqbe_pi1['.$name.']" value="'.$value['form'][$i]['value'].'" /> '.$value['form'][$i]['label'];
+					$listaRadio .= '<input'.$idi.$update.' type="radio" name="tx_wfqbe_pi1['.$name.']" value="'.$value['form'][$i]['value'].'" /> '.$value['form'][$i]['label'];
 				if ($i<$value['form']['numValues']-1)
 					$listaRadio .= '<br />';
 			}
@@ -308,6 +313,9 @@ class tx_wfqbe_search {
 		}	else	{
 			$update = '';
 		}
+		
+		if ($value['form']['additional_attributes']!='')
+			$update .= ' '.$value['form']['additional_attributes'];
 
 		if ($value['form']['source']=='static')	{
 			for ($i=0; $i<$value['form']['numValues']; $i++)	{
@@ -316,9 +324,9 @@ class tx_wfqbe_search {
 				else
 					$idi = '';
 				if ((is_array($wfqbe[$name]) && in_array($value['form'][$i]['value'], $wfqbe[$name])) || $value['form'][$i]['value']==$this->pibase->piVars[$name])
-					$listCheck .= '<input'.$idi.' checked="checked" type="checkbox" name="tx_wfqbe_pi1['.$name.'][]" value="'.$value['form'][$i]['value'].'" /> '.$value['form'][$i]['label'];
+					$listCheck .= '<input'.$idi.$update.' checked="checked" type="checkbox" name="tx_wfqbe_pi1['.$name.'][]" value="'.$value['form'][$i]['value'].'" /> '.$value['form'][$i]['label'];
 				else
-					$listCheck .= '<input'.$idi.' type="checkbox" name="tx_wfqbe_pi1['.$name.'][]" value="'.$value['form'][$i]['value'].'" /> '.$value['form'][$i]['label'];
+					$listCheck .= '<input'.$idi.$update.' type="checkbox" name="tx_wfqbe_pi1['.$name.'][]" value="'.$value['form'][$i]['value'].'" /> '.$value['form'][$i]['label'];
 				if ($i<$value['form']['numValues']-1)
 					$listCheck .= '<br />';
 			}
@@ -373,6 +381,9 @@ class tx_wfqbe_search {
 		}	else	{
 			$update = '';
 		}
+		
+		if ($value['form']['additional_attributes']!='')
+			$update .= ' '.$value['form']['additional_attributes'];
 
 		if ($value['form']['multiple']=='si')	{
 			$size = $value['form']['size']>0 ? $value['form']['size'] : 5;
