@@ -908,11 +908,11 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 			$array = $ris -> FetchRow();
 			$content .= $array[$value['form']['field_view']];
 			if (is_array($value['form']['field_view_sub']))	{
-				foreach ($value['form']['field_view_sub'] as $key => $value)	{
-					if ($value['sep']!='')
-						$content .= $value['sep'];
-					if ($value['field']!='')
-						$content .= $array[$value['field']];
+				foreach ($value['form']['field_view_sub'] as $subkey => $subview)	{
+					if ($subview['sep']!='')
+						$content .= $subview['sep'];
+					if ($subview['field']!='')
+						$content .= $array[$subview['field']];
 				}
 			}
 			$content.='<input id="'.$id.'" type="hidden" name="tx_wfqbe_pi1['.$name.']" value="'.$array[$value['form']['field_insert']].'" />';
