@@ -857,10 +857,10 @@ class tx_wfqbe_results {
 		//for ($i=1; $i<=$numPages; $i++)	{
 		for ($i=$start; $i<=$numPages && $i<=$end; $i++)	{
 			if ($i==$actualPage)
-				$mA['###PAGE_LIST###'] .= ' <span class="wfqbe_actualPage">'.$i.'</span> - ';
+				$mA['###PAGE_LIST###'] .= ' <span class="wfqbe_actualPage">'.$i.'</span>'.$this->pibase->pi_getLL('page_separator');
 			else	{
 				$this->pibase->piVars['showpage'][$uid] = $i;
-				$mA['###PAGE_LIST###'] .= ' <a href="'.htmlentities($this->pibase->pi_linkTP_keepPIvars_url(array(),0,0,$altPageId).$backendParams).'" title="'.$this->pibase->pi_getLL('go_to_page').' '.$i.'">'.$i.'</a> - ';
+				$mA['###PAGE_LIST###'] .= ' <a href="'.htmlentities($this->pibase->pi_linkTP_keepPIvars_url(array(),0,0,$altPageId).$backendParams).'" title="'.$this->pibase->pi_getLL('go_to_page').' '.$i.'">'.$i.'</a>'.$this->pibase->pi_getLL('page_separator');
 			}
 		}
 		if ($mA['###PAGE_LIST###']!='')

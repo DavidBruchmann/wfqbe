@@ -9,6 +9,7 @@
 			<label index="prev">Previous page</label>
 			<label index="next">Next page</label>
 			<label index="page">Page</label>
+			<label index="page_separator"> - </label>
 			<label index="of">of</label>
 			<label index="prev_link">&lt;&lt;</label>
 			<label index="next_link">&gt;&gt;</label>
