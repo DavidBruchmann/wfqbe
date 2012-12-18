@@ -863,9 +863,9 @@ class tx_wfqbe_results {
 				$mA['###PAGE_LIST###'] .= ' <a href="'.htmlentities($this->pibase->pi_linkTP_keepPIvars_url(array(),0,0,$altPageId).$backendParams).'" title="'.$this->pibase->pi_getLL('go_to_page').' '.$i.'">'.$i.'</a>'.$this->pibase->pi_getLL('page_separator');
 			}
 		}
-		if ($mA['###PAGE_LIST###']!='')
-			$mA['###PAGE_LIST###'] = substr($mA['###PAGE_LIST###'], 0, -3);
-			
+		if ($mA['###PAGE_LIST###']!='' && $this->pibase->pi_getLL('page_separator')!='')
+			$mA['###PAGE_LIST###'] = substr($mA['###PAGE_LIST###'], 0, -strlen($this->pibase->pi_getLL('page_separator')));
+		
 		return $content;
 	}
 
