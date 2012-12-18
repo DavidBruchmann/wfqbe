@@ -401,9 +401,23 @@ $TCA["tx_wfqbe_backend"] = Array (
 				"maxitems" => 1,
 			)
 		),
+		"export_mode" => Array (
+				"exclude" => 1,
+				"label" => "LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_backend.export_mode",
+				"config" => Array (
+					"type" => "select",
+					"items" => Array (
+						Array("LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_backend.export_mode.I.0", ""),
+						Array("LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_backend.export_mode.I.1", "csv"),
+						Array("LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_backend.export_mode.I.2", "xls"),
+					),
+					"size" => 1,
+					"maxitems" => 1,
+				)
+		),
 	),
 	"types" => Array (
-		"0" => Array("showitem" => "hidden;;1;;1-1-1, title,description,--div--;Listing,listq, recordsforpage,--div--;Details,detailsq,--div--;Search,searchq,searchq_position,--div--;Insert,insertq,--div--;Config,typoscript"),
+		"0" => Array("showitem" => "hidden;;1;;1-1-1, title,description,--div--;Listing,listq, recordsforpage, export_mode,--div--;Details,detailsq,--div--;Search,searchq,searchq_position,--div--;Insert,insertq,--div--;Config,typoscript"),
 	),
 	"palettes" => Array (
 	)

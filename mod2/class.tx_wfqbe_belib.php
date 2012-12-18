@@ -38,6 +38,7 @@ class tx_wfqbe_belib	{
 	var $piVars = '';
 	var $conf;
 	var $beDoc = null;
+	var $export_content = '';
 	
 	
 	/**
@@ -77,6 +78,24 @@ class tx_wfqbe_belib	{
 			$content = $LANG->getLL('not_available');
 		}	else	{
 			$content = 'An error has occured while retrieving database configuration. Please contact the system administrator and report this error.';
+		}
+		
+		//t3lib_div::debug($this->export_content, 'START');die;
+		
+		if ($_GET['type']==181)	{
+			if ($_GET['export_mode']=='csv')	{
+				header('Content-type:application/csv');
+				header('Content-Disposition: attachment; filename=results.csv');
+				header('Content-Transfer-Encoding:binary');
+				echo $this->export_content;
+				exit;
+			}	elseif ($_GET['export_mode']=='xls')	{
+				header('Content-type:application/xls');
+				header('Content-Disposition: attachment; filename=results.xls');
+				header('Content-Transfer-Encoding:binary');
+				echo $this->export_content;
+				exit;
+			}
 		}
 		
 		return $content;
@@ -188,8 +207,20 @@ class tx_wfqbe_belib	{
 				$PI1->conf['ff_data']['queryObject'] = $backend['listq'];
 				if ($backend['recordsforpage']>0)
 					$PI1->conf['ff_data']['recordsForPage'] = $backend['recordsforpage'];
+				if ($backend['export_mode']!='' && $_GET['type']==181)	{
+					//$PI1->conf['ff_data']['csvDownload'] = 1;
+					$PI1->conf['export_mode'] = $backend['export_mode'];
+					$PI1->conf['template'] = 'EXT:wfqbe/pi1/wfqbe_'.$backend['export_mode'].'_template.html';
+					$PI1->conf['defLayout'] = 0;
+					$PI1->conf['exportAll'] = 1;
+				}
+				
 				$form_built = false;
-				$content .= $PI1->do_general('', $form_built, $this);
+				if ($_GET['type']==181)	{
+					$this->export_content = $PI1->do_general('', $form_built, $this);
+				}	else	{
+					$content .= $PI1->do_general('', $form_built, $this);
+				}
 			}
 			
 			if ($contentSearchQ!='' && ($backend['searchq_position']=='bottom' || $backend['searchq_position']==''))
@@ -197,6 +228,9 @@ class tx_wfqbe_belib	{
 			
 			if ($backend['insertq']>0)	{
 				$content .= '<br /><p><a href="index.php?&M=web_txwfqbeM2&id='.$this->page_id.'&tx_wfqbe_backend[uid]='.$backend['uid'].'&tx_wfqbe_backend[query]='.$backend['insertq'].$searchParams.'"><span class="t3-icon t3-icon-actions t3-icon-actions-document t3-icon-document-new">&nbsp;</span>'.$LANG->getLL('new_record').'</a></p>';
+			}
+			if ($backend['export_mode']!='')	{
+				$content .= '<br /><p><a href="index.php?&M=web_txwfqbeM2&id='.$this->page_id.'&tx_wfqbe_backend[uid]='.$backend['uid'].'&tx_wfqbe_backend[query]='.$backend['listq'].$searchParams.'&export_mode='.$backend['export_mode'].'&type=181"><span class="t3-icon t3-icon-actions t3-icon-actions-document t3-icon-document-export-t3d">&nbsp;</span>'.$LANG->getLL('export').'</a></p>';
 			}
 		}
 		

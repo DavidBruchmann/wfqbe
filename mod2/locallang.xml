@@ -13,6 +13,7 @@
             <label index="please_select_more">Select one of the following available actions to start manage records.</label>
             <label index="back_to_list">Back to list</label>
             <label index="new_record">Create new record</label>
+            <label index="export">Export records</label>
             <label index="not_allowed_idrestricting">Not allowed due to restriction in action.</label>
         </languageKey>
     </data>

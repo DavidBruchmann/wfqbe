@@ -86,6 +86,10 @@
 			<label index="tx_wfqbe_backend.recordsforpage">Records for page</label>
 			<label index="tx_wfqbe_backend.searchq_position.I.0">Bottom</label>
 			<label index="tx_wfqbe_backend.searchq_position.I.1">Top</label>
+			<label index="tx_wfqbe_backend.export_mode">Export mode</label>
+			<label index="tx_wfqbe_backend.export_mode.I.0">Disabled</label>
+			<label index="tx_wfqbe_backend.export_mode.I.1">Csv (comma separated values)</label>
+			<label index="tx_wfqbe_backend.export_mode.I.2">Xls (excel file)</label>
 		</languageKey>
 		<languageKey index="it" type="array">
 			<label index="tx_wfqbe_credentials">Credenziali utente</label>
