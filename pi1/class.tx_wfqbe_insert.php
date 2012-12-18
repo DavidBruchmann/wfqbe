@@ -1591,6 +1591,10 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 								$val = $this->get_timestamp($val, $blocks['fields'][$key]);
 							}
 							
+							if ($blocks['fields'][$key]['type']=="calendar" && $blocks['fields'][$key]['form']['convert_to_date_oracle']=='si' && $val!="")	{
+								$val = "TO_DATE(".$val.", '".$blocks['fields'][$key]['form']['format']."')";
+							}
+							
 							if (is_array($val))
 								$val = implode(",",$val);
 							

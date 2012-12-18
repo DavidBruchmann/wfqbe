@@ -516,6 +516,12 @@ class tx_wfqbe_insertform_generator{
 			$html .= '<br />'.$GLOBALS['LANG']->getLL('convert_timestamp').': <input type="checkbox" name="wfqbe[fields]['.$key.'][form][convert_timestamp]" value="si" />';
 		}
 		
+		if ($form['convert_to_date_oracle']=="si")	{
+			$html .= '<br />'.$GLOBALS['LANG']->getLL('convert_to_date_oracle').': <input type="checkbox" name="wfqbe[fields]['.$key.'][form][convert_to_date_oracle]" value="si" checked="checked" />';
+		}	else	{
+			$html .= '<br />'.$GLOBALS['LANG']->getLL('convert_to_date_oracle').': <input type="checkbox" name="wfqbe[fields]['.$key.'][form][convert_to_date_oracle]" value="si" />';
+		}
+		
 		$html.= '<br /><br /><strong>If you don\'t use the (deprecated) date2cal extension, in order to get the calendar to work in the frontend you need the jQuery datepicker plugin. In the backend it is rendered based on the standard extjs TYPO3 calendar.</strong><br />';
 		
 		return $html;
