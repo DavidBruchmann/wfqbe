@@ -100,7 +100,7 @@ class tx_wfqbe_results {
 			else
 				$csv_query = $row['uid'];
 			
-			if ($this->conf['ff_data']['csvDownload']!=1)	{
+			if ($this->conf['ff_data']['csvDownload']==1)	{
 				$mA["###CONF_CSV###"] = htmlentities($this->pibase->pi_linkTP_keepPIvars_url().'&type=181&tx_wfqbe_pi1[wfqbe_results_query]='.$csv_query);
 				$mA['###LABEL_CSV###'] = $this->pibase->pi_getLL('csv_link', 'Export in CSV');
 			}
