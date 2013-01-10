@@ -178,6 +178,18 @@ class tx_wfqbe_results {
 		if (is_array($tsMarkers))	{
 			foreach ($tsMarkers as $marker)	{
 				$emptyCase = false;
+				
+				if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['wfqbe']['processMarkerParametersBeforeTSRendering']))    {
+					foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['wfqbe']['processMarkerParametersBeforeTSRendering'] as $_classRef)    {
+						$_procObj = &t3lib_div::getUserObj($_classRef);
+						$_params = array(
+								'markerParametri' => $markerParametri,
+								'marker' => $marker
+								);
+						$markerParametri = $_procObj->processMarkerParametersBeforeTSRendering($_params, $this);
+					}
+				}
+				
 				if ($this->conf['customQuery.'][$row['uid'].'.'][$marker]!="" && (($markerParametri["###".$marker."###"]=='' && $this->conf['customQuery.'][$row['uid'].'.'][$marker."."]["overrideIfEmpty"]==1) || ($markerParametri["###".$marker."###"]!='' && $this->conf['customQuery.'][$row['uid'].'.'][$marker."."]["overrideIfNotEmpty"]==1) || $this->conf['customQuery.'][$row['uid'].'.'][$marker."."]["overrideAlways"]==1))	{
 					if ($markerParametri["###".$marker."###"]=='' && $this->conf['customQuery.'][$row['uid'].'.'][$marker."."]["overrideIfEmpty"]==1)
 						$emptyCase = true;
