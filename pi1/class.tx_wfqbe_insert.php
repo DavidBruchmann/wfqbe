@@ -1575,6 +1575,7 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 							}
 						}	else	{
 							$val = $data[$key];
+							$raw_val = $val;
 			
 							// This is necessary for removing the path of the file. We want to save only the name of the file 
 							if ($blocks['fields'][$key]['type']=="upload" && $val!="")	{
@@ -1592,7 +1593,7 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 							}
 							
 							if ($blocks['fields'][$key]['type']=="calendar" && $blocks['fields'][$key]['form']['convert_to_date_oracle']=='si' && $val!="")	{
-								$val = "TO_DATE(".$val.", '".$blocks['fields'][$key]['form']['format']."')";
+								$val = "TO_DATE('".$val."', '".strtoupper(str_replace('yy','yyyy',$blocks['fields'][$key]['form']['format']))."')";
 							}
 							
 							if (is_array($val))
@@ -1603,8 +1604,14 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 								$val = eval('return '.$func.';');
 							}
 							
-							$insert_data[$blocks['fields'][$key]['field']] = $h->qstr($this->entityToChar($val)); //$h->qstr($val);
-							$insert_data_row[$blocks['fields'][$key]['field']] = $val; //$h->qstr($val);
+							if ($blocks['fields'][$key]['type']=="calendar" && $blocks['fields'][$key]['form']['convert_to_date_oracle']=='si')	{
+								$insert_data[$blocks['fields'][$key]['field']] = $val;
+								$insert_data_row[$blocks['fields'][$key]['field']] = $raw_val;
+							}	else	{
+								$insert_data[$blocks['fields'][$key]['field']] = $h->qstr($this->entityToChar($val));
+								$insert_data_row[$blocks['fields'][$key]['field']] = $val;
+							}
+							
 						}
 					}				
 				}
@@ -1807,6 +1814,10 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 				}	elseif ($config['type']=='calendar' && $config['form']['convert_timestamp']=='si')	{
 					//	convert the date in a human readable format
 					$this->pibase->piVars[$key] = $this->get_dateFromTimestamp($row[$config['field']], $config);
+				}	elseif ($config['type']=="calendar" && $config['form']['convert_to_date_oracle']=='si' && $row[$config['field']]!="")	{
+					// convert date from DB format to form format
+					$explodedDate = explode('-',  $row[$config['field']]);
+					$this->pibase->piVars[$key] = $this->get_dateFromTimestamp(mktime(0,0,0,$explodedDate[1], $explodedDate[2], $explodedDate[0]), $config);
 				}	else	{
 					$this->pibase->piVars[$key] = $row[$config['field']];
 				}
@@ -1895,9 +1906,9 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 	
 	//This function convertes a timestamp in an human readable date (dd.mm.yyyy)  (Fabian Moser and Mauro Lorenzutti)
 	function get_dateFromTimestamp($timestamp, $form) {
-		if ($form['type']=='datetype')
+		if ($form['type']=='datetype')	{
 			$format = 'd.m.Y';
-		else	{
+		}	elseif ($form['type']=="calendar" && $form['form']['convert_to_date_oracle']=='si')	{
 			$format = str_replace('%M', '%i', $form['form']['format']);
 			$format = str_replace('dd', 'd', $format);
 			$format = str_replace('mm', 'm', $format);
