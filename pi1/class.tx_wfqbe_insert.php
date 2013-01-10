@@ -1605,8 +1605,13 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 							}
 							
 							if ($blocks['fields'][$key]['type']=="calendar" && $blocks['fields'][$key]['form']['convert_to_date_oracle']=='si')	{
-								$insert_data[$blocks['fields'][$key]['field']] = $val;
-								$insert_data_row[$blocks['fields'][$key]['field']] = $raw_val;
+								if ($val=='')	{
+									$insert_data[$blocks['fields'][$key]['field']] = "''";
+									$insert_data_row[$blocks['fields'][$key]['field']] = '';
+								}	else	{
+									$insert_data[$blocks['fields'][$key]['field']] = $val;
+									$insert_data_row[$blocks['fields'][$key]['field']] = $raw_val;
+								}
 							}	else	{
 								$insert_data[$blocks['fields'][$key]['field']] = $h->qstr($this->entityToChar($val));
 								$insert_data_row[$blocks['fields'][$key]['field']] = $val;
