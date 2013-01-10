@@ -35,6 +35,7 @@
 			<label index="commit_result_insert">Record inserted</label>
 			<label index="please_confirm">Confirm operation</label>
 			<label index="no_data">No data</label>
+			<label index="empty_results">No results found</label>
 		</languageKey>
 		<languageKey index="it" type="array">
 			<label index="prev">Pagina precedente</label>

@@ -295,7 +295,7 @@ class tx_wfqbe_results {
 		if ($this->conf['ff_data']['emptyResult']!='')
 			$mA['###CONF_EMPTYTEXT###'] = $this->conf['ff_data']['emptyResult'];
 		else
-			$mA['###CONF_EMPTYTEXT###'] = 'No data';
+			$mA['###CONF_EMPTYTEXT###'] = $this->pibase->pi_getLL('empty_results');
 
 		if ($this->pibase->piVars['wfqbe_select_wizard']=='')	{
 			$emptyTemplate = $this->cObj->substituteSubpart($emptyTemplate, '###WIZARD_TEMPLATE###', '', 0,0);
@@ -309,6 +309,14 @@ class tx_wfqbe_results {
 		}
 		$mA['###CONF_DIVID###'] = $this->conf['ff_data']['div_id'];
 		$mA['###LABEL_CANCEL###'] = $this->pibase->pi_getLL('cancel', 'Cancel');
+		
+		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['wfqbe']['processMarkerArrayEmptyResults']))    {
+			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['wfqbe']['processMarkerArrayEmptyResults'] as $_classRef)    {
+				$_procObj = &t3lib_div::getUserObj($_classRef);
+				$_params = array('mA' => $mA);
+				$mA = $_procObj->processMarkerArrayEmptyResults($_params, $this);
+			}
+		}
 
 		$content = $this->cObj->substituteMarkerArray($emptyTemplate, $mA);
 		return $content;
