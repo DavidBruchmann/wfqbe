@@ -567,6 +567,7 @@ class tx_wfqbe_results {
 		$mA["###TABLE_SUMMARY###"]=$this->conf['ff_data']['summary'];
 		
 		$mA['###WFQBE_NUMROWS###'] = $numRows;
+		$mA['###TOTAL_RECORDS###'] = $numRows;
 
 		if ($numPages<2)
 			$content = $this->cObj->substituteSubpart($content, '###BROWSE_TEMPLATE###', '', 1,0);
@@ -729,6 +730,7 @@ class tx_wfqbe_results {
 		$mA["###SUMMARY###"]=$this->conf['ff_data']['summary'];
 		
 		$mA['###WFQBE_NUMROWS###'] = $numRows;
+		$mA['###TOTAL_RECORDS###'] = $numRows;
 
 		if ($numPages<2)
 			$listaRighe = $this->cObj->substituteSubpart($listaRighe, '###BROWSE_TEMPLATE###', '', 1,0);
