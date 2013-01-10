@@ -430,6 +430,14 @@ class tx_wfqbe_results {
 						}
 					}
 					$mA["###COLUMN_NAME_I###"] = "###COLUMN_NAME_".($i/2)."###";
+					
+					if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['wfqbe']['processDataMarkerArrayDefaultLayout']))    {
+						foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['wfqbe']['processDataMarkerArrayDefaultLayout'] as $_classRef)    {
+							$_procObj = &t3lib_div::getUserObj($_classRef);
+							$_params = array('mA' => $mA);
+							$mA = $_procObj->processDataMarkerArrayDefaultLayout($_params, $this);
+						}
+					}
 
 					$listaColonne.=$this->cObj->substituteMarkerArray($templateColonne, $mA);
 					if ($flag==0)
