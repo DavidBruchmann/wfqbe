@@ -34,6 +34,7 @@
 			<label index="commit_result_delete">Record deleted</label>
 			<label index="commit_result_insert">Record inserted</label>
 			<label index="please_confirm">Confirm operation</label>
+			<label index="no_data">No data</label>
 		</languageKey>
 		<languageKey index="it" type="array">
 			<label index="prev">Pagina precedente</label>

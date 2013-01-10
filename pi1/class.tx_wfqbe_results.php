@@ -71,7 +71,10 @@ class tx_wfqbe_results {
 			$content .= '<br /><strong>Query constructed:</strong><br />'.$this->query.'<br /><strong>Execution time:</strong>'.$this->executionTime.'<br /><br />';
 
 		if($ris === false)	{
-			$content .= "Query failed (uid=".$row['uid'].")<br />".$h->ErrorMsg();
+			if ($this->conf['debugQuery'] || $this->conf['customProcess.'][$row['uid'].'.']['debugQuery'])
+				$content .= "Query failed (uid=".$row['uid'].")<br />".$h->ErrorMsg();
+			
+			$content = $this->pibase->pi_getLL('no_data');
 			return $content;
 		}
 
