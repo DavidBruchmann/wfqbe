@@ -1,6 +1,8 @@
 <?php
 if (!defined ('TYPO3_MODE')) 	die ('Access denied.');
 
+require_once t3lib_extMgm::extPath('wfqbe').'class.tx_wfqbe_tca_credentials_connection_localconf_preprocessing.php';
+
 $TCA["tx_wfqbe_credentials"] = Array (
 	"ctrl" => $TCA["tx_wfqbe_credentials"]["ctrl"],
 	"interface" => Array (
@@ -23,6 +25,7 @@ $TCA["tx_wfqbe_credentials"] = Array (
 				'items' => Array (
 					Array('LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_credentials.type.I.0', 'standard'),
 					Array('LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_credentials.type.I.1', 'uri'),
+					Array('LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_credentials.type.I.2', 'localconf'),
 				),
 			)
 		),
@@ -110,11 +113,23 @@ $TCA["tx_wfqbe_credentials"] = Array (
 				"size" => "80",
 			)
 		),
+		"connection_localconf" => Array (
+				"exclude" => 1,
+				"label" => "LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_credentials.connection_localconf",
+				"config" => Array (
+						"type" => "select",
+						"items" => array(array('','')),
+						"size" => 1,
+						"maxitems" => 1,
+						"itemsProcFunc" => "tx_wfqbe_tca_credentials_connection_localconf_preprocessing->main",
+				)
+		),
 	),
 	"types" => Array (
 		"0" => Array("showitem" => "title;;;;2-2-2, type, host;;;;3-3-3, dbms, username, passw, dbname, conn_type, setdbinit"),
 		"standard" => Array("showitem" => "title;;;;2-2-2, type, host;;;;3-3-3, dbms, username, passw, dbname, conn_type, setdbinit"),
 		"uri" => Array("showitem" => "title;;;;2-2-2, type, connection_uri, setdbinit"),
+		"localconf" => Array("showitem" => "title;;;;2-2-2, type, connection_localconf, setdbinit"),
 	),
 	"palettes" => Array (
 		"1" => Array("showitem" => "")

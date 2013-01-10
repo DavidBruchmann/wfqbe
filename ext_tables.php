@@ -14,7 +14,7 @@ $TCA["tx_wfqbe_credentials"] = Array (
 		"iconfile" => t3lib_extMgm::extRelPath($_EXTKEY)."icon_tx_wfqbe_credentials.gif",
 	),
 	"feInterface" => Array (
-		"fe_admin_fieldList" => "title, type, host, dbms, username, passw, conn_type, setdbinit, connection_uri",
+		"fe_admin_fieldList" => "title, type, host, dbms, username, passw, conn_type, setdbinit, connection_uri, connection_localconf",
 	)
 );
 

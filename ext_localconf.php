@@ -18,4 +18,5 @@ t3lib_extMgm::addPItoST43($_EXTKEY,'pi1/class.tx_wfqbe_pi1.php','_pi1','list_typ
 
 $TYPO3_CONF_VARS['BE']['AJAX']['tx_wfqbe_mod1_ajax::fieldTypeHelp'] = 'typo3conf/ext/wfqbe/mod1/class.tx_wfqbe_mod1_ajax.php:tx_wfqbe_mod1_ajax->ajaxFieldTypeHelp';
 
+
 ?>

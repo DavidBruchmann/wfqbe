@@ -13,6 +13,7 @@
 			<label index="tx_wfqbe_credentials.type">Connection mode</label>
 			<label index="tx_wfqbe_credentials.type.I.0">Standard</label>
 			<label index="tx_wfqbe_credentials.type.I.1">Alternative URI</label>
+			<label index="tx_wfqbe_credentials.type.I.2">Connection specified in localconf.php</label>
 			<label index="tx_wfqbe_credentials.dbms.I.0">MySql</label>
 			<label index="tx_wfqbe_credentials.dbms.I.1">PostgreSQL</label>
 			<label index="tx_wfqbe_credentials.dbms.I.2">MSSQL Server</label>
@@ -28,6 +29,7 @@
 			<label index="tx_wfqbe_credentials.conn_type.I.2">NConnect</label>
 			<label index="tx_wfqbe_credentials.conn_type">Connection type</label>
 			<label index="tx_wfqbe_credentials.setdbinit">Connection SQL configuration</label>
+			<label index="tx_wfqbe_credentials.connection_localconf">Select connection (if empty, please configure it in typo3conf/localconf.php)</label>
 			<label index="tx_wfqbe_query">Query table</label>
 			<label index="tx_wfqbe_query.title">Title</label>
 			<label index="tx_wfqbe_query.description">Description</label>

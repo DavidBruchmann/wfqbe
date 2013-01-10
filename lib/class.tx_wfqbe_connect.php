@@ -72,8 +72,17 @@ class tx_wfqbe_connect {
 				return false;
 			}
 		} else {
-			$res2 = $GLOBALS['TYPO3_DB']->exec_SELECTquery('host,dbms,username,passw,conn_type,setdbinit,dbname,type,connection_uri', 'tx_wfqbe_credentials', 'tx_wfqbe_credentials.uid=' . $credentials, '', '', '');
+			$res2 = $GLOBALS['TYPO3_DB']->exec_SELECTquery('host,dbms,username,passw,conn_type,setdbinit,dbname,type,connection_uri,connection_localconf', 'tx_wfqbe_credentials', 'tx_wfqbe_credentials.uid=' . $credentials, '', '', '');
 			while ($row2 = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res2)) {
+				if ($row2['type']=='localconf')	{
+					global $TYPO3_CONF_VARS;
+					// Overwrites standard configuration array with values from localconf. Useful to avoid rewriting connection calls
+					if ($row2['connection_localconf']!='' && is_array($TYPO3_CONF_VARS['EXTCONF']['wfqbe']['__CONNECTIONS']) && is_array($TYPO3_CONF_VARS['EXTCONF']['wfqbe']['__CONNECTIONS'][$row2['connection_localconf']]))	{
+						foreach ($TYPO3_CONF_VARS['EXTCONF']['wfqbe']['__CONNECTIONS'][$row2['connection_localconf']] as $key => $value)
+							$row2[$key] = $value;
+					}
+				}
+				
 				if ($row2['type']=='uri')	{
 					// Alternative uri connection type
 					$h = NewADOConnection($row2['connection_uri']);

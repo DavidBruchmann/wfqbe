@@ -19,6 +19,7 @@ CREATE TABLE tx_wfqbe_credentials (
 	dbname tinytext NOT NULL,
 	type varchar(20) DEFAULT '0' NOT NULL,
 	connection_uri varchar(80) DEFAULT '' NOT NULL,
+	connection_localconf varchar(255) DEFAULT '' NOT NULL,
 	
 	PRIMARY KEY (uid),
 	KEY parent (pid)
