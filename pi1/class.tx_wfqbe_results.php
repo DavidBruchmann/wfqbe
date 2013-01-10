@@ -737,6 +737,14 @@ class tx_wfqbe_results {
 		else	{
 			$listaRighe = $this->showBrowser($listaRighe, $mA, $numPages, $numRows, $actualPage, $row['uid']);
 		}
+		
+		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['wfqbe']['processMarkerArrayUserLayoutResults']))    {
+			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['wfqbe']['processMarkerArrayUserLayoutResults'] as $_classRef)    {
+				$_procObj = &t3lib_div::getUserObj($_classRef);
+				$_params = array('mA' => $mA);
+				$mA = $_procObj->processMarkerArrayUserLayoutResults($_params, $this);
+			}
+		}
 
 		$listaRighe =$this->cObj->substituteMarkerArray($listaRighe, $mA);
 		$content.=$listaRighe;
