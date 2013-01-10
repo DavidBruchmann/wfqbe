@@ -1744,13 +1744,13 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 				}
 				
 				//This is neccessary to check if the entered date is correct or not (Fabian Moser)
-				if ($blocks['fields'][strtoupper($key)]['type']=="datetype" && !$this->is_dateValid($data[$key], $blocks['fields'][strtoupper($key)])) 
+				if ($blocks['fields'][strtoupper($key)]['type']=="datetype" && $data[$key]!='' && !$this->is_dateValid($data[$key], $blocks['fields'][strtoupper($key)])) 
 				{
 					$required['required'][] = strtoupper($key);
 				}
 				
 				//	This is neccessary to check if the entered date is correct or not
-				if ($blocks['fields'][strtoupper($key)]['type']=="calendar" && !$this->is_dateValid($data[$key], $blocks['fields'][strtoupper($key)])) 
+				if ($blocks['fields'][strtoupper($key)]['type']=="calendar" && $data[$key]!='' && !$this->is_dateValid($data[$key], $blocks['fields'][strtoupper($key)])) 
 				{
 					$required['required'][] = strtoupper($key);
 				}
