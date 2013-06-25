@@ -15,7 +15,7 @@ $EM_CONF[$_EXTKEY] = array(
 	'description' => 'This extension allows to generate queries (with a little sql knowledge), search forms and insert forms to generic databases through a wizard. The results visualization is template-based and fully configurable via TS. The extension uses ADOdb and supports XAJAX.',
 	'category' => 'plugin',
 	'shy' => 0,
-	'version' => '2.0.0',
+	'version' => '2.0.1',
 	'dependencies' => 'adodb',
 	'conflicts' => '',
 	'priority' => '',
@@ -36,6 +36,7 @@ $EM_CONF[$_EXTKEY] = array(
 		'depends' => array(
 			'adodb' => '',
 			'php' => '5.2.0-0.0.0',
+			'php' => '4.5.0-0.0.0',
 		),
 		'conflicts' => array(
 		),

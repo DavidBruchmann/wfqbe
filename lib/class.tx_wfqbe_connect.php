@@ -72,7 +72,7 @@ class tx_wfqbe_connect {
 				return false;
 			}
 		} else {
-			$res2 = $GLOBALS['TYPO3_DB']->exec_SELECTquery('host,dbms,username,passw,conn_type,setdbinit,dbname,type,connection_uri,connection_localconf', 'tx_wfqbe_credentials', 'tx_wfqbe_credentials.uid=' . $credentials, '', '', '');
+			$res2 = $GLOBALS['TYPO3_DB']->exec_SELECTquery('host,dbms,username,passw,conn_type,setdbinit,dbname,type,connection_uri,connection_localconf', 'tx_wfqbe_credentials', 'tx_wfqbe_credentials.uid=' . intval($credentials), '', '', '');
 			while ($row2 = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res2)) {
 				if ($row2['type']=='localconf')	{
 					global $TYPO3_CONF_VARS;

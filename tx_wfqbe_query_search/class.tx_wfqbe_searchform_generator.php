@@ -259,10 +259,10 @@ class tx_wfqbe_searchform_generator{
 		$var=t3lib_div::_GP('P');
 		// There are problems with the JOIN if using DBAL
 		//$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('q.query', 'tx_wfqbe_query AS s JOIN tx_wfqbe_query AS q ON s.searchinquery=q.uid', 's.uid="'.$var['uid'].'" AND s.deleted=0 AND q.deleted=0', '', '','');
-		$resS = $GLOBALS['TYPO3_DB']->exec_SELECTquery('searchinquery', 'tx_wfqbe_query', 'uid='.$var['uid'].' AND deleted=0', '', '','');
+		$resS = $GLOBALS['TYPO3_DB']->exec_SELECTquery('searchinquery', 'tx_wfqbe_query', 'uid='.intval($var['uid']).' AND deleted=0', '', '','');
 		if ($GLOBALS['TYPO3_DB']->sql_num_rows($resS)==1)	{
 			$rowS = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($resS);
-			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('query', 'tx_wfqbe_query', 'uid='.$rowS['searchinquery'].' AND deleted=0', '', '','');
+			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('query', 'tx_wfqbe_query', 'uid='.intval($rowS['searchinquery']).' AND deleted=0', '', '','');
 			if ($GLOBALS['TYPO3_DB']->sql_num_rows($res)==1)
 				$row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
 		}
@@ -683,7 +683,7 @@ class tx_wfqbe_searchform_generator{
 		
 		$var=t3lib_div::_GP('P');
 		//estraggo la query salvata dal database (modalit� xml) e la converto in array  
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('search', 'tx_wfqbe_query', 'tx_wfqbe_query.uid='.$var['uid'].' AND tx_wfqbe_query.deleted!=1', '', '','');
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('search', 'tx_wfqbe_query', 'tx_wfqbe_query.uid='.intval($var['uid']).' AND tx_wfqbe_query.deleted!=1', '', '','');
 		$row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
 		$saveXml = $API->xml2array($row["search"]);
 		//siccome per rispettare la sintassi xml aggiungo dei tag contenitori quando salvo(vedi funzione saveQuery) adesso estraggo solo

@@ -125,7 +125,7 @@ class tx_wfqbe_results {
 		$loadValue= $API->xml2array($row["query"]);//converto la stringa che rappresenta la query creata tramite wizard in array
 		$wfqbe=$loadValue['contentwfqbe']["wfqbe"];//selezione solo una parte e cio� elimino in tag radice <wfqbe>
 		$rawwfqbe=$loadValue['contentwfqbe']["rawwfqbe"];
-		$query= $API2->createQuery($wfqbe,$rawwfqbe,$this->pibase->piVars,$row['uid']);//This function creates the SQL query
+		$query= $API2->createQuery($wfqbe,$rawwfqbe,$this->pibase->piVars,$row['uid'],$this);//This function creates the SQL query
 		$mA = array();
 
 		// Gestione parametri query

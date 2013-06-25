@@ -1085,7 +1085,7 @@ class tx_wfqbe_insertform_generator{
 		
 		$var=t3lib_div::_GP('P');
 		//estraggo la query salvata dal database (modalità xml) e la converto in array  
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('insertq', 'tx_wfqbe_query', 'tx_wfqbe_query.uid='.$var['uid'].' AND tx_wfqbe_query.deleted!=1', '', '','');
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('insertq', 'tx_wfqbe_query', 'tx_wfqbe_query.uid='.intval($var['uid']).' AND tx_wfqbe_query.deleted!=1', '', '','');
 		$row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
 		$this->blocks = $API->xml2array($row["insertq"]);
 	}

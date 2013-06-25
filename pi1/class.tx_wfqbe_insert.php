@@ -848,10 +848,12 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 	
 	
 	function showRelation($value, $name, $h, $id)	{
-		if (is_array($this->pibase->piVars[$name]))
+		if (is_array($this->pibase->piVars[$name]))	{
+			foreach ($this->pibase->piVars[$name] as $uidkey => $uidval)
+				$this->pibase->piVars[$name][$uidkey] = intval($uidval);
 			$uids = implode(",", $this->pibase->piVars[$name]);
-		else	{
-			$uids = $this->pibase->piVars[$name];
+		}	else	{
+			$uids = intval($this->pibase->piVars[$name]);
 			unset($this->pibase->piVars[$name]);
 			$this->pibase->piVars[$name] = explode(",", $uids);
 		}
@@ -1273,7 +1275,7 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 			            	}
 		            	}
 		            	if (is_dir($upDir))	{
-			            	if ( $blocks['fields'][strtoupper($field_key)]['form']['donotrename']==1)	{
+		            		if ( $blocks['fields'][strtoupper($field_key)]['form']['donotrename']==1)	{
 			            		$upFile = $upDir.$_FILES['tx_wfqbe_pi1']['name'][$field_key][$key];
 			            		if ($blocks['fields'][strtoupper($field_key)]['form']['overwrite']==1)	{
 			            			if (file_exists($upFile))	{
@@ -1298,6 +1300,7 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 			            	}	else	{
 		            			$upFile = $upDir.time()."_".$_FILES['tx_wfqbe_pi1']['name'][$field_key][$key];
 			            	}
+
 			            	if (move_uploaded_file($_FILES['tx_wfqbe_pi1']['tmp_name'][$field_key][$key], $upFile))	{
 			            		//$content .= '<br />File '.$_FILES['tx_wfqbe_pi1']['name'][$field_key][$key].' has been uploaded correctly';
 			            		$this->pibase->piVars[$field_key][] = str_replace($blocks['fields'][strtoupper($field_key)]['form']['basedir'],"",$upFile);
@@ -1395,7 +1398,9 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 					}	else	{
 						if ($blocks['fields'][$key]['type']=='password')	{
 							$mA['###INSERT_VALUE###'] = "********";
-						}	elseif ($blocks['fields'][$key]['form']['source']=='db' || $blocks['fields'][$key]['type']=='relation')	{
+						}	elseif (($blocks['fields'][$key]['form']['source']=='db' || $blocks['fields'][$key]['type']=='relation') && $value!='')	{
+							if (!is_numeric($value))
+								$value = addslashes($value);
 							$query = 'SELECT '.$blocks['fields'][$key]['form']['field_view'].' FROM '.$blocks['fields'][$key]['form']['table'].' WHERE '.$blocks['fields'][$key]['form']['field_insert'].'="'.$value.'"';
 							$res = $h->Execute($query);
 							while ($row = $res->FetchRow())
@@ -1523,9 +1528,9 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 		        return $results;
 			}	else	{
 				if ($this->pibase->piVars['wfqbe_delete_subrecord']!='' && $this->pibase->piVars['wfqbe_add_new']!='')
-					$id = $this->pibase->piVars['wfqbe_delete_subrecord'];
+					$id = intval($this->pibase->piVars['wfqbe_delete_subrecord']);
 				elseif ($this->pibase->piVars['wfqbe_id_field']!='')
-					$id = $this->pibase->piVars['wfqbe_id_field'];
+					$id = intval($this->pibase->piVars['wfqbe_id_field']);
 			}
 
 			$query = "SELECT * FROM ".$blocks['table']." WHERE ".$blocks['ID_field']."=".$id;
@@ -1643,9 +1648,9 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 			        return $results;
 				}	else	{
 					if ($this->pibase->piVars['wfqbe_edit_subrecord']!='' && $this->pibase->piVars['wfqbe_add_new']!='')
-						$id = $this->pibase->piVars['wfqbe_edit_subrecord'];
+						$id = intval($this->pibase->piVars['wfqbe_edit_subrecord']);
 					elseif ($this->pibase->piVars['wfqbe_id_field']!='')
-						$id = $this->pibase->piVars['wfqbe_id_field'];
+						$id = intval($this->pibase->piVars['wfqbe_id_field']);
 				}
 				$update_query = "";
 				foreach($insert_data as $col => $val)	{
@@ -1867,7 +1872,7 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 	
 	function getEditingRecord($h, $id='')	{
 		if ($id=='')
-			$id = $this->pibase->piVars[$this->blocks['ID_field']];
+			$id = intval($this->pibase->piVars[$this->blocks['ID_field']]);
 		$query = "SELECT * FROM ".$this->blocks['table']." WHERE ".$this->blocks['ID_field']."=".$id;
 		$res = $h->Execute($query);
 		if ($res===false)

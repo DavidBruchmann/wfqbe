@@ -132,7 +132,7 @@ class tx_wfqbe_queryform_generator{
 
 		$var=t3lib_div::_GP('P');
 		//estraggo la query salvata dal database (modalit� xml) e la converto in array
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('query', 'tx_wfqbe_query', 'tx_wfqbe_query.uid='.$var['uid'].' AND tx_wfqbe_query.deleted!=1', '', '','');
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('query', 'tx_wfqbe_query', 'tx_wfqbe_query.uid='.intval($var['uid']).' AND tx_wfqbe_query.deleted!=1', '', '','');
 		$row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
 		$saveXml = $API->xml2array($row["query"]);
 		$saveXml = $saveXml['contentwfqbe'];
@@ -1036,7 +1036,7 @@ class tx_wfqbe_queryform_generator{
 	 * @return	[string]	$query: stringa che contiene la query creata tramite il wizard
 	 */
 
-	function createQuery($wfqbe=NULL,$rawwfqbe=NULL,$piVars=NULL,$query_uid=NULL){
+	function createQuery($wfqbe=NULL,$rawwfqbe=NULL,$piVars=NULL,$query_uid=NULL,$pObj=NULL){
 
 
 		if($wfqbe!=NULL)
@@ -1301,10 +1301,15 @@ class tx_wfqbe_queryform_generator{
 				$query.=" ";
 			}
 
+			$allowedOrderByFields = '';
+			if ($pObj->conf['customQuery.'][$query_uid.'.']['allowedOrderByFields']!='')	{
+				$allowedOrderByFields = $pObj->conf['customQuery.'][$query_uid.'.']['allowedOrderByFields'];
+			}
+
 			if ($this->wfqbe['setoperator'][$numForm]=='')	{
 				//sezione order by
-				if (is_array($piVars['orderby']) && $piVars['orderby'][$query_uid]['field']!='' && t3lib_div::inList('ASC,DESC', $piVars['orderby'][$query_uid]['mode']))	{
-					$query.="ORDER BY ".htmlspecialchars($piVars['orderby'][$query_uid]['field'])." ".$piVars['orderby'][$query_uid]['mode']." ";
+				if (is_array($piVars['orderby']) && $piVars['orderby'][$query_uid]['field']!='' && t3lib_div::inList($allowedOrderByFields,$piVars['orderby'][$query_uid]['field']) && t3lib_div::inList('ASC,DESC', $piVars['orderby'][$query_uid]['mode']))	{
+					$query.="ORDER BY ".addslashes($piVars['orderby'][$query_uid]['field'])." ".addslashes($piVars['orderby'][$query_uid]['mode'])." ";
 				}	else	{
 					if($this->wfqbe[$numForm]['orderby'][0]!="")	{
 						$query.="ORDER BY ";
@@ -1313,12 +1318,13 @@ class tx_wfqbe_queryform_generator{
 							break;
 							if($j != 0)
 							$query.=",";
-							$query.=$this->wfqbe[$numForm]['orderby'][$j];
-							if($this->wfqbe[$numForm]['ad'][$j]!=""){
-			
-								$query.=" ";
-								$query.=$this->wfqbe[$numForm]['ad'][$j];
-								$query.=" ";
+							if (t3lib_div::inList($allowedOrderByFields,$this->wfqbe[$numForm]['orderby'][$j]))	{
+								$query.=addslashes($this->wfqbe[$numForm]['orderby'][$j]);
+								if($this->wfqbe[$numForm]['ad'][$j]!="" && t3lib_div::inList('ASC,DESC', $this->wfqbe[$numForm]['ad'][$j])){				
+									$query.=" ";
+									$query.=addslashes($this->wfqbe[$numForm]['ad'][$j]);
+									$query.=" ";
+								}
 							}
 						}
 					}
