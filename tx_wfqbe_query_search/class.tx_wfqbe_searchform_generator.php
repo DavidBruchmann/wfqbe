@@ -202,6 +202,7 @@ class tx_wfqbe_searchform_generator{
 		
 		$content .= ' - '.$GLOBALS['LANG']->getLL('update_change').': <input type="text" name="wfqbe[fields]['.$key.'][form][onchange]" value="'.$value['form']['onchange'].'" />';
 		
+		$content .= '<br />'.$GLOBALS['LANG']->getLL('custom_id').': <input type="text" name="wfqbe[fields]['.$key.'][form][custom_id]" value="'.$value['form']['custom_id'].'" />';
 		$content .= ' - '.$GLOBALS['LANG']->getLL('additional_attributes').': <input type="text" name="wfqbe[fields]['.$key.'][form][additional_attributes]" value="'.$value['form']['additional_attributes'].'" />';
 		
 		$content.= '<br />';
@@ -500,6 +501,8 @@ class tx_wfqbe_searchform_generator{
 		}	else
 			$html .= ' - '.$GLOBALS['LANG']->getLL('required').': <input onclick="javascript:updateForm();" type="checkbox" name="wfqbe[fields]['.$key.'][form][required]" value="si" />';
 		
+		$html .= '<br />Label for empty value: <input type="text" name="wfqbe[fields]['.$key.'][form][labelEmptyValue]" value="'.$form['labelEmptyValue'].'" size="30" />';
+				
 		$html .= '<br />';
 		
 		if ($form['source']=="db")	{

@@ -16,6 +16,7 @@
 			<label index="number_values">number of values</label>
 			<label index="update_change">update_on_change</label>
 			<label index="additional_attributes">additional tag attributes</label>
+			<label index="custom_id">Custom id</label>
 			<label index="input">input field</label>
 			<label index="radio">radio button</label>
 			<label index="select">select field</label>

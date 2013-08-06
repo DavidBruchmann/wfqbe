@@ -752,7 +752,10 @@ class tx_wfqbe_insertform_generator{
 		}	else
 			$html .= ' - Multiple: <input onclick="javascript:updateForm();" type="checkbox" name="wfqbe[fields]['.$key.'][form][multiple]" value="si" />';
 		
-		$html .= '<br />';
+$html .= '<br />Label for empty value: <input type="text" name="wfqbe[fields]['.$key.'][form][labelEmptyValue]" value="'.$form['labelEmptyValue'].'" size="30" />';
+$html .= '<br />-----';
+		
+		
 		
 		if ($form['source']=="db")	{
 			$html .= '<br />-----';

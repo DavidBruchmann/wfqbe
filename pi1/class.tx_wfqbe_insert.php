@@ -153,8 +153,32 @@ class tx_wfqbe_insert {
 		if(is_array($_FILES['tx_wfqbe_pi1']['error']))	{
 			$content .= $this->uploadFiles($this->blocks);
 		}
+		
 		if ($this->pibase->piVars['file_delete']!='')	{
-			$this->deleteFiles($this->pibase->piVars['file_delete']);
+			
+			$fileDelete = $this->pibase->piVars['file_delete'];
+			$actionRequired = intval($this->pibase->piVars['action_required']);
+			//do checks
+			if(is_array($this->blocks['fields'])){
+				$fields = $this->blocks['fields'];
+				foreach($fields as $key=>$field){
+					// Hook that can be used to do custom delete of file
+					if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['wfqbe']['customFileDelete']))    {
+						foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['wfqbe']['customFileDelete'] as $_classRef)    {
+							$_procObj = &t3lib_div::getUserObj($_classRef);
+							$fileDelete = $_procObj->deleteFile($results, $fileDelete, $this->blocks, $this->mode, $h, $this);
+						}
+					}else{
+						if(intval($key) === $actionRequired){
+							$baseDir = dirname($fileDelete).DIRECTORY_SEPARATOR;
+							if($baseDir == $field['form']['basedir']){
+								$this->deleteFiles($fileDelete);
+							}
+							break;
+						}
+					}
+				}
+			}
 		}
 
 		if (isset($this->pibase->piVars['submit_confirm']) && !isset($this->pibase->piVars['submit_insert']) && !isset($this->pibase->piVars['submit_modify']))	{
@@ -983,19 +1007,21 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 	
 	function showUpload($value, $name, $id)	{
 		$html = '';
-		$html = '<input type="hidden" name="MAX_FILE_SIZE" value="'.$value['form']['maxfilesize'].'" />';
-		$html = '<input type="hidden" id="'.$this->conf['ff_data']['div_id'].'_file_delete" name="tx_wfqbe_pi1[file_delete]" value="" />';
+		$html .= '<input type="hidden" name="MAX_FILE_SIZE" value="'.$value['form']['maxfilesize'].'" />';
+		$html .= '<input type="hidden" id="'.$this->conf['ff_data']['div_id'].'_file_delete" name="tx_wfqbe_pi1[file_delete]" value="" />';
+		$html .= '<input type="hidden" id="'.$this->conf['ff_data']['div_id'].'_action_required" name="tx_wfqbe_pi1[action_required]" value="" />';
 		for ($i=0; $i<$value['form']['numofuploads']; $i++)	{
 			if (isset($this->pibase->piVars[$name][$i]) && $this->pibase->piVars[$name][$i]!="")	{
 				$html .= '<input id="'.$id.'_'.$i.'" type="hidden" name="tx_wfqbe_pi1['.$name.']['.$i.']" value="'.$this->pibase->piVars[$name][$i].'" />';
 				$html .= '<a href="'.$this->blocks['fields'][$name]['form']['basedir'].$this->pibase->piVars[$name][$i].'">'.$this->pibase->piVars[$name][$i].'</a>';
 				if (t3lib_extMgm::isLoaded('xajax') && $this->conf['enableXAJAX']==1)	{
-					$update = ' onclick="document.getElementById(\''.$this->conf['ff_data']['div_id'].'_file_delete\').value=\''.$this->blocks['fields'][$name]['form']['basedir'].$this->pibase->piVars[$name][$i].'\'; document.getElementById(\''.$id.'_'.$i.'\').value=\'\'; document.getElementById(\'wfqbe_destination_id\').value=\''.$value['form']['onchange'].'\'; '.$this->prefixId .'processInsertData(xajax.getFormValues(\''.$this->conf['ff_data']['div_id'].'_form\')); return false;"';
+					$update = 'onclick=" document.getElementById(\''.$this->conf['ff_data']['div_id'].'_action_required\').value=\''.$name.'\'; document.getElementById(\''.$this->conf['ff_data']['div_id'].'_file_delete\').value=\''.$this->blocks['fields'][$name]['form']['basedir'].$this->pibase->piVars[$name][$i].'\'; document.getElementById(\''.$id.'_'.$i.'\').value=\'\'; document.getElementById(\'wfqbe_destination_id\').value=\''.$value['form']['onchange'].'\'; '.$this->prefixId .'processInsertData(xajax.getFormValues(\''.$this->conf['ff_data']['div_id'].'_form\')); return false;"';
 				}	else	{
 					$params = array();
 					$params['parameter'] = $GLOBALS['TSFE']->id;
 					$action = $this->cObj->typoLink_URL($params);
-					$update = ' onclick="document.getElementById(\''.$this->conf['ff_data']['div_id'].'_file_delete\').value=\''.$this->blocks['fields'][$name]['form']['basedir'].$this->pibase->piVars[$name][$i].'\'; document.getElementById(\''.$id.'_'.$i.'\').value=\'\'; document.getElementById(\''.$this->conf['ff_data']['div_id'].'_form\').action=\''.$action.'\'; document.getElementById(\''.$this->conf['ff_data']['div_id'].'_form\').onsubmit=\'\'; document.getElementById(\''.$this->conf['ff_data']['div_id'].'_form\').submit(); return false;"';
+					
+					$update = 'onclick=" document.getElementById(\''.$this->conf['ff_data']['div_id'].'_action_required\').value=\''.$name.'\'; document.getElementById(\''.$this->conf['ff_data']['div_id'].'_file_delete\').value=\''.$this->blocks['fields'][$name]['form']['basedir'].$this->pibase->piVars[$name][$i].'\'; document.getElementById(\''.$id.'_'.$i.'\').value=\'\'; document.getElementById(\''.$this->conf['ff_data']['div_id'].'_form\').action=\''.$action.'\'; document.getElementById(\''.$this->conf['ff_data']['div_id'].'_form\').onsubmit=\'\'; document.getElementById(\''.$this->conf['ff_data']['div_id'].'_form\').submit(); return false;"';
 				}
 				$html .= '&nbsp;-&nbsp;(<a href="#"'.$update.'>delete</a>)';
 			}	else	{
@@ -1129,7 +1155,7 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 			$listaSelect = '<select'.$update.' id="'.$id.'" name="tx_wfqbe_pi1['.$name.'][]">';
 		
 		if ($value['required']!=1)
-			$listaSelect .= '<option value=""></option>';
+			$listaSelect .= '<option value="">'.$value['form']['labelEmptyValue'].'</option>';
 		
 		if ($value['form']['source']=='static')	{
 			for ($i=0; $i<$value['form']['numValues']; $i++)	{
@@ -1331,9 +1357,15 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 	/**
 	 * Function used to delete files
 	 * @param string file
-	 */
-	function deleteFiles($file)	{
-		unlink($file);
+	 */	
+	function deleteFiles($file){
+		if ($this->pibase->beMode!=''){
+			global $BACK_PATH;
+			$fileToDelete = $BACK_PATH.'../'.$file;
+			unlink($fileToDelete);
+		}else{
+			unlink($file);
+		}
 	}
 	
 	
@@ -1398,12 +1430,13 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 					}	else	{
 						if ($blocks['fields'][$key]['type']=='password')	{
 							$mA['###INSERT_VALUE###'] = "********";
-						}	elseif (($blocks['fields'][$key]['form']['source']=='db' || $blocks['fields'][$key]['type']=='relation') && $value!='')	{
+						}	elseif (($blocks['fields'][$key]['form']['source']=='db' || $blocks['fields'][$key]['type']=='relation') && $value!='' && !is_array($value))	{
 							if (!is_numeric($value))
 								$value = addslashes($value);
 							$query = 'SELECT '.$blocks['fields'][$key]['form']['field_view'].' FROM '.$blocks['fields'][$key]['form']['table'].' WHERE '.$blocks['fields'][$key]['form']['field_insert'].'="'.$value.'"';
 							$res = $h->Execute($query);
-							while ($row = $res->FetchRow())
+							$mA['###INSERT_VALUE###'] = '';
+							while ($res!==false && $row = $res->FetchRow())
 								$mA['###INSERT_VALUE###'] = $row[$blocks['fields'][$key]['form']['field_view']];
 						/*}	elseif ($blocks['fields'][$key]['form']['source']=='static')	{
 							$mA['###INSERT_VALUE###'] .= $blocks['fields'][$key]['form'][$value]['label'];*/
@@ -1413,6 +1446,9 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 							if ($blocks['fields'][$key]['form']['clear']!="")	{
 								$func = str_replace('|', str_replace(array("\\","'"),array("\\\\","\\'"),$value), $blocks['fields'][$key]['form']['clear']);
 								$value = eval('return '.$func.';');
+							}
+							if (is_array($value)) {
+								$value = '';
 							}
 							$mA['###INSERT_VALUE###'] = $value;
 						}
@@ -1618,7 +1654,11 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 									$insert_data_row[$blocks['fields'][$key]['field']] = $raw_val;
 								}
 							}	else	{
+								if ($val=='' && $blocks['fields'][$key]['form']['insert_NULL']==1)	{
+									$insert_data[$blocks['fields'][$key]['field']] = 'NULL';
+								}	else	{
 								$insert_data[$blocks['fields'][$key]['field']] = $h->qstr($this->entityToChar($val));
+								}
 								$insert_data_row[$blocks['fields'][$key]['field']] = $val;
 							}
 							

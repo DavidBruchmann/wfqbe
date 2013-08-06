@@ -663,7 +663,9 @@ class tx_wfqbe_results {
 				$mA["###WFQBE_CLASS###"]=$this->conf['classes.']['odd'];
 			$flag++;
 
+			if (!($this->conf["customProcess."][$row['uid']."."]['excludeDuplicatedValuesInColumns']!='' && $this->conf["customProcess."][$row['uid']."."]['emptyRowForExcludeDuplicatedValuesInColumns']==1 && $this->isEmptyRowForExcludeDuplicatedValuesInColumns($row, $mA)))	{
 			$listaRighe.=$this->cObj->substituteMarkerArray($templateLista, $mA);
+		}
 		}
 
 		$listaRighe = $this->cObj->substituteSubpart($template,"###DATA_TEMPLATE###",$listaRighe,$recursive=0,$keepMarker=0);
@@ -750,6 +752,19 @@ class tx_wfqbe_results {
 		$content.=$listaRighe;
 
 		return $content;
+	}
+
+
+	
+	private function isEmptyRowForExcludeDuplicatedValuesInColumns($row, $mA)	{
+		$fields = explode(',', $this->conf["customProcess."][$row['uid']."."]['excludeDuplicatedValuesInColumns']);
+		if (is_array($fields))	{
+			foreach ($fields as $field)	{
+				if ($mA['###FIELD_'.$field.'###']!='')
+					return false;
+			}
+		}
+		return true;
 	}
 
 

@@ -224,6 +224,9 @@ class tx_wfqbe_search {
 		if ($value['form']['additional_attributes']!='')
 			$additionalParams .= ' '.$value['form']['additional_attributes'];
 		
+		if ($value['form']['custom_id']!="")
+			$id = $value['form']['custom_id'];
+			
 		return '<input'.$additionalParams.' id="'.$id.'" type="'.$type.'" name="tx_wfqbe_pi1['.$name.']" value="'.$wfqbe[$name].'"'.$update.' />';
 	}
 	
@@ -252,9 +255,12 @@ class tx_wfqbe_search {
 
 		if ($value['form']['source']=='static')	{
 			for ($i=0; $i<$value['form']['numValues']; $i++)	{
-				if ($i==0)
-					$idi=' id="'.$id.'"';
+				if ($i==0)	{
+					if ($value['form']['custom_id']!="")
+						$idi = ' id="'.$value['form']['custom_id'].'"';
 				else
+						$idi=' id="'.$id.'"';
+				}	else
 					$idi = '';
 				if ($value['form'][$i]['value']==$wfqbe[$name] || $value['form'][$i]['value']==$this->pibase->piVars[$name])
 					$listaRadio .= '<input'.$idi.$update.' checked="checked" type="radio" name="tx_wfqbe_pi1['.$name.']" value="'.$value['form'][$i]['value'].'" /> '.$value['form'][$i]['label'];
@@ -282,6 +288,9 @@ class tx_wfqbe_search {
 					$listaRadio .= '<input'.$update.' type="radio" name="tx_wfqbe_pi1['.$name.']" value="'.$array[1].'" /> '.$array[0].'<br />';
 			}
 			if (!$emptyOption)	{
+				if ($value['form']['custom_id']!="")
+					$id = $value['form']['custom_id'];
+				
 				if ($wfqbe[$name]=="")
 					$listaRadio = '<input id="'.$id.'"'.$update.' checked="checked" type="radio" name="tx_wfqbe_pi1['.$name.']" value="" /> <br />'.$listaRadio;
 				else
@@ -319,9 +328,12 @@ class tx_wfqbe_search {
 
 		if ($value['form']['source']=='static')	{
 			for ($i=0; $i<$value['form']['numValues']; $i++)	{
-				if ($i==0)
-					$idi=' id="'.$id.'"';
+				if ($i==0)	{
+					if ($value['form']['custom_id']!="")
+						$idi = ' id="'.$value['form']['custom_id'].'"';
 				else
+						$idi=' id="'.$id.'"';
+				}	else
 					$idi = '';
 				if ((is_array($wfqbe[$name]) && in_array($value['form'][$i]['value'], $wfqbe[$name])) || $value['form'][$i]['value']==$this->pibase->piVars[$name])
 					$listCheck .= '<input'.$idi.$update.' checked="checked" type="checkbox" name="tx_wfqbe_pi1['.$name.'][]" value="'.$value['form'][$i]['value'].'" /> '.$value['form'][$i]['label'];
@@ -384,6 +396,8 @@ class tx_wfqbe_search {
 		
 		if ($value['form']['additional_attributes']!='')
 			$update .= ' '.$value['form']['additional_attributes'];
+		if ($value['form']['custom_id']!="")
+			$id = $value['form']['custom_id'];
 
 		if ($value['form']['multiple']=='si')	{
 			$size = $value['form']['size']>0 ? $value['form']['size'] : 5;
@@ -430,7 +444,7 @@ class tx_wfqbe_search {
 			$ris = $h->Execute($query);
 			
 			if ($value['form']['required']!='si')
-				$listaSelect .= '<option value=""></option>';
+				$listaSelect .= '<option value="">'.$value['form']['labelEmptyValue'].'</option>';
 			
 			if ($ris!==false)	{
 				while($array = $ris -> FetchRow()){
@@ -462,6 +476,8 @@ class tx_wfqbe_search {
 	
 	function showCalendar($value, $name, $id, &$blockTemplate)	{
 		$wfqbe = t3lib_div::_GP('tx_wfqbe_pi1');
+		if ($value['form']['custom_id']!="")
+			$id = $value['form']['custom_id'];
 		
 		if ($value['form']['date2cal']=='si' && t3lib_extMgm::isLoaded('date2cal'))	{
 			include_once(t3lib_extMgm::siteRelPath('date2cal') . '/src/class.jscalendar.php');

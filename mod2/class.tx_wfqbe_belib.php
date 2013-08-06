@@ -226,7 +226,7 @@ class tx_wfqbe_belib	{
 			if ($contentSearchQ!='' && ($backend['searchq_position']=='bottom' || $backend['searchq_position']==''))
 				$content .= $contentSearchQ;
 			
-			if ($backend['insertq']>0)	{
+			if ($backend['insertq']>0 && $this->conf['backend.']['disableCreateNewRecord']!=1)	{
 				$content .= '<br /><p><a href="index.php?&M=web_txwfqbeM2&id='.$this->page_id.'&tx_wfqbe_backend[uid]='.$backend['uid'].'&tx_wfqbe_backend[query]='.$backend['insertq'].$searchParams.'"><span class="t3-icon t3-icon-actions t3-icon-actions-document t3-icon-document-new">&nbsp;</span>'.$LANG->getLL('new_record').'</a></p>';
 			}
 			if ($backend['export_mode']!='')	{
