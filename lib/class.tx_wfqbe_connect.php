@@ -37,8 +37,13 @@ class tx_wfqbe_connect {
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', 'tx_wfqbe_query', $where . 'tx_wfqbe_query.hidden!=1 AND tx_wfqbe_query.deleted!=1');
 		if ($GLOBALS['TYPO3_DB']->sql_num_rows($res)>0)	{
 			$row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
-			$h = $this->connectNow($row['credentials'], $row['dbname']);
-			$h->SetFetchMode(ADODB_FETCH_BOTH);
+			if (!isset($GLOBALS['WFQBE'][$row['credentials']]))	{
+				$h = $this->connectNow($row['credentials'], $row['dbname']);
+				$h->SetFetchMode(ADODB_FETCH_BOTH);
+				$GLOBALS['WFQBE'][$row['credentials']] = $h;
+			}	else	{
+				$h = $GLOBALS['WFQBE'][$row['credentials']];
+			}
 			if ($h!==false)
 				return array("conn" => $h, "row" => $row);
 			else
