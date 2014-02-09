@@ -1,9 +1,6 @@
 
 /*
  * JS library used in the WFQBE Extension
- * 
- * @author	Mauro Lorenzutti (Webformat srl) (mauro.lorenzutti@webformat.com)
- * 
  */
 
 /**
