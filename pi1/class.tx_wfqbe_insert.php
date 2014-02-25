@@ -816,7 +816,7 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 					
 				$jsCode .= '});
 							</script>';
-				$GLOBALS['TSFE']->additionalHeaderData['wfqbe_datepicker'] = $jsCode;
+				$GLOBALS['TSFE']->additionalHeaderData['wfqbe_datepicker'] .= $jsCode;
 				$fieldValue = $this->pibase->piVars[$name]!='' ? $this->pibase->piVars[$name] : ($this->pibase->piVars[$value['field']]!='' ? $this->pibase->piVars[$value['field']] : '');
 				
 				return '<input id="'.$id.'" type="text" name="tx_wfqbe_pi1['.$name.']" value="'.$this->charToEntity($fieldValue).'" />';
