@@ -53,26 +53,19 @@
 		
 		$content = $this->cObj->substituteMarkerArray($content, $mA);
 
-		$Typo3_htmlmail = t3lib_div::makeInstance('t3lib_htmlmail');
-	    $Typo3_htmlmail->start();
-	    $Typo3_htmlmail->mailer = 'TYPO3 HTMLMail';
-	    $Typo3_htmlmail->subject = $subject;
-	    $Typo3_htmlmail->from_email = $this->conf['email.']['from_email'];
-	    $Typo3_htmlmail->returnPath = $this->conf['email.']['from_email'];
-	    $Typo3_htmlmail->from_name = $this->conf['email.']['from'];
-	    $Typo3_htmlmail->replyto_email = $this->conf['email.']['from_email'];
-	    $Typo3_htmlmail->replyto_name = $this->conf['email.']['from'];
-	    $Typo3_htmlmail->organisation = '';
-	    $Typo3_htmlmail->priority = 3;
-		//$Typo3_htmlmail->addPlain(strip_tags($content));
-		$Typo3_htmlmail->setHTML($content);
-		$Typo3_htmlmail->setHeaders();
-	    $Typo3_htmlmail->setContent();
-	    $Typo3_htmlmail->setRecipient(explode(',',$to));
-	    $Typo3_htmlmail->add_header('Bcc: '.$this->conf['email.']['bcc']);
+		$mail = t3lib_div::makeInstance('t3lib_mail_Message');
+		$mail->setFrom(array($this->conf['email.']['from_email'] => $this->conf['email.']['from']));
+		$mail->setReplyTo(array($this->conf['email.']['from_email'] => $this->conf['email.']['from']));
+		$mail->setReturnPath($this->conf['email.']['from_email']);
+		$mail->setSubject($subject);
+		$mail->setTo(array($to));
+		if ($this->conf['email.']['bcc']!='')
+			$mail->setBcc(explode(',',$this->conf['email.']['bcc']));
+		$mail->setBody($content);
+		$mail->send();
 	    
 	    if ($this->conf['email.']['debug']==1)	{
-	    	t3lib_div::debug($Typo3_htmlmail);
+	    	t3lib_utility_Debug::debug($Typo3_htmlmail);
 	    }	else	{
 	    	$sent = $Typo3_htmlmail->sendtheMail();
 	    }

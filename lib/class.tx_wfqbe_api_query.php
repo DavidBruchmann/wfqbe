@@ -55,7 +55,7 @@ class tx_wfqbe_api_query{
 	 * @return boolean	Connection status
 	 */
 	function init($query, $cObj="", $piVars="")	{
-		if (!t3lib_div::testInt($query))
+		if (!t3lib_utility_Math::canBeInterpretedAsInteger($query))
 			return false;
 		
 		$this->cObj = $cObj;

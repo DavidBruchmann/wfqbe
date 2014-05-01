@@ -53,10 +53,8 @@ class tx_wfqbe_api_array2xml{
      */
 	function array2xml($data)   {
 		global $TYPO3_CONF_VARS;
-		require(PATH_typo3conf.'localconf.php');
 		$config = unserialize($TYPO3_CONF_VARS['EXT']['extConf']['wfqbe']);
-		
-		
+				
 		if ($config['mode']=='xml')	{
 		       $line = "";
 			   

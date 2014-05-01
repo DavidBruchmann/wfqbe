@@ -78,8 +78,6 @@ class tx_wfqbe_insert {
 			$this->mode = 'delete';
 		else
 			$this->mode = 'insert';
-//t3lib_div::debug($this->pibase->piVars);
-//t3lib_div::debug($this->mode);
 	}
 	
 	
@@ -127,7 +125,7 @@ class tx_wfqbe_insert {
 			if (!$this->RTEObj) $this->RTEObj = t3lib_div::makeInstance('tx_rtehtmlarea_pi2');
 			$this->thePidValue = $GLOBALS['TSFE']->id;
 		}
-//t3lib_div::debug($new_id);
+
 		if (is_array($new_id))	{
 			if ($new_id[2]=='unset')	{
 				if ($this->blocks['fields'][$new_id[0]]['form']['multiple']=='si' || $this->blocks['fields'][$new_id[0]]['form']['multiple']=='1' || $this->blocks['fields'][$new_id[0]]['type']=='select')	{
@@ -149,7 +147,7 @@ class tx_wfqbe_insert {
 			}
 		}
 		$content ='';
-//t3lib_div::debug($this->pibase->piVars);
+
 		if(is_array($_FILES['tx_wfqbe_pi1']['error']))	{
 			$content .= $this->uploadFiles($this->blocks);
 		}
@@ -206,7 +204,7 @@ class tx_wfqbe_insert {
 		    
 			if ($this->mode == 'edit' && $this->blocks['ID_restricting']!='')	{
 				$res = $this->checkIDRestricting($h, $this->blocks['ID_restricting'], $editing_record);
-//t3lib_div::debug(array('mode'=>$this->mode, 'query'=>$this->blocks['ID_restricting'], 'res'=>$res, 'piVars'=>$this->pibase->piVars, 'editingrecord'=>$editing_record));
+
 				if ($res['notAllowed']==1)	{
 					return $res['content'];
 				}
@@ -244,8 +242,8 @@ class tx_wfqbe_insert {
 			}
 			
 			if ($this->conf['email.']['debug']==1)	{
-				t3lib_div::debug($results);
-				t3lib_div::debug($this->pibase->piVars);
+				t3lib_utility_Debug::debug($results);
+				t3lib_utility_Debug::debug($this->pibase->piVars);
 				die('DIE IN CLASS.TX_WFQBE_INSERT.PHP DUE TO EMAIL DEBUG ACTIVE');
 			}
 			
@@ -255,7 +253,7 @@ class tx_wfqbe_insert {
 					require_once(PATH_t3lib.'class.t3lib_tcemain.php');
 					$tce = t3lib_div::makeInstance('t3lib_TCEmain');
 					foreach ($clear_cache as $pUid)	{
-						if (t3lib_div::testInt($pUid))
+						if (t3lib_utility_Math::canBeInterpretedAsInteger($pUid))
 							$tce->clear_cacheCmd($pUid);
 					}
 				}
@@ -327,9 +325,7 @@ class tx_wfqbe_insert {
 				$content = $this->showInsertModule($file, $this->blocks['fields'], $h, $row);
 			}
 		}
-		
-//$content .= t3lib_div::debug($this->pibase->piVars);
-		
+				
 		return $content;
 	}
 	
@@ -413,7 +409,7 @@ class tx_wfqbe_insert {
 			$wfqbe_add_new = $this->pibase->piVars['wfqbe_add_new'];
 			$this->old_piVars = $this->pibase->piVars;
 			if ($this->pibase->piVars['submit_modify']=='')	{
-				if (t3lib_div::testInt($this->pibase->piVars['wfqbe_edit_subrecord']) && $this->pibase->piVars['wfqbe_edit_subrecord']!='')	{
+				if (t3lib_utility_Math::canBeInterpretedAsInteger($this->pibase->piVars['wfqbe_edit_subrecord']) && $this->pibase->piVars['wfqbe_edit_subrecord']!='')	{
 					$wfqbe_edit_subrecord = $this->pibase->piVars['wfqbe_edit_subrecord'];
 					unset($this->pibase->piVars);
 					$this->initValues($h, $wfqbe_edit_subrecord);
@@ -473,9 +469,8 @@ class tx_wfqbe_insert {
 		
 		if ($this->mode == 'edit' && $this->blocks['ID_restricting']!='')	{
 			$res = $this->checkIDRestricting($h, $this->blocks['ID_restricting'], $editing_record);
-//t3lib_div::debug(array('mode'=>$this->mode, 'query'=>$this->blocks['ID_restricting'], 'res'=>$res, 'piVars'=>$this->pibase->piVars, 'editingrecord'=>$editing_record));
 			if ($res['notAllowed']==1)	{
-t3lib_div::debug('not allowed');
+				t3lib_utility_Debug::debug('not allowed');
 				return $res['content'];
 			}
 		}
@@ -1276,8 +1271,6 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 	 * Upload files function
 	 */
 	function uploadFiles($blocks)	{
-//t3lib_div::debug($blocks);
-//t3lib_div::debug($_FILES);
 		$content = '';
 		foreach	($_FILES['tx_wfqbe_pi1']['error'] as $field_key => $field)	{
 			foreach	($field as $key => $error)	{
@@ -1824,8 +1817,6 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 	 * Function used to show the original form after an add_new operation
 	 */
 	function showOriginalForm($h, $results)	{
-//t3lib_div::debug($this->mode);
-//t3lib_div::debug($this->pibase->piVars);
 		$new_id = $results['id'];
 		if (!$new_id || $this->mode=='delete')	{
 			// insert_ID() not supported -> it's not possible to set the new value option automatically
@@ -1898,7 +1889,7 @@ $rA['###INSERT_SELECT_WIZARD###'] = "<a href='#' onclick=\"javascript:submitActi
 		$label = '';
 		if (is_array($field_conf))	{
 			foreach ($field_conf as $key => $value)	{
-				if (t3lib_div::testInt($key))	{
+				if (t3lib_utility_Math::canBeInterpretedAsInteger($key))	{
 					if ($value['value']==$v && $value['label']!='')	{
 						$label = $value['label'];
 						break;

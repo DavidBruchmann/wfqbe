@@ -99,7 +99,6 @@ class tx_wfqbe_search {
 	
 		
 	function searchForm($content, $blocks, $h, $row)	{
-//t3lib_div::debug($blocks);
 		$this->row = $row;
 		$blockTemplate = $this->cObj->getSubpart($content, '###SEARCH_BLOCK###');
 		$blockList = '';
@@ -217,9 +216,9 @@ class tx_wfqbe_search {
 		}
 		
 		$additionalParams = '';
-		if ($value['form']['size']!='' && t3lib_div::testInt($value['form']['size']))
+		if ($value['form']['size']!='' && t3lib_utility_Math::canBeInterpretedAsInteger($value['form']['size']))
 			$additionalParams .= ' size="'.$value['form']['size'].'"';
-		if ($value['form']['maxlength']!='' && t3lib_div::testInt($value['form']['maxlength']))
+		if ($value['form']['maxlength']!='' && t3lib_utility_Math::canBeInterpretedAsInteger($value['form']['maxlength']))
 			$additionalParams .= ' maxlength="'.$value['form']['maxlength'].'"';
 		if ($value['form']['additional_attributes']!='')
 			$additionalParams .= ' '.$value['form']['additional_attributes'];
@@ -440,7 +439,6 @@ class tx_wfqbe_search {
 				$query = 'SELECT DISTINCT '.$value['form']['field_view'].', '.$value['form']['field_insert'].' FROM '.$value['form']['table'].' '.$where.$orderby;
 			}
 			
-//t3lib_div::debug($query);
 			$ris = $h->Execute($query);
 			
 			if ($value['form']['required']!='si')

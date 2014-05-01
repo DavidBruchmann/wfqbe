@@ -243,7 +243,7 @@ class tx_wfqbe_module1 extends t3lib_SCbase {
 		$content .= '<option value=""></option>';
 		
 		if ($BE_USER->userTS['module.']['user_txwfqbeM1.']['allowedCredentials']=='' || ($BE_USER->userTS['module.']['user_txwfqbeM1.']['allowedCredentials']!='' && t3lib_div::inList($BE_USER->userTS['module.']['user_txwfqbeM1.']['allowedCredentials'], '0')))	{
-			if (t3lib_div::_GP('credentials')==0 && t3lib_div::testInt(t3lib_div::_GP('credentials')))
+			if (t3lib_div::_GP('credentials')==0 && t3lib_utility_Math::canBeInterpretedAsInteger(t3lib_div::_GP('credentials')))
 				$selected = ' selected="selected"';
 			else
 				$selected = '';
@@ -270,7 +270,7 @@ class tx_wfqbe_module1 extends t3lib_SCbase {
 		global $LANG, $BE_USER;
 		$content = '<label for="table">'.$LANG->getLL('label_table').'<label>: <select onchange="submit();" id="table" name="table">';
 		
-		if (t3lib_div::testInt($credentials))	{
+		if (t3lib_utility_Math::canBeInterpretedAsInteger($credentials))	{
 			
 			$CONNECTION = t3lib_div::makeInstance("tx_wfqbe_connect");
 			$this->conn = $CONNECTION->connectNow($credentials);
@@ -415,7 +415,7 @@ class tx_wfqbe_module1 extends t3lib_SCbase {
 			}
 			
 			$dict = NewDataDictionary($this->conn);
-			$flds = $field['name']." ".$field['type'].(t3lib_div::testInt($field['maxlength']) ? "(".$field['maxlength'].")" : "");
+			$flds = $field['name']." ".$field['type'].(t3lib_utility_Math::canBeInterpretedAsInteger($field['maxlength']) ? "(".$field['maxlength'].")" : "");
 			$sqlarray = $dict->ChangeTableSQL($table, $flds);
 			$dict->ExecuteSQLArray($sqlarray);
 			

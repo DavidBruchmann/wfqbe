@@ -132,7 +132,7 @@ class tx_wfqbe_results {
 		// Sosituisce i marcatori ###WFQBE_NOMEVARIABILE### con t3lib_div::_GP('wfqbe[nomevariabile]')
 		$parametri = $this->pibase->piVars;
 		$markerParametri = array();
-//t3lib_div::debug($parametri);
+		
 		if (is_array($parametri))	{
 			$markerParametri = $this->parametersToMarkers($parametri, $markerParametri);
 			/*
@@ -487,7 +487,7 @@ class tx_wfqbe_results {
 				eval('$mA["###COLUMN_NAME###"]=$this->cObj->'.$this->conf["customHeader."][$row["uid"]."."][$i].'($confArray);');
 				if ($confArray['enableOrderByHeaders']==1)
 					$enableOrderByHeaders = 1;
-				elseif ($confArray['enableOrderByHeaders']==0 && t3lib_div::testInt($confArray['enableOrderByHeaders']))
+				elseif ($confArray['enableOrderByHeaders']==0 && t3lib_utility_Math::canBeInterpretedAsInteger($confArray['enableOrderByHeaders']))
 					$enableOrderByHeaders = 0;
 			}	elseif ($this->conf['globalCustomProcess.'][$marker]) {
 				$wfqbeArray = array();
@@ -497,7 +497,7 @@ class tx_wfqbe_results {
 				eval('$mA["###COLUMN_NAME###"]=$this->cObj->'.$this->conf["globalCustomHeader."][$i].'($confArray);');
 				if ($confArray['enableOrderByHeaders']==1)
 					$enableOrderByHeaders = 1;
-				elseif ($confArray['enableOrderByHeaders']==0 && t3lib_div::testInt($confArray['enableOrderByHeaders']))
+				elseif ($confArray['enableOrderByHeaders']==0 && t3lib_utility_Math::canBeInterpretedAsInteger($confArray['enableOrderByHeaders']))
 					$enableOrderByHeaders = 0;
 			}	else	{
 				$mA["###COLUMN_NAME###"]= $field->name;
@@ -697,7 +697,7 @@ class tx_wfqbe_results {
 					eval('$mA["###HEADER_".$col."###"]=$this->cObj->'.$confCustomHeaderObj.'($confArray);');
 					if ($confArray['enableOrderByHeaders']==1)
 						$enableOrderByHeaders = 1;
-					elseif ($confArray['enableOrderByHeaders']==0 && t3lib_div::testInt($confArray['enableOrderByHeaders']))
+					elseif ($confArray['enableOrderByHeaders']==0 && t3lib_utility_Math::canBeInterpretedAsInteger($confArray['enableOrderByHeaders']))
 						$enableOrderByHeaders = 0;
 				}	else	{
 					$mA["###HEADER_".$col."###"]= $col;

@@ -30,8 +30,8 @@
  * 
  */
 
-
-require_once(PATH_tslib.'class.tslib_pibase.php');
+if (intval(str_replace('.','',TYPO3_branch))<62)
+	require_once(PATH_tslib.'class.tslib_pibase.php');
 require_once(t3lib_extMgm::extPath('wfqbe')."lib/class.tx_wfqbe_api_xml2array.php");
 require_once(t3lib_extMgm::extPath('wfqbe')."lib/class.tx_wfqbe_utils.php");
 require_once(t3lib_extMgm::extPath('wfqbe')."lib/class.tx_wfqbe_connect.php");
@@ -78,12 +78,18 @@ class tx_wfqbe_pi1 extends tslib_pibase {
 		$this->initFF();
 		
 		// Hook that can be used to customize the extension configuration programmatically
+
 		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['wfqbe']['customizeConfiguration']))    {
+
 			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['wfqbe']['customizeConfiguration'] as $_classRef)    {
+
 				$_procObj = &t3lib_div::getUserObj($_classRef);
 				$_params = array('conf' => $this->conf);
+
 				$this->conf = $_procObj->customizeConfiguration($_params, $this);
+
 			}
+
 		}
 		
 		
@@ -203,7 +209,7 @@ class tx_wfqbe_pi1 extends tslib_pibase {
 		if ($this->conf['ff_data']['templateFile']!='')	{
 			if (strpos($this->conf['ff_data']['templateFile'], 'media:')!==false)	{
 				$file = explode(':', $this->conf['ff_data']['templateFile']);
-				if (t3lib_div::testInt($file[1]))	{
+				if (t3lib_utility_Math::canBeInterpretedAsInteger($file[1]))	{
 					$resDam = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', 'tx_dam', 'uid='.$file[1].$this->cObj->enableFields('tx_dam'));
 					if ($resDam!==false && $GLOBALS['TYPO3_DB']->sql_num_rows($resDam)==1)	{
 						$rowDam = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($resDam);
@@ -314,7 +320,9 @@ class tx_wfqbe_pi1 extends tslib_pibase {
 		$content='';
 		
 		if (!is_null($beObj))	{
+
 			$this->beObj = $beObj;
+
 		}
 		
 		if (!is_object($this->cObj))	{
@@ -353,7 +361,7 @@ class tx_wfqbe_pi1 extends tslib_pibase {
 			$where = 'tx_wfqbe_query.uid='.intval($this->piVars['wfqbe_results_query']).' AND ';
 		}	elseif ($this->piVars['wfqbe_add_new']!='')	{
 			$where = 'tx_wfqbe_query.uid='.intval($this->insertBlocks['fields'][$this->piVars['wfqbe_add_new']]['form']['add_new']).' AND ';
-		}	elseif (t3lib_div::testInt($this->piVars['wfqbe_select_wizard']))	{
+		}	elseif (t3lib_utility_Math::canBeInterpretedAsInteger($this->piVars['wfqbe_select_wizard']))	{
 			$where = 'tx_wfqbe_query.uid='.intval($this->insertBlocks['fields'][$this->piVars['wfqbe_select_wizard']]['form']['select_wizard']).' AND ';
 		}	else	{
 			$where = 'tx_wfqbe_query.uid='.intval($this->conf['ff_data']['queryObject']).' AND ';

@@ -47,7 +47,6 @@ class tx_wfqbe_api_xml2array {
 	function main($conf, $cObj)	{
 		$this->conf=$conf;
 		$this->cObj = $cObj;
-		//$this->logged = $GLOBALS["TSFE"]->fe_user->user;
 		return;
 	}
 
@@ -61,7 +60,6 @@ class tx_wfqbe_api_xml2array {
             if (strpos($xmlstring, '<contentwfqbe>')!==false || strpos($xmlstring, '<searchwfqbe>')!==false || strpos($xmlstring, '<insertwfqbe>')!==false)	{
             	$API = t3lib_div::makeInstance("tx_wfqbe_api_xml2data_structure");
 	            $data_structure = $API->parse($xmlstring);
-				//t3lib_div::debug($data_structure);
 	            return $this->convert($data_structure);
             }	else	{
 	            return unserialize(stripslashes($xmlstring));
@@ -72,19 +70,13 @@ class tx_wfqbe_api_xml2array {
     
     
     /**
-     * Converte la struttura dati in un array associativo chiave->valore
+     * Converts the structure in an associative array
      */
     function convert($struttura)    {
-		//return $struttura;
-        //$data = array();
-		//t3lib_div::debug($struttura);
-        if (sizeof($struttura["_ELEMENTS"])==0)  {
-            //$data[$struttura["_NAME"]] = trim($struttura["_DATA"]);
+		if (sizeof($struttura["_ELEMENTS"])==0)  {
             return trim($struttura["_DATA"]);
         }   else    {
-            //$data[$struttura["_NAME"]] = array();
             foreach($struttura["_ELEMENTS"] as $key => $value)  {
-                //$data[$struttura["_NAME"]][$value["_NAME"]] = $this->convert($value);
                 if (($value["_NAME"]=="item" && $value["number"]!="")||($value["_NAME"]=="content" && $value["number"]!=""))
                     $data[$value["number"]] = $this->convert($value);
                 else

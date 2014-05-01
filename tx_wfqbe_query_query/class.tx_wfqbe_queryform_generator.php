@@ -48,7 +48,7 @@ class tx_wfqbe_queryform_generator{
 	var $operatoriWhere = array(">",">=","<","<=","=","!=","LIKE","ILIKE","IS","IS NOT","IN","NOT IN","BETWEEN","NOT BETWEEN");
 	//contiene tutti i possibili tipi di join che si possono usare nella clausola from
 	var $operatoriJoin = array("NATURAL JOIN","JOIN","LEFT OUTER JOIN","RIGHT OUTER JOIN","FULL OUTER JOIN");
-	//contiene tutti i possibili operatori che si possono usare nella clausola from e pi��� precisamente nel costrutto ON
+	//contiene tutti i possibili operatori che si possono usare nella clausola from e piu' precisamente nel costrutto ON
 	var $operatoriOn=array("=");
 	//contiene tutte le possibili funzioni che si possono usare nella clausola having
 	var $aggregationFunctions=array("COUNT","MAX","MIN","AVG","SUM");
@@ -62,12 +62,12 @@ class tx_wfqbe_queryform_generator{
 	//contiene tutti i possibili operatori possono usare utilizzare le operazioni insiemistiche
 	var $setOperator=array("UNION","EXCEPT","INTERSECT");
 	//contiene l'html  temporaneo della query creata tramite il form.Il contenuto viene inserito come valore dll'elemento pass[hiddenqbe]
-	//utilizzato nella modalit��� RAW QUERY
+	//utilizzato nella modalita' RAW QUERY
 	var $hiddenqbe;
 	//contiene l'html  temporaneo della query creata tramite la text area.Il contenuto viene inserito come valore dll'elemento pass[hiddenraw]
-	//utilizzato nelle modalit��� QBE
+	//utilizzato nelle modalita' QBE
 	var $hiddenraw;
-	// contiene la modalit��� selezionata(QBE o RAW QUERY)
+	// contiene la modalita' selezionata(QBE o RAW QUERY)
 	var $wfqbefunction;
 	//var $setoperator;
 
@@ -76,12 +76,12 @@ class tx_wfqbe_queryform_generator{
 		$API2 = t3lib_div::makeInstance("tx_wfqbe_api_xml2array");
 
 		$this->wfqbefunction= t3lib_div::_GP('wfqbefunction');
-		if($this->wfqbefunction=="RAWQUERY" && t3lib_div::_GP('rawwfqbe')!=""){//caso in cui resto nella modalit��� RAWQUERY
+		if($this->wfqbefunction=="RAWQUERY" && t3lib_div::_GP('rawwfqbe')!=""){//caso in cui resto nella modalita' RAWQUERY
 			$this->rawwfqbe=t3lib_div::_GP('rawwfqbe');
 			$this->pass=t3lib_div::_GP('pass');
 			$this->hiddenqbe= $this->pass['hiddenqbe'];
 
-		}elseif($this->wfqbefunction=="QBE" && t3lib_div::_GP('wfqbe')!="") {//caso in cui resto nella modalit��� QBE
+		}elseif($this->wfqbefunction=="QBE" && t3lib_div::_GP('wfqbe')!="") {//caso in cui resto nella modalita' QBE
 			$this->wfqbe=t3lib_div::_GP('wfqbe');
 			$this->pass=t3lib_div::_GP('pass');
 			$this->hiddenraw= $this->pass['hiddenraw'];
@@ -92,7 +92,7 @@ class tx_wfqbe_queryform_generator{
 
 			if($this->wfqbe!="")
 			$this->hiddenqbe=$API->array2xml($this->wfqbe);
-			else //se provengo dal qbe in modalit��� impossibile memorizzo in hiddenqbe il contenuto del campo pass[hiddenqbe]
+			else //se provengo dal qbe in modalita' impossibile memorizzo in hiddenqbe il contenuto del campo pass[hiddenqbe]
 			$this->hiddenqbe=$this->pass['hiddenqbe'];
 
 			//$this->rawwfqbe=$API2->xml2array("<tempwfqbe>".$this->pass['hiddenraw']."</tempwfqbe>");
@@ -112,7 +112,7 @@ class tx_wfqbe_queryform_generator{
 			//$this->wfqbe=$this->wfqbe['tempwfqbe'];
 		}
                 
-                /*se "provengo" dal plugin(e perci��� l'array wfqbe ��� vuoto) allora richiamo la funzione parseQuery che ha il compito di riempire l'array
+                /*se "provengo" dal plugin(e percio' l'array wfqbe e' vuoto) allora richiamo la funzione parseQuery che ha il compito di riempire l'array
 		 wfqbe e di conseguenza creare il form.*/
 		if($this->wfqbe=="" && $this->rawwfqbe==""){
                     $this->parseQuery();
@@ -135,7 +135,7 @@ class tx_wfqbe_queryform_generator{
 		$API = t3lib_div::makeInstance("tx_wfqbe_api_xml2array");
 
 		$var=t3lib_div::_GP('P');
-		//estraggo la query salvata dal database (modalit��� xml) e la converto in array
+		//estraggo la query salvata dal database (modalita' xml) e la converto in array
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('query', 'tx_wfqbe_query', 'tx_wfqbe_query.uid='.intval($var['uid']).' AND tx_wfqbe_query.deleted!=1', '', '','');
 		$row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
 		$saveXml = $API->xml2array($row["query"]);
@@ -147,7 +147,7 @@ class tx_wfqbe_queryform_generator{
                 //siccome per rispettare la sintassi xml aggiungo dei tag contenitori quando salvo(vedi funzione saveQuery) adesso estraggo solo
 		//la parte utile per costruire il form o la text area.
 		$this->wfqbe=$saveXml['wfqbe'];
-		//se wfqbe ��� vuoto(ho salvato un file xml del tipo ...<wfqbe></wfqbe>)setto il primo campo select(riferito alla prima tabella) a vuoto
+		//se wfqbe e' vuoto(ho salvato un file xml del tipo ...<wfqbe></wfqbe>)setto il primo campo select(riferito alla prima tabella) a vuoto
 		if($this->wfqbe=="")
 		$this->wfqbe[0]['table'][0]="";
 		$this->rawwfqbe=$saveXml['rawwfqbe'];
@@ -168,7 +168,7 @@ class tx_wfqbe_queryform_generator{
 		//Aggiungo all'inizio e alla fine dei tag contenitori per rispettare le regole XML.
 		//Se compongo la query tramite la textArea(e quindi senza usare il form) racchiudo l'html tra i tag <rawquery> e </rawquery>.Se
 		//invece costruisco la query servendomi del form allora racchiudo l'html tra <wfqbe> e </wfqbe>.
-		//In ogni caso salvo la modalit���(QBE o RAW QBE) tra i tag <function> e </function> e perci��� , sempre per rispettare la sintassi xml,
+		//In ogni caso salvo la modalita' (QBE o RAW QBE) tra i tag <function> e </function> e percio' , sempre per rispettare la sintassi xml,
 		//racchiudo tutto tra i tag <contentwfqbe> e </contentwfqbe>.
 		//t3lib_div::debug($this->rawwfqbe);
 		//t3lib_div::debug($this->wfqbe);
@@ -211,8 +211,8 @@ class tx_wfqbe_queryform_generator{
 		$content='<table style="font-size: 0.9em" class="typo3-dblist">';
 		$content.='<tr class="db_list_normal"><td>'.$this->showMenu().'</td></tr>';
 
-		//visualizzo il form classico la prima volta(quando non ho salvato niente) oppure quando ��� stata selezionata la modalit��� QBE e
-		//la text area di inserimento a mano della query ��� vuota(e cio��� quando rawwfqbe[invalidqbe] ��� vuoto )
+		//visualizzo il form classico la prima volta(quando non ho salvato niente) oppure quando e' stata selezionata la modalita' QBE e
+		//la text area di inserimento a mano della query e' vuota(e cioe' quando rawwfqbe[invalidqbe] e' vuoto )
 		if(($this->wfqbefunction=="QBE" || $this->wfqbefunction=="" ) && ($this->rawwfqbe['invalidwfqbe']==0 || $this->rawwfqbe['invalidwfqbe']=="") ){
 
 			for($numForm=0;$numForm<sizeof($this->wfqbe['setoperator'])+1;$numForm++){
@@ -223,7 +223,7 @@ class tx_wfqbe_queryform_generator{
 				$backgroundColor='db_list_normal';
 				else
 				$backgroundColor='db_list_normal';
-				//$tabelle ��� un array che contiene le tabelle presenti nel database selezionato
+				//$tabelle e' un array che contiene le tabelle presenti nel database selezionato
 				$tabelle=$h->MetaTables(false,true);
 
 				$content.='<tr class="'.$backgroundColor.'" ><td>';
@@ -234,7 +234,7 @@ class tx_wfqbe_queryform_generator{
 				}
 				$content.='</td></tr>';
 
-				//se non ��� stata selezionata nessuna tabella non presento gli elementi
+				//se non e' stata selezionata nessuna tabella non presento gli elementi
 				if($this->wfqbe[$numForm]['table'][0]!=""){
 
 					$content.='<tr class="'.$backgroundColor.'" ><td>';
@@ -250,10 +250,10 @@ class tx_wfqbe_queryform_generator{
 					$content.='</td></tr>';
 
 					$content.='<tr class="'.$backgroundColor.'" id="groupby"><td>';
-					for($i=0;$i<sizeof($this->wfqbe[$numForm]['groupby'])+1;$i++){//richiamo la funzione showGroupBy tante volte quanto ��� grande l'array
-						$content.= $this->showGroupBy($h,$i,$this->wfqbe[$numForm]['groupby'][$i+1]=="",$numForm);	//wfqbe['groupby'] pi��� una volta perch��� si possono specificare molti
-						if($this->wfqbe[$numForm]['groupby'][$i]=="")				//attributi di raggruppamento e perci��� quando l'utente ne seleziona uno
-						break;										//si deve dare la possibilit��� di selezionarne un'altro.
+					for($i=0;$i<sizeof($this->wfqbe[$numForm]['groupby'])+1;$i++){//richiamo la funzione showGroupBy tante volte quanto e' grande l'array
+						$content.= $this->showGroupBy($h,$i,$this->wfqbe[$numForm]['groupby'][$i+1]=="",$numForm);	//wfqbe['groupby'] piu' una volta perche' si possono specificare molti
+						if($this->wfqbe[$numForm]['groupby'][$i]=="")				//attributi di raggruppamento e percio' quando l'utente ne seleziona uno
+						break;										//si deve dare la possibilita' di selezionarne un'altro.
 					}
 
 					$content.='<br /><br /><strong>Custom group by:</strong> <input type="text" name="wfqbe['.$numForm.'][groupby][custom]" value="'.$this->wfqbe[$numForm]['groupby']['custom'].'" size="80" />';
@@ -288,7 +288,7 @@ class tx_wfqbe_queryform_generator{
 			$content.=$this->showQuery($i);
 			$content.='</div>';
 		}
-		//se ��� stata selezionata la modalit��� QBE ma ��� stato inserito qualche cosa nelll'area inserimento query a mano(rawwfqbe[invalidqbe] ���
+		//se e' stata selezionata la modalita' QBE ma e' stato inserito qualche cosa nelll'area inserimento query a mano(rawwfqbe[invalidqbe] e'
 		//uguale a 1) allora visualizzo un ,assaggio di errore
 		elseif($this->wfqbefunction=="QBE" && $this->rawwfqbe['invalidwfqbe']==1){
 
@@ -296,13 +296,13 @@ class tx_wfqbe_queryform_generator{
 			$content.='<strong>Not available.</strong><br/><br/>You are using the RAW method. If you want to create a query with QBE functions, you have to reset the RAWQUERY function with the reset button.<br/>';
 			$content.="<input type='hidden' value='".str_replace("'", '"', $this->hiddenraw)."'  name='pass[hiddenraw]'/>";
 			//salvo anche il contenuto del campo pass[hiddenqbe] che cotiene l'html del form creato fino a questo momento. Se non lo faccio
-			//quando ritorno nella modalit��� RAW QUERY perdo l'array wfqbe e non potrei pi��� riscostruire la query  fatta fino a quel
+			//quando ritorno nella modalita' RAW QUERY perdo l'array wfqbe e non potrei piu' riscostruire la query  fatta fino a quel
 			//momento tramite  il form
 			$content.="<input type='hidden' value='".$this->pass['hiddenqbe']."'  name='pass[hiddenqbe]'/>";
 			$content.='</td></tr></table>';
 
 		}
-		//Qunado ��� stata selezionata la modalit��� RAW QUERY visualizzo l'area di inserimento quary a mano.
+		//Qunado e' stata selezionata la modalita' RAW QUERY visualizzo l'area di inserimento quary a mano.
 		else{
 			$content.='<tr class="db_list_normal"><td>';
 			$content.=$this->showInsertQuery();
@@ -313,7 +313,7 @@ class tx_wfqbe_queryform_generator{
 	}
 
 	/**
-	 * Crea il men��� per la selezione della modalit���
+	 * Crea il menu' per la selezione della modalita'
 	 *
 	 * @return	[string]	$content: stringa che contiene l'html del form
 	 */
@@ -341,7 +341,7 @@ class tx_wfqbe_queryform_generator{
 	 * @param	[type]		$h: puntatore alla connessione
 	 * @param	[intero]	$numSelect: numero identificativo degli elementi select(posizione corrente dell'array wfqbe). Es: 0,1,2,....,n
 	 * @param	[type]		$selectedTable:posizione corrente dell'array wfqbw
-	 * @param	[type]		$nextEmpty:verifica se il successivo elemento dell'array wfqbe['table'] ��� vuoto
+	 * @param	[type]		$nextEmpty:verifica se il successivo elemento dell'array wfqbe['table'] e' vuoto
 	 * @param	[type]		$tabelle:
 	 *
 	 * @return	[string]	$content: stringa che contiene html degli elementi select per la selezione delle tabelle
@@ -358,7 +358,7 @@ class tx_wfqbe_queryform_generator{
 
 
 		$content.='<select onChange="updateForm();"  name="wfqbe['.$numForm.'][table]['.$numSelect.']" title="table['.$numSelect.']" >';
-		//se il successivo ��� vuoto inserisci una opzione vuota per permettere di eliminare una tabella. Se invece la successiva non ���
+		//se il successivo e' vuoto inserisci una opzione vuota per permettere di eliminare una tabella. Se invece la successiva non e'
 		//vuota non permetto di annullare(e quindi non metto la opzione vuota) ma solo di modificare
 		if($nextEmpty)
 		$content.='<option  value=""></option>';
@@ -373,7 +373,7 @@ class tx_wfqbe_queryform_generator{
 		//inserisco 4 spazi dopo di ogni elemento
 		$content.="&nbsp;&nbsp;&nbsp;&nbsp;";
 
-		// se ��� stata selezionata una tabella tabella allora visualizzo un campo input che mi permette di rinominarla
+		// se e' stata selezionata una tabella tabella allora visualizzo un campo input che mi permette di rinominarla
 		if($this->wfqbe[$numForm]['table'][$numSelect]!=""){
 			$content.='AS&nbsp;&nbsp;&nbsp;&nbsp;';
 			$content.='<input type="text" value="'.$this->wfqbe[$numForm]['renametable'][$numSelect].'" name="wfqbe['.$numForm.'][renametable]['.$numSelect.']"/>';
@@ -387,21 +387,21 @@ class tx_wfqbe_queryform_generator{
 			$content.='<br/>';
 		}
 
-		//se non ��� l'elemento che visualizza la prima tabella selezionata (wfqbe['table'][0]) e l'elemento corrente che visaulizza la tabella
-		//selezionata ��� diverso da vuoto allora richiamo la funzione che visualizza il costrutto ON.
-		//Inoltre controllo se la clausola join ��� diversa da vuota.Infatti se ��� vuota vuol dire che ho deciso di effettuare un prodotto
-		//cartesiano e perci��� l'elemento ON non deve essere visualizzato.
-		//Inoltre, non richiamo la funzione se ��� stato selezionato il NATURAL JOIN perch��� questo tipo di join crea automaticamente una
+		//se non e' l'elemento che visualizza la prima tabella selezionata (wfqbe['table'][0]) e l'elemento corrente che visaulizza la tabella
+		//selezionata e' diverso da vuoto allora richiamo la funzione che visualizza il costrutto ON.
+		//Inoltre controllo se la clausola join e' diversa da vuota.Infatti se e' vuota vuol dire che ho deciso di effettuare un prodotto
+		//cartesiano e percio' l'elemento ON non deve essere visualizzato.
+		//Inoltre, non richiamo la funzione se e' stato selezionato il NATURAL JOIN perche' questo tipo di join crea automaticamente una
 		//condizione implicita di equijoin per ogniuna coppia di attributi con lo stesso nome.
 		if($this->wfqbe[$numForm]['table'][$numSelect]!="" && $numSelect!=0 && $this->wfqbe[$numForm]['join'][$numSelect-1]!="" && $this->wfqbe[$numForm]['join'][$numSelect-1]!="NATURAL JOIN")
 		$content.=$this->showON($numSelect,$h,$numForm);
 
 		if($this->wfqbe[$numForm]['table'][0]!=""){
-			//visualizzo l'elemento che contiene le clausole JOIN solo quando seleziono la prima tabella oppure quando il primo join ��� stato selezionato
-			//Questo perch��� quando non seleziono il primo JOIN vuol dire che voglio fare un prodotto cartesiano e perci��� non visualizzo
+			//visualizzo l'elemento che contiene le clausole JOIN solo quando seleziono la prima tabella oppure quando il primo join e' stato selezionato
+			//Questo perche' quando non seleziono il primo JOIN vuol dire che voglio fare un prodotto cartesiano e percio' non visualizzo
 			//i restanti elementi di join
 			if($this->wfqbe[$numForm]['join'][0]!="" || $numSelect==0){
-				//se l'elemento che contiene la seconda tabella non ��� vuoto visualizzo l'elemento che contiene i vari tipi di join
+				//se l'elemento che contiene la seconda tabella non e' vuoto visualizzo l'elemento che contiene i vari tipi di join
 				if($this->wfqbe[$numForm]['table'][$numSelect]!="")
 				$content.=$this->showJoin($numSelect,$numForm);
 			}
@@ -422,19 +422,19 @@ class tx_wfqbe_queryform_generator{
 
 		$content.='<select onChange="updateForm();"  name="wfqbe['.$numForm.'][join]['.$j.']" title="join['.$j.']" >';
 		$content.='<option  value="" ></option>';
-		//se dopo aver creato dei join annidati elimino il primo allora setto l'array a vuoto cos��� non mi compare il costrutto ON perch���
-		//assumo che si voglia creare un prodotto cartesiano. Non vengono presi in considerazione gli altri join perch��� se il primo ��� settato
+		//se dopo aver creato dei join annidati elimino il primo allora setto l'array a vuoto cosi' non mi compare il costrutto ON perche'
+		//assumo che si voglia creare un prodotto cartesiano. Non vengono presi in considerazione gli altri join perche' se il primo e' settato
 		//non permetto che gli altri siano vuoti
 		if($this->wfqbe[$numForm]['join'][0]=="")
 		$this->wfqbe[$numForm]['join']="";
 		//questo if serve per settare l'elemnto JOIN corrente con il valore JOIN(deciso di default) nel caso in cui si sta facendo dei join annidati e si seleziona
-		//una tabella senza selezionare un operatore di join.Questo viene fatto perch��� non si permette di costruire una clausola FROM
+		//una tabella senza selezionare un operatore di join.Questo viene fatto perche' non si permette di costruire una clausola FROM
 		//con prodotti cartesiani e join insieme.
 		if($this->wfqbe[$numForm]['join'][$j-1]!="" && $this->wfqbe[$numForm]['join'][$j]=="" && $this->wfqbe[$numForm]['table'][$j+1]!=""){
 			$content.='<option  value="JOIN" selected="true">JOIN</option>';
-			//setto questo valore perch��� altrimenti non mi verrebbe visualizzato l'elemento ON associato.Questo perch��� quando richiamo
+			//setto questo valore perche' altrimenti non mi verrebbe visualizzato l'elemento ON associato.Questo perche' quando richiamo
 			//la funzione che costruisce il costrutto ON controllo che il join associato sia diverso da vuoto e se non faccio questo
-			//assegnamento l'elemento JOIN ��� uguale a vuoto e perci��� l'elemento ON non viene visualizzato.
+			//assegnamento l'elemento JOIN e' uguale a vuoto e percio' l'elemento ON non viene visualizzato.
 			$this->wfqbe[$numForm]['join'][$j]="JOIN";
 		}
 		for($i=0;$i<sizeof($this->operatoriJoin);$i++){
@@ -468,7 +468,7 @@ class tx_wfqbe_queryform_generator{
 		//contenuti nel secondo costrutto on.
 		$content.='<select onChange="updateForm();"  name="wfqbe['.$numForm.'][on1]['.$i.']" title="left ON['.$i.']" >';
 		$content.='<option  value="" ></option>';
-		//se leftOn e rightOn sono vuoti vuol dire che st��� costruendo il primo elemnto On (il primo join) e perci��� devo ricavare i campi della
+		//se leftOn e rightOn sono vuoti vuol dire che sta costruendo il primo elemnto On (il primo join) e percio' devo ricavare i campi della
 		//prima tabella selezionata attraverso una connessione al database
 		if($this->leftOn=="" && $this->rightOn==""){
 			$this->leftOn=$h->MetaColumnNames($this->wfqbe[$numForm]['table'][0]);
@@ -480,9 +480,9 @@ class tx_wfqbe_queryform_generator{
 			foreach($this->leftOn AS $key => $value)
 			$this->leftOn[$key]=$tableName.".".$this->leftOn[$key];
 		}
-		//se leftOn e rightOn non sono vuoti vuol dire che st��� costruendo un elemento ON successivo al primo(i-esimo) e perci��� faccio un ciclo
+		//se leftOn e rightOn non sono vuoti vuol dire che sta costruendo un elemento ON successivo al primo(i-esimo) e percio' faccio un ciclo
 		//for sull'array associativo leftOn(costruito nell' if precedente per la prima tabella e incrementato con i campi delle successive
-		//tabelle selezionate durante la costuzione del secondo elemento del costrutto ON) e se il campo ���  stato selezionato inserisco
+		//tabelle selezionate durante la costuzione del secondo elemento del costrutto ON) e se il campo e'  stato selezionato inserisco
 		//l'attributo selected="true"
 		foreach($this->leftOn AS $key => $value){
 			if($value == $this->wfqbe[$numForm]['on1'][$i])
@@ -510,7 +510,7 @@ class tx_wfqbe_queryform_generator{
 		//secondo elemento del cosrtutto on.Contiene i campi dell'ultima tabella selezionata.
 		$content.='<select onChange="updateForm();"  name="wfqbe['.$numForm.'][on2]['.$i.']" title="right ON['.$i.']" >';
 		$content.='<option  value="" ></option>';
-		//il contenuto del secondo elemento del costrutto on deve essere sempre calcolato con una connessione al databasa perch��� deve
+		//il contenuto del secondo elemento del costrutto on deve essere sempre calcolato con una connessione al databasa perche' deve
 		//contenere solamente i campi dell'ultima tabella selezionata
 		$this->rightOn=$h->MetaColumnNames($this->wfqbe[$numForm]['table'][$i]);
 		if($this->wfqbe[$numForm]['renametable'][$i]!="")
@@ -603,7 +603,7 @@ class tx_wfqbe_queryform_generator{
 		$content.='<select   onChange="insertField(\'field'.$numForm.$index.'\',\'selectedfields'.$numForm.$index.'\');updateForm()" id="field'.$numForm.$index.'" name="wfqbe['.$numForm.'][field]" title="fields" multiple="multiple" size="10" >';
 		$content.='<option value="*">*</option>';
 		for($i=0;$i<sizeof($this->wfqbe[$numForm]['table']);$i++){
-			//se l'i-esima posizione dell'array ��� vuota mi fermo altrimenti andrei a estrarre le colonne di una tabella inesistente
+			//se l'i-esima posizione dell'array e' vuota mi fermo altrimenti andrei a estrarre le colonne di una tabella inesistente
 			if($this->wfqbe[$numForm]['table'][$i]=="")
 			break;
 			if($this->wfqbe[$numForm]['renametable'][$i]!="")
@@ -641,7 +641,7 @@ class tx_wfqbe_queryform_generator{
 		for($j=0;$j<sizeof($this->wfqbe[$numForm]['ao'])+1;$j++){
 
 			//$numTab serve per definire di quanto deve essere spostato verso sx l'elemento div che costruisco e si basa sul numero di parentesi
-			//aperte.Lo calcolo prima e dopo la costruzione della select che contiene le parentesi da aprire perch��� nella costruzione di questo elemento
+			//aperte.Lo calcolo prima e dopo la costruzione della select che contiene le parentesi da aprire perche' nella costruzione di questo elemento
 			//modifico il contatore ($parentesiAperte) che conteggia il numero delle parentesi aperte fino a questo momento.
 			//Se non lo facessi il contatore verrebbe aumentato ma la variabile $numTab non verrebbe aggiornata.
 			$numTab=$parentesiAperte*3;
@@ -665,7 +665,7 @@ class tx_wfqbe_queryform_generator{
 			$content.='<select onChange="updateForm();"  name="wfqbe['.$numForm.'][where]['.$j.']" title="where['.$j.']" >';
 			$content.='<option  value="" ></option>';
 			for($i=0;$i<sizeof($this->wfqbe[$numForm]['table']);$i++){
-				//se l'i-esima posizione dell'array ��� vuota mi fermo altrimenti andrei a estrarre le colonne di una tabella inesistente
+				//se l'i-esima posizione dell'array e' vuota mi fermo altrimenti andrei a estrarre le colonne di una tabella inesistente
 				if($this->wfqbe[$numForm]['table'][$i]=="")
 				break;
 				if($this->wfqbe[$numForm]['renametable'][$i]!="")
@@ -719,7 +719,7 @@ class tx_wfqbe_queryform_generator{
 					}
 				}else{
 					$content.="&nbsp;&nbsp;&nbsp;&nbsp;";
-					//elemento input nel quale si pu��� inserire un valore
+					//elemento input nel quale si puo' inserire un valore
 					$content.='<input type="text" id="ins'.$numForm.$j.'" value="'.$this->wfqbe[$numForm]['insert'][$j].'" name="wfqbe['.$numForm.'][insert]['.$j.']" title="insert['.$i.']"/>';
 					$content.="&nbsp;&nbsp;&nbsp;&nbsp;";
 					//elemento select attraverso il quale posso selezionare un campo da inserire nel campo input e contiene tutti i campi
@@ -727,7 +727,7 @@ class tx_wfqbe_queryform_generator{
 					$content.='<select onChange="insertwhere(\'insf'.$numForm.$j.'\',\'ins'.$numForm.$j.'\');updateForm()" id="insf'.$numForm.$j.'" name="wfqbe['.$numForm.'][insertfield]['.$j.']" title="insert field['.$j.']" >';
 					$content.='<option  value="" ></option>';
 					for($i=0;$i<sizeof($this->wfqbe[$numForm]['table']);$i++){
-						//se l'i-esima posizione dell'array ��� vuota mi fermo altrimenti andrei a estrarre le colonne di una tabella inesistente
+						//se l'i-esima posizione dell'array e' vuota mi fermo altrimenti andrei a estrarre le colonne di una tabella inesistente
 						if($this->wfqbe[$numForm]['table'][$i]=="")
 						break;
 						if($this->wfqbe[$numForm]['renametable'][$i]!="")
@@ -751,7 +751,7 @@ class tx_wfqbe_queryform_generator{
 			//elemento select che contiene le parentesi da chiudere
 			//non lo visualizzo la prima volta
 			$parOpen="";
-			//se la select per apertura parentesi non ��� settata oppure non ci sono parentesi aperte non faccio vedere la select per
+			//se la select per apertura parentesi non e' settata oppure non ci sono parentesi aperte non faccio vedere la select per
 			// chiusura parentesi
 			$numTabClose=($parentesiAperte-strlen($this->wfqbe[$numForm]['parentesiclose'][$j]))*3;
 			if($parentesiAperte || $this->wfqbe[$numForm]['parentesiopen'][$j]!=""){
@@ -816,7 +816,7 @@ class tx_wfqbe_queryform_generator{
 	 *
 	 * @param	[type]		$h: puntatore alla connessine
 	 * @param	[intero]	$num : indice identificativo dell'elemento corrente che viene costruito
-	 * @param	[type]		$nextEmpty:verifica se il successivo elemento dell'array wfqbe['groupby'] ��� vuoto
+	 * @param	[type]		$nextEmpty:verifica se il successivo elemento dell'array wfqbe['groupby'] e' vuoto
 	 * @return	[string]	$content: stringa che contiene l'html dell'elemento select che rappresenta la clausola groupBy
 	 */
 
@@ -880,7 +880,7 @@ class tx_wfqbe_queryform_generator{
 		$content.='<option value="*">*</option>';
 
 		for($i=0;$i<sizeof($this->wfqbe[$numForm]['table']);$i++){
-			//se l'i-esima posizione dell'array ��� vuota mi fermo altrimenti andrei a estrarre le colonne di una tabella inesistente
+			//se l'i-esima posizione dell'array e' vuota mi fermo altrimenti andrei a estrarre le colonne di una tabella inesistente
 			if($this->wfqbe[$numForm]['table'][$i]=="")
 			break;
 			$column=$h->MetaColumnNames($this->wfqbe[$numForm]['table'][$i]);
@@ -926,7 +926,7 @@ class tx_wfqbe_queryform_generator{
 	 *
 	 * @param	[type]		$h: puntatore a una nuova connessine
 	 * @param	[type]		$num : indice identificativo dell'elemento corrente che viene costruito
-	 * @param	[type]		$nextEmpty:verifica se il successivo elemento dell'array wfqbe['orderby'] ��� vuoto
+	 * @param	[type]		$nextEmpty:verifica se il successivo elemento dell'array wfqbe['orderby'] e' vuoto
 	 * @return	[string]	$content: stringa che contiene l'html dell'elemento select che rappresenta la clausola groupBy
 	 */
 
@@ -1050,7 +1050,7 @@ class tx_wfqbe_queryform_generator{
 		if($wfqbe!=NULL)
 		$this->wfqbe=$wfqbe;
 		//t3lib_div::debug($wfqbe);
-		//se la query ��� stata inserita manualmente in $query metto il contenuto della text area e mi fermo
+		//se la query e' stata inserita manualmente in $query metto il contenuto della text area e mi fermo
 		if($rawwfqbe!=NULL){
 			if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['wfqbe']['preProcessRawQuery']))    {
 				foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['wfqbe']['preProcessRawQuery'] as $_classRef)    {
@@ -1092,7 +1092,7 @@ class tx_wfqbe_queryform_generator{
 			//sezione select
 			$query.="SELECT";
 			$query.=" ";
-			//se ��� stata selezionata la clausola distinct la aggiungo ma se ��� stata selezionata la clausola all non la agguingo perch��� per lo
+			//se e' stata selezionata la clausola distinct la aggiungo ma se e' stata selezionata la clausola all non la agguingo perche' per lo
 			//standard sql select a = select all a
 			if($this->wfqbe[$numForm]['distinctall']=='distinct'){
 				$query.="DISTINCT";
@@ -1108,13 +1108,13 @@ class tx_wfqbe_queryform_generator{
 			$query.="FROM";
 			$query.=" ";
 
-			//$from ��� una variabile che utilizzo per contenere temporaneamente il codice SQL della sezione from
+			//$from e' una variabile che utilizzo per contenere temporaneamente il codice SQL della sezione from
 			$from="";
 			if($this->wfqbe[$numForm]['join']!=""){
 				for($j=0;$j<sizeof($this->wfqbe[$numForm]['join']);$j++){
 					if($this->wfqbe[$numForm]['join'][$j]=="")
 					break;
-					//per ogni join creato devo inserire una parentesi aperta dopo la parola chiave from. La inserisco in questo punto perch���
+					//per ogni join creato devo inserire una parentesi aperta dopo la parola chiave from. La inserisco in questo punto perche'
 					//quando entro nel for esterno sono sicuro che ho creato un join e quindi inserisco una parentesi aperta
 					$from="(".$from;
 					if($j==0){
@@ -1225,7 +1225,7 @@ class tx_wfqbe_queryform_generator{
 					$query.=" ";
 					$query.=$this->wfqbe[$numForm]['op'][$i];
 					$query.=" ";
-					//se l'operatore selezionato ��� between allora inserisco i due valori e l'AND
+					//se l'operatore selezionato e' between allora inserisco i due valori e l'AND
 					if($this->wfqbe[$numForm]['op'][$i]=="BETWEEN" || $this->wfqbe[$numForm]['op'][$i]=="NOT BETWEEN"){
 						if(is_numeric($this->wfqbe[$numForm]['insertbetween1'][$i]) && $this->wfqbe[$numForm]['insertbetween1'][$i]!="")
 						$query.=$this->wfqbe[$numForm]['insertbetween1'][$i];
@@ -1240,7 +1240,7 @@ class tx_wfqbe_queryform_generator{
 						$query.="'".$this->wfqbe[$numForm]['insertbetween2'][$i]."'";
 						//altrimenti
 					}else{
-						//se l'operatore selezionato ��� in inserisco i valori
+						//se l'operatore selezionato e' in inserisco i valori
 						if($this->wfqbe[$numForm]['op'][$i]=="IN" || $this->wfqbe[$numForm]['op'][$i]=="NOT IN"){
 							$query.="(";
 							$query.=" ";
@@ -1259,7 +1259,7 @@ class tx_wfqbe_queryform_generator{
 						}
 						//altrimenti procedo normalmente
 						else{
-							//se il valore inserito ��� un numero , null oppure ��� stato selezionato un campo di una tabella non lo racchiudo tra apici altrimenti si
+							//se il valore inserito e' un numero , null oppure e' stato selezionato un campo di una tabella non lo racchiudo tra apici altrimenti si
 							if((is_numeric($this->wfqbe[$numForm]['insert'][$i]) && $this->wfqbe[$numForm]['insert'][$i]!="") || $this->wfqbe[$numForm]['insert'][$i]=='null' || $this->wfqbe[$numForm]['insert'][$i]==$this->wfqbe[$numForm]['insertfield'][$i])
 							$query.=$this->wfqbe[$numForm]['insert'][$i];
 							else

@@ -33,9 +33,11 @@
 unset($MCONF);
 require ('conf.php');
 require ($BACK_PATH.'init.php');
-require ($BACK_PATH.'template.php');
+if (intval(str_replace('.','',TYPO3_branch))<62) {
+	require ($BACK_PATH.'template.php');
+	require_once (PATH_t3lib.'class.t3lib_scbase.php');
+}
 //$LANG->includeLLFile('EXT:wfqbe/tx_wfqbe_query_insert/locallang.xml');
-require_once (PATH_t3lib.'class.t3lib_scbase.php');
 //includo il file form_generator.php. La prima parte dell'argomento mi d� il path della estensione
 require_once(t3lib_extMgm::extPath('wfqbe')."tx_wfqbe_query_insert/class.tx_wfqbe_insertform_generator.php");
 require_once(t3lib_extMgm::extPath('wfqbe')."lib/class.tx_wfqbe_connect.php");
@@ -70,6 +72,7 @@ require_once(t3lib_extMgm::extPath('wfqbe')."lib/class.tx_wfqbe_connect.php");
 				function main()	{
 					global $BE_USER,$LANG,$BACK_PATH,$TCA_DESCR,$TCA,$CLIENT,$TYPO3_CONF_VARS;
 					$this->P = t3lib_div::_GP('P');
+
 					$this->id = $this->P['pid'];
 					$this->qbe = t3lib_div::makeInstance("tx_wfqbe_insertform_generator");
 					$this->qbe->init();
@@ -274,7 +277,8 @@ require_once(t3lib_extMgm::extPath('wfqbe')."lib/class.tx_wfqbe_connect.php");
 										// Se i parametri savedoc_x e saveandclose_x sono passati tramite post allora includi la classe sopra specificata 
 										// che servir� per fare dei salvataggi.
 										if ($_POST['savedok_x'] || $_POST['saveandclosedok_x'])	{
-											require_once (PATH_t3lib.'class.t3lib_tcemain.php');
+											if (intval(str_replace('.','',TYPO3_branch))<62)
+												require_once (PATH_t3lib.'class.t3lib_tcemain.php');
 										}
 							
 							
