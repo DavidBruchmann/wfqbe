@@ -12,7 +12,7 @@
 
 $EM_CONF[$_EXTKEY] = array(
 	'title' => 'DB Integration',
-	'description' => 'This extension allows to generate queries (with a little sql knowledge), search forms and insert forms to generic databases through a wizard. The results visualization is template-based and fully configurable via TS. The extension uses ADOdb and supports XAJAX.',
+	'description' => 'LATEST VERSION COMPATIBLE WITH TYPO3 4.x - This extension allows to generate queries (with a little sql knowledge), search forms and insert forms to generic databases through a wizard. The results visualization is template-based and fully configurable via TS. The extension uses ADOdb and supports XAJAX.',
 	'category' => 'plugin',
 	'shy' => 0,
 	'version' => '2.0.1',
