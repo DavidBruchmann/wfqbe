@@ -74,7 +74,7 @@ class tx_wfqbe_results {
 			if ($this->conf['debugQuery'] || $this->conf['customProcess.'][$row['uid'].'.']['debugQuery'])
 				$content .= "Query failed (uid=".$row['uid'].")<br />".$h->ErrorMsg();
 			
-			$content = $this->pibase->pi_getLL('no_data');
+			$content .= $this->pibase->pi_getLL('no_data');
 			return $content;
 		}
 
