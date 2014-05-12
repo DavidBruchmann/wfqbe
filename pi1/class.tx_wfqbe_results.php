@@ -74,7 +74,7 @@ class tx_wfqbe_results {
 			if ($this->conf['debugQuery'] || $this->conf['customProcess.'][$row['uid'].'.']['debugQuery'])
 				$content .= "Query failed (uid=".$row['uid'].")<br />".$h->ErrorMsg();
 			
-			$content .= $this->pibase->pi_getLL('no_data');
+			$content = $this->pibase->pi_getLL('no_data');
 			return $content;
 		}
 
@@ -104,7 +104,9 @@ class tx_wfqbe_results {
 				$csv_query = $row['uid'];
 			
 			if ($this->conf['ff_data']['csvDownload']==1)	{
-				$mA["###CONF_CSV###"] = htmlentities($this->pibase->pi_linkTP_keepPIvars_url().'&type=181&tx_wfqbe_pi1[wfqbe_results_query]='.$csv_query);
+				$csvLink = $this->pibase->pi_linkTP_keepPIvars_url();
+				$csvLink .= (strpos($csvLink, '?')>0 ? '' : '?');
+				$mA["###CONF_CSV###"] = htmlentities($csvLink.'&type=181&tx_wfqbe_pi1[wfqbe_results_query]='.$csv_query);
 				$mA['###LABEL_CSV###'] = $this->pibase->pi_getLL('csv_link', 'Export in CSV');
 			}
 			
