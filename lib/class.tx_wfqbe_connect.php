@@ -70,6 +70,9 @@ class tx_wfqbe_connect {
 						$h->query($statement);
 					}
 				}
+				if (intval(str_replace('.','',TYPO3_branch))>=47) {
+					$h->query("SET NAMES utf8;");
+				}
 				return $h;
 			} else {
 				$content = $h->ErrorMsg()."<br /><br />";

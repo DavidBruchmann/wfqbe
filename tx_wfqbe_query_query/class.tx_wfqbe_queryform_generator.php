@@ -1059,6 +1059,11 @@ class tx_wfqbe_queryform_generator{
 				}
 			}
 			$query=$rawwfqbe['rawquery'];
+			if ($piVars['orderby'][$query_uid]['field']) {
+				$query.= 'ORDER BY '.
+					addslashes($piVars['orderby'][$query_uid]['field'])." ".
+					addslashes($piVars['orderby'][$query_uid]['mode'])." ";
+			}
 			return $query;
 		}
 		$query="";
