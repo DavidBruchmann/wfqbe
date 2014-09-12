@@ -31,11 +31,11 @@ unset ($MCONF);
 require_once ('conf.php');
 
 require_once ($BACK_PATH . 'init.php');
-require_once ($BACK_PATH . 'template.php');
+// require_once ($BACK_PATH . 'template.php');
 require_once(t3lib_extMgm::extPath('wfqbe')."lib/class.tx_wfqbe_connect.php");
 
 $LANG->includeLLFile('EXT:wfqbe/mod1/locallang.xml');
-require_once (PATH_t3lib . 'class.t3lib_scbase.php');
+// require_once (PATH_t3lib . 'class.t3lib_scbase.php');
 $BE_USER->modAccess($MCONF, 1); // This checks permissions and exits if the users has no permission for entry.
 // DEFAULT initialization of a module [END]
 
