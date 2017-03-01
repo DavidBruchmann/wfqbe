@@ -52,7 +52,7 @@
 			<label index="query">Query record</label>
 			<label index="max_items_in_list">Records for page</label>
 			<label index="debugQuery">Debug query</label>
-			<label index="parameterCheck">Execute query if the following parameter is not empty (eg. tx_wfqbe_pi1|submit means tx_wfqbe_pi1[submit])</label>
+			<label index="parameterCheck">Execute query if the following parameter is not empty (eg. Tx_Wfqbe_Pi1|submit means Tx_Wfqbe_Pi1[submit])</label>
 			<label index="templateFile">Template</label>
 			<label index="customTemplate">Template type</label>
 			<label index="customTemplate.I.0">From TypoScript</label>

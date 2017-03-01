@@ -1,5 +1,5 @@
 
-plugin.tx_wfqbe_pi1 {
+plugin.Tx_Wfqbe_Pi1 {
 	template = EXT:wfqbe/pi1/wfqbe_template.html
 	style = EXT:wfqbe/pi1/stile.css
 	defLayout = 0
@@ -71,7 +71,7 @@ csv_wfqbe = PAGE
 csv_wfqbe {
   typeNum = 181
 
-  10 =< plugin.tx_wfqbe_pi1
+  10 =< plugin.Tx_Wfqbe_Pi1
   10.template = EXT:wfqbe/pi1/wfqbe_csv_template.html
   10.defLayout = 0
   10.export_mode = csv

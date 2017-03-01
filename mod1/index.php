@@ -25,18 +25,8 @@
 
 // DEFAULT initialization of a module [BEGIN]
 
-
-
-unset ($MCONF);
-require_once ('conf.php');
-
-require_once ($BACK_PATH . 'init.php');
-// require_once ($BACK_PATH . 'template.php');
-require_once(t3lib_extMgm::extPath('wfqbe')."lib/class.tx_wfqbe_connect.php");
-
 $LANG->includeLLFile('EXT:wfqbe/mod1/locallang.xml');
-// require_once (PATH_t3lib . 'class.t3lib_scbase.php');
-$BE_USER->modAccess($MCONF, 1); // This checks permissions and exits if the users has no permission for entry.
+$GLOBALS['BE_USER']->modAccess($GLOBALS['TBE_MODULES']['_configuration']['txwfqbeM1'], 1); // This checks permissions and exits if the users has no permission for entry.
 // DEFAULT initialization of a module [END]
 
 /**
@@ -55,15 +45,10 @@ class tx_wfqbe_module1 extends t3lib_SCbase {
 	 * @return    void
 	 */
 	function init() {
-		global $BE_USER, $LANG, $BACK_PATH, $TCA_DESCR, $TCA, $CLIENT, $TYPO3_CONF_VARS;
+		global $LANG, $BACK_PATH, $TCA_DESCR, $TCA, $CLIENT, $TYPO3_CONF_VARS;
 
 		parent :: init();
 
-		/*
-		if (t3lib_div::_GP('clear_all_cache'))    {
-		    $this->include_once[] = PATH_t3lib.'class.t3lib_tcemain.php';
-		}
-		*/
 	}
 
 	/**
@@ -89,7 +74,7 @@ class tx_wfqbe_module1 extends t3lib_SCbase {
 	 * @return    [type]        ...
 	 */
 	function main() {
-		global $BE_USER, $LANG, $BACK_PATH, $TCA_DESCR, $TCA, $CLIENT, $TYPO3_CONF_VARS;
+		global $LANG, $BACK_PATH, $TCA_DESCR, $TCA, $CLIENT, $TYPO3_CONF_VARS;
 
 		// Access check!
 		// The page will show only if there is a valid page and if this page may be viewed by the user
@@ -99,7 +84,7 @@ class tx_wfqbe_module1 extends t3lib_SCbase {
 		if (true) {
 
 			// Draw the header.
-			$this->doc = t3lib_div :: makeInstance('bigDoc');
+			$this->doc = \TYPO3\CMS\Core\Utility\GeneralUtility :: makeInstance('bigDoc');
 			$this->doc->backPath = $BACK_PATH;
 			$this->doc->form = '<form action="" method="POST">';
 			
@@ -158,7 +143,7 @@ class tx_wfqbe_module1 extends t3lib_SCbase {
 			                            </script>
 			                        ';
 
-			$headerSection = $this->doc->getHeader('pages', $this->pageinfo, $this->pageinfo['_thePath']) . '<br />' . $LANG->sL('LLL:EXT:lang/locallang_core.xml:labels.path') . ': ' . t3lib_div :: fixed_lgd_cs($this->pageinfo['_thePath'], 50);
+			$headerSection = $this->doc->getHeader('pages', $this->pageinfo, $this->pageinfo['_thePath']) . '<br />' . $LANG->sL('LLL:EXT:lang/locallang_core.xml:labels.path') . ': ' . \TYPO3\CMS\Core\Utility\GeneralUtility :: fixed_lgd_cs($this->pageinfo['_thePath'], 50);
 
 			$this->content .= $this->doc->startPage($LANG->getLL('title'));
 			$this->content .= $this->doc->header($LANG->getLL('title'));
@@ -169,7 +154,7 @@ class tx_wfqbe_module1 extends t3lib_SCbase {
 			$this->moduleContent();
 
 			// ShortCut
-			if ($BE_USER->mayMakeShortcut()) {
+			if ($GLOBALS['BE_USER']->mayMakeShortcut()) {
 				$this->content .= $this->doc->spacer(20);
 			}
 
@@ -177,7 +162,7 @@ class tx_wfqbe_module1 extends t3lib_SCbase {
 		} else {
 			// If no access or if ID == zero
 
-			$this->doc = t3lib_div :: makeInstance('bigDoc');
+			$this->doc = \TYPO3\CMS\Core\Utility\GeneralUtility :: makeInstance('bigDoc');
 			$this->doc->backPath = $BACK_PATH;
 
 			$this->content .= $this->doc->startPage($LANG->getLL('title'));
@@ -211,14 +196,14 @@ class tx_wfqbe_module1 extends t3lib_SCbase {
 				$content = '<p>' . $LANG->getLL('mod_descr') . '</p>';
 				$content .= $this->selectCredentials().'<br /><br />';
 				
-				if (t3lib_div::_GP('credentials')!='')	{
-					$content .= $this->selectTable(t3lib_div::_GP('credentials')).'<br /><br />';
+				if (\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('credentials')!='')	{
+					$content .= $this->selectTable(\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('credentials')).'<br /><br />';
 					
-					if (t3lib_div::_GP('credentials')!='')	{
-						if (t3lib_div::_GP('new_field')!='')	{
-							$content .= $this->addFieldsForm(t3lib_div::_GP('table')).'<br /><br />';
+					if (\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('credentials')!='')	{
+						if (\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('new_field')!='')	{
+							$content .= $this->addFieldsForm(\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('table')).'<br /><br />';
 						}	else	{
-							$content .= $this->manageFields(t3lib_div::_GP('credentials'), t3lib_div::_GP('table')).'<br /><br />';
+							$content .= $this->manageFields(\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('credentials'), \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('table')).'<br /><br />';
 						}					
 					}
 				}
@@ -232,18 +217,18 @@ class tx_wfqbe_module1 extends t3lib_SCbase {
 	
 	
 	function selectCredentials()	{
-		global $LANG, $BE_USER;
+		global $LANG;
 		
-		if ($BE_USER->userTS['module.']['user_txwfqbeM1.']['allowedCredentials']!='')
-			$where = ' AND uid IN ('.$BE_USER->userTS['module.']['user_txwfqbeM1.']['allowedCredentials'].')';
+		if ($GLOBALS['BE_USER']->userTS['module.']['user_txwfqbeM1.']['allowedCredentials']!='')
+			$where = ' AND uid IN ('.$GLOBALS['BE_USER']->userTS['module.']['user_txwfqbeM1.']['allowedCredentials'].')';
 		else
 			$where = '';
 		
 		$content = '<br /><label for="credentials">'.$LANG->getLL('label_credentials').'</label>: <select onchange="submit();" id="credentials" name="credentials">';
 		$content .= '<option value=""></option>';
 		
-		if ($BE_USER->userTS['module.']['user_txwfqbeM1.']['allowedCredentials']=='' || ($BE_USER->userTS['module.']['user_txwfqbeM1.']['allowedCredentials']!='' && t3lib_div::inList($BE_USER->userTS['module.']['user_txwfqbeM1.']['allowedCredentials'], '0')))	{
-			if (t3lib_div::_GP('credentials')==0 && t3lib_utility_Math::canBeInterpretedAsInteger(t3lib_div::_GP('credentials')))
+		if ($GLOBALS['BE_USER']->userTS['module.']['user_txwfqbeM1.']['allowedCredentials']=='' || ($GLOBALS['BE_USER']->userTS['module.']['user_txwfqbeM1.']['allowedCredentials']!='' && \TYPO3\CMS\Core\Utility\GeneralUtility::inList($GLOBALS['BE_USER']->userTS['module.']['user_txwfqbeM1.']['allowedCredentials'], '0')))	{
+			if (\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('credentials')==0 && \TYPO3\CMS\Core\Utility\MathUtility::canBeInterpretedAsInteger(\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('credentials')))
 				$selected = ' selected="selected"';
 			else
 				$selected = '';
@@ -253,7 +238,7 @@ class tx_wfqbe_module1 extends t3lib_SCbase {
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', 'tx_wfqbe_credentials', 'deleted=0'.$where);
 		if($GLOBALS['TYPO3_DB']->sql_num_rows($res)>0)	{
 			while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res))	{
-				if (t3lib_div::_GP('credentials')==$row['uid'])
+				if (\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('credentials')==$row['uid'])
 					$selected = ' selected="selected"';
 				else
 					$selected = '';
@@ -267,22 +252,22 @@ class tx_wfqbe_module1 extends t3lib_SCbase {
 	
 	
 	function selectTable($credentials)	{
-		global $LANG, $BE_USER;
+		global $LANG;
 		$content = '<label for="table">'.$LANG->getLL('label_table').'<label>: <select onchange="submit();" id="table" name="table">';
 		
-		if (t3lib_utility_Math::canBeInterpretedAsInteger($credentials))	{
+		if (\TYPO3\CMS\Core\Utility\MathUtility::canBeInterpretedAsInteger($credentials))	{
 			
-			$CONNECTION = t3lib_div::makeInstance("tx_wfqbe_connect");
+			$CONNECTION = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance("tx_wfqbe_connect");
 			$this->conn = $CONNECTION->connectNow($credentials);
 			if ($this->conn!=false)	{
 				$tables = $this->conn->MetaTables(false, true);
 				$content .= '<option value=""></option>';
 				if (is_array($tables) && count($tables)>0)	{
 					foreach ($tables as $table)	{
-						if ($BE_USER->userTS['module.']['user_txwfqbeM1.']['allowedTables.'][$credentials]!='' && !t3lib_div::inList($BE_USER->userTS['module.']['user_txwfqbeM1.']['allowedTables.'][$credentials], $table))
+						if ($GLOBALS['BE_USER']->userTS['module.']['user_txwfqbeM1.']['allowedTables.'][$credentials]!='' && !\TYPO3\CMS\Core\Utility\GeneralUtility::inList($GLOBALS['BE_USER']->userTS['module.']['user_txwfqbeM1.']['allowedTables.'][$credentials], $table))
 							continue;
 						
-						if (t3lib_div::_GP('table')==$table)
+						if (\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('table')==$table)
 							$selected = ' selected="selected"';
 						else
 							$selected = '';
@@ -309,16 +294,16 @@ class tx_wfqbe_module1 extends t3lib_SCbase {
 		if ($table=='')
 			return '';
 		
-		if (t3lib_div::_GP('delete_field')!='')	{
-			if ($this->deleteField($table, t3lib_div::_GP('delete_field')))	{
+		if (\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('delete_field')!='')	{
+			if ($this->deleteField($table, \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('delete_field')))	{
 				$content .= '<span>'.$LANG->getLL('field_deleted').'</span><br /><br />';
 			}	else	{
 				$content .= '<span style="color: red">'.$LANG->getLL('field_not_deleted').'</span><br /><br />';
 			}
 		}
 		
-		if (t3lib_div::_GP('add_field')!='')
-			$content .= $this->addField(t3lib_div::_GP('table'));
+		if (\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('add_field')!='')
+			$content .= $this->addField(\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('table'));
 		
 		
 		$columns=$this->conn->MetaColumns($table);
@@ -395,7 +380,7 @@ class tx_wfqbe_module1 extends t3lib_SCbase {
 	function deleteField($table, $field)	{
 		global $LANG;
 		$dict = NewDataDictionary($this->conn);
-		$flds = t3lib_div::_GP('delete_field');
+		$flds = \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('delete_field');
 		$sqlarray = $dict->DropColumnSQL($table, $flds);
 		$dict->ExecuteSQLArray($sqlarray);
 			
@@ -405,7 +390,7 @@ class tx_wfqbe_module1 extends t3lib_SCbase {
 	
 	
 	function addField($table)	{
-		$field = t3lib_div::_GP('newfield');
+		$field = \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('newfield');
 		if (is_array($field))	{
 			if ($field['name']=='')	{
 				return '<span style="color: red;">'.$LANG->getLL('newfield_error_name').'</span>';
@@ -415,7 +400,7 @@ class tx_wfqbe_module1 extends t3lib_SCbase {
 			}
 			
 			$dict = NewDataDictionary($this->conn);
-			$flds = $field['name']." ".$field['type'].(t3lib_utility_Math::canBeInterpretedAsInteger($field['maxlength']) ? "(".$field['maxlength'].")" : "");
+			$flds = $field['name']." ".$field['type'].(\TYPO3\CMS\Core\Utility\MathUtility::canBeInterpretedAsInteger($field['maxlength']) ? "(".$field['maxlength'].")" : "");
 			$sqlarray = $dict->ChangeTableSQL($table, $flds);
 			$dict->ExecuteSQLArray($sqlarray);
 			
@@ -431,26 +416,17 @@ class tx_wfqbe_module1 extends t3lib_SCbase {
 	    global $LANG;
 	    
         // the content is an array that can be set through $key / $value pairs as parameter
-        $ajaxObj->addContent('help', t3lib_div::_GP('field').' - '.date('H:i:s', time()));
+        $ajaxObj->addContent('help', \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('field').' - '.date('H:i:s', time()));
 	}
 	
 	
 	
 }
 
-if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wfqbe/mod1/index.php']) {
-	include_once ($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wfqbe/mod1/index.php']);
-}
-
 
 // Make instance:
-$SOBE = t3lib_div :: makeInstance('tx_wfqbe_module1');
+$SOBE = \TYPO3\CMS\Core\Utility\GeneralUtility :: makeInstance('tx_wfqbe_module1');
 $SOBE->init();
-
-// Include files?
-foreach ($SOBE->include_once as $INC_FILE)
-	include_once ($INC_FILE);
 
 $SOBE->main();
 $SOBE->printContent()
-?>

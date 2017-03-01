@@ -1,8 +1,6 @@
 <?php
 if (!defined ('TYPO3_MODE')) 	die ('Access denied.');
 
-require_once t3lib_extMgm::extPath('wfqbe').'class.tx_wfqbe_tca_credentials_connection_localconf_preprocessing.php';
-
 $TCA["tx_wfqbe_credentials"] = Array (
 	"ctrl" => $TCA["tx_wfqbe_credentials"]["ctrl"],
 	"interface" => Array (
@@ -22,6 +20,7 @@ $TCA["tx_wfqbe_credentials"] = Array (
 			"label" => "LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_credentials.type",
 			'config' => Array (
 				'type' => 'select',
+				'renderType' => 'selectSingle',
 				'items' => Array (
 					Array('LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_credentials.type.I.0', 'standard'),
 					Array('LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_credentials.type.I.1', 'uri'),
@@ -43,6 +42,7 @@ $TCA["tx_wfqbe_credentials"] = Array (
 			"label" => "LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_credentials.dbms",		
 			"config" => Array (
 				"type" => "select",
+				"renderType" => "selectSingle",
 				"items" => Array (
 					Array("LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_credentials.dbms.I.0", "mysql"),
 					Array("LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_credentials.dbms.I.1", "postgres"),
@@ -78,6 +78,7 @@ $TCA["tx_wfqbe_credentials"] = Array (
 			"label" => "LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_credentials.conn_type",		
 			"config" => Array (
 				"type" => "select",
+				"renderType" => "selectSingle",
 				"items" => Array (
 					Array("LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_credentials.conn_type.I.0", "Connetc"),
 					Array("LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_credentials.conn_type.I.1", "PConnect"),
@@ -118,6 +119,7 @@ $TCA["tx_wfqbe_credentials"] = Array (
 				"label" => "LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_credentials.connection_localconf",
 				"config" => Array (
 						"type" => "select",
+						"renderType" => "selectSingle",
 						"items" => array(array('','')),
 						"size" => 1,
 						"maxitems" => 1,
@@ -158,6 +160,7 @@ $TCA["tx_wfqbe_query"] = Array (
 			"label" => "LLL:EXT:lang/locallang_general.xml:LGL.fe_group",
 			"config" => Array (
 				"type" => "select",
+				"renderType" => "selectSingle",
 				"items" => Array (
 					Array("", 0),
 					Array("LLL:EXT:lang/locallang_general.xml:LGL.hide_at_login", -1),
@@ -171,6 +174,7 @@ $TCA["tx_wfqbe_query"] = Array (
 			"label" => "LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_query.type",
 			'config' => Array (
 				'type' => 'select',
+				'renderType' => 'selectSingle',
 				'items' => Array (
 					Array('LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_query.type.I.0', 'select'),
 					Array('LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_query.type.I.1', 'insert'),
@@ -211,8 +215,10 @@ $TCA["tx_wfqbe_query"] = Array (
 						"title" => "Select Wizard:",
 						"type" => "script",
 						"notNewRecords" => 1,
-						"icon" => t3lib_extMgm::extRelPath("wfqbe")."tx_wfqbe_query_query/wizard_icon.gif",
-						"script" => t3lib_extMgm::extRelPath("wfqbe")."tx_wfqbe_query_query/index.php",
+						"icon" => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath("wfqbe")."tx_wfqbe_query_query/wizard_icon.gif",
+						"module" => array(
+							"name" => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath("wfqbe")."tx_wfqbe_query_query/index.php",
+						),
 					),
 				),
 			)
@@ -230,8 +236,10 @@ $TCA["tx_wfqbe_query"] = Array (
 						"title" => "Search Wizard:",
 						"type" => "script",
 						"notNewRecords" => 1,
-						"icon" => t3lib_extMgm::extRelPath("wfqbe")."tx_wfqbe_query_search/wizard_icon.gif",
-						"script" => t3lib_extMgm::extRelPath("wfqbe")."tx_wfqbe_query_search/index.php",
+						"icon" => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath("wfqbe")."tx_wfqbe_query_search/wizard_icon.gif",
+						"module" => array(
+							"name" => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath("wfqbe")."tx_wfqbe_query_search/index.php",
+						),
 					),
 				),
 			)
@@ -249,8 +257,10 @@ $TCA["tx_wfqbe_query"] = Array (
 						"title" => "Insert Wizard:",
 						"type" => "script",
 						"notNewRecords" => 1,
-						"icon" => t3lib_extMgm::extRelPath("wfqbe")."tx_wfqbe_query_insert/wizard_icon.gif",
-						"script" => t3lib_extMgm::extRelPath("wfqbe")."tx_wfqbe_query_insert/index.php",
+						"icon" => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath("wfqbe")."tx_wfqbe_query_insert/wizard_icon.gif",
+						"module" => array(
+							"name" => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath("wfqbe")."tx_wfqbe_query_insert/index.php",
+						),
 					),
 				),
 			)
@@ -260,6 +270,7 @@ $TCA["tx_wfqbe_query"] = Array (
 			"label" => "LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_query.credentials",		
 			"config" => Array (
 				"type" => "select",	
+				"renderType" => "selectSingle",
 				"items" => Array (
 					Array("LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_query.credentials.I.0", "#TYPO3DB#"),
 				),
@@ -408,6 +419,7 @@ $TCA["tx_wfqbe_backend"] = Array (
 			"label" => "LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_backend.searchq_position",
 			"config" => Array (
 				"type" => "select",
+				"renderType" => "selectSingle",
 				"items" => Array (
 					Array("LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_backend.searchq_position.I.0", "bottom"),
 					Array("LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_backend.searchq_position.I.1", "top"),
@@ -421,6 +433,7 @@ $TCA["tx_wfqbe_backend"] = Array (
 				"label" => "LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_backend.export_mode",
 				"config" => Array (
 					"type" => "select",
+					"renderType" => "selectSingle",
 					"items" => Array (
 						Array("LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_backend.export_mode.I.0", ""),
 						Array("LLL:EXT:wfqbe/locallang_db.xml:tx_wfqbe_backend.export_mode.I.1", "csv"),

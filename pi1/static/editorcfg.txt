@@ -1,9 +1,9 @@
 
 
-plugin.tx_wfqbe_pi1.CSS_editor = Plugin: "tx_wfqbe_pi1"
-plugin.tx_wfqbe_pi1.CSS_editor.selector = .tx-wfqbe-pi1
-plugin.tx_wfqbe_pi1.CSS_editor.exampleWrap = <HR><strong>Plugin: "tx_wfqbe_pi1"</strong><HR><div class="tx-wfqbe-pi1"> | </div>
-plugin.tx_wfqbe_pi1.CSS_editor.ch {
+plugin.Tx_Wfqbe_Pi1.CSS_editor = Plugin: "Tx_Wfqbe_Pi1"
+plugin.Tx_Wfqbe_Pi1.CSS_editor.selector = .tx-wfqbe-pi1
+plugin.Tx_Wfqbe_Pi1.CSS_editor.exampleWrap = <HR><strong>Plugin: "Tx_Wfqbe_Pi1"</strong><HR><div class="tx-wfqbe-pi1"> | </div>
+plugin.Tx_Wfqbe_Pi1.CSS_editor.ch {
 	P = Text
 	P.selector = P
 	P.attribs = BODYTEXT

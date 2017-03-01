@@ -24,18 +24,10 @@
 
 
     // DEFAULT initialization of a module [BEGIN]
-unset($MCONF);
-require_once('conf.php');
-require_once($BACK_PATH.'init.php');
-// require_once($BACK_PATH.'template.php');
 
 $LANG->includeLLFile('EXT:wfqbe/mod2/locallang.xml');
-// require_once(PATH_t3lib.'class.t3lib_scbase.php');
-$BE_USER->modAccess($MCONF,1);    // This checks permissions and exits if the users has no permission for entry.
+$GLOBALS['BE_USER']->modAccess($GLOBALS['TBE_MODULES']['_configuration']['txwfqbeM2'],1);    // This checks permissions and exits if the users has no permission for entry.
     // DEFAULT initialization of a module [END]
-
-
-require_once (t3lib_extMgm::extPath('wfqbe').'mod2/class.tx_wfqbe_belib.php');
 
 
 /**
@@ -53,15 +45,10 @@ class  tx_wfqbe_module2 extends t3lib_SCbase {
                  * @return    void
                  */
                 function init()    {
-                    global $BE_USER,$LANG,$BACK_PATH,$TCA_DESCR,$TCA,$CLIENT,$TYPO3_CONF_VARS;
+                    global $LANG,$BACK_PATH,$TCA_DESCR,$TCA,$CLIENT,$TYPO3_CONF_VARS;
 
                     parent::init();
 
-                    /*
-                    if (t3lib_div::_GP('clear_all_cache'))    {
-                        $this->include_once[] = PATH_t3lib.'class.t3lib_tcemain.php';
-                    }
-                    */
                 }
 
                 /**
@@ -88,17 +75,17 @@ class  tx_wfqbe_module2 extends t3lib_SCbase {
                  * @return    [type]        ...
                  */
                 function main()    {
-                    global $BE_USER,$LANG,$BACK_PATH,$TCA_DESCR,$TCA,$CLIENT,$TYPO3_CONF_VARS;
+                    global $LANG,$BACK_PATH,$TCA_DESCR,$TCA,$CLIENT,$TYPO3_CONF_VARS;
 
                     // Access check!
                     // The page will show only if there is a valid page and if this page may be viewed by the user
                     $this->pageinfo = t3lib_BEfunc::readPageAccess($this->id,$this->perms_clause);
                     $access = is_array($this->pageinfo) ? 1 : 0;
 
-                    if (($this->id && $access) || ($BE_USER->user['admin'] && !$this->id))    {
+                    if (($this->id && $access) || ($GLOBALS['BE_USER']->user['admin'] && !$this->id))    {
 
                             // Draw the header.
-                        $this->doc = t3lib_div::makeInstance('bigDoc');
+                        $this->doc = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('bigDoc');
                         $this->doc->backPath = $BACK_PATH;
                         $this->doc->form='<form action="" id="_form" method="post" enctype="multipart/form-data">';
 
@@ -126,7 +113,7 @@ class  tx_wfqbe_module2 extends t3lib_SCbase {
                         );
                         //$pageRenderer->addInlineSettingArray('', $typo3Settings);
 
-                        //$headerSection = $this->doc->getHeader('pages',$this->pageinfo,$this->pageinfo['_thePath']).'<br />'.$LANG->sL('LLL:EXT:lang/locallang_core.xml:labels.path').': '.t3lib_div::fixed_lgd_cs($this->pageinfo['_thePath'],50);
+                        //$headerSection = $this->doc->getHeader('pages',$this->pageinfo,$this->pageinfo['_thePath']).'<br />'.$LANG->sL('LLL:EXT:lang/locallang_core.xml:labels.path').': '.\TYPO3\CMS\Core\Utility\GeneralUtility::fixed_lgd_cs($this->pageinfo['_thePath'],50);
 
                         $this->content.=$this->doc->startPage($LANG->getLL('title'));
                         //$this->content.=$this->doc->header($LANG->getLL('title'));
@@ -140,7 +127,7 @@ class  tx_wfqbe_module2 extends t3lib_SCbase {
 
 
                         // ShortCut
-                        if ($BE_USER->mayMakeShortcut())    {
+                        if ($GLOBALS['BE_USER']->mayMakeShortcut())    {
                             $this->content.=$this->doc->spacer(20).$this->doc->section('',$this->doc->makeShortcutIcon('id',implode(',',array_keys($this->MOD_MENU)),$this->MCONF['name']));
                         }
 
@@ -148,7 +135,7 @@ class  tx_wfqbe_module2 extends t3lib_SCbase {
                     } else {
                             // If no access or if ID == zero
 
-                        $this->doc = t3lib_div::makeInstance('mediumDoc');
+                        $this->doc = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('mediumDoc');
                         $this->doc->backPath = $BACK_PATH;
 
                         $this->content.=$this->doc->startPage($LANG->getLL('title'));
@@ -175,7 +162,7 @@ class  tx_wfqbe_module2 extends t3lib_SCbase {
                  * @return    void
                  */
                 function moduleContent()    {
-                    $BELIB = t3lib_div::makeInstance('tx_wfqbe_belib');
+                    $BELIB = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_wfqbe_belib');
                     $content = $BELIB->getContent($this);
                     $title = $BELIB->getTitle();
 					$this->content.=$this->doc->section($title,$content,0,1);
@@ -184,21 +171,9 @@ class  tx_wfqbe_module2 extends t3lib_SCbase {
 
 
 
-if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wfqbe/mod2/index.php'])    {
-    include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wfqbe/mod2/index.php']);
-}
-
-
-
-
 // Make instance:
-$SOBE = t3lib_div::makeInstance('tx_wfqbe_module2');
+$SOBE = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_wfqbe_module2');
 $SOBE->init();
-
-// Include files?
-foreach($SOBE->include_once as $INC_FILE)    include_once($INC_FILE);
 
 $SOBE->main();
 $SOBE->printContent();
-
-?>

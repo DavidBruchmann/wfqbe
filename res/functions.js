@@ -16,12 +16,10 @@ function wfqbe_manage_help(id){
 	return false;
 }
 
-
-
-
 /*
  * This two lines are executed onLoad to hide all the help texts.
  */
 if(document.getElementById && document.createElement){
 	document.write('<style type="text/css">*.wfqbe_help{display:none}</style>');
 }
+

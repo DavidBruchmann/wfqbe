@@ -31,18 +31,7 @@
 
 
 
-	// DEFAULT initialization of a module [BEGIN]
-unset($MCONF);
-require ('conf.php');
-require ($BACK_PATH.'init.php');
-if (intval(str_replace('.','',TYPO3_branch))<62) {
-	require ($BACK_PATH.'template.php');
-	require_once (PATH_t3lib.'class.t3lib_scbase.php');
-}
 $LANG->includeLLFile('EXT:wfqbe/tx_wfqbe_query_query/locallang.xml');
-//includo il file form_generator.php. La prima parte dell'argomento mi d� il path della estensione
-require_once(t3lib_extMgm::extPath('wfqbe')."tx_wfqbe_query_query/class.tx_wfqbe_queryform_generator.php");
-require_once(t3lib_extMgm::extPath('wfqbe')."lib/class.tx_wfqbe_connect.php");
 	// ....(But no access check here...)
 	// DEFAULT initialization of a module [END]
 
@@ -72,14 +61,14 @@ class tx_wfqbe_tx_wfqbe_query_querywiz extends t3lib_SCbase {
  * @return	[type]		...
  */
 				function main()	{
-					global $BE_USER,$LANG,$BACK_PATH,$TCA_DESCR,$TCA,$CLIENT,$TYPO3_CONF_VARS;
-					$this->P = t3lib_div::_GP('P');
+					global $LANG,$BACK_PATH,$TCA_DESCR,$TCA,$CLIENT,$TYPO3_CONF_VARS;
+					$this->P = \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('P');
 
 					$this->id = $this->P['pid'];
-					$this->qbe = t3lib_div::makeInstance("tx_wfqbe_queryform_generator");
+					$this->qbe = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance("tx_wfqbe_queryform_generator");
 					$this->qbe->init();
 						// Draw the header.
-					$this->doc = t3lib_div::makeInstance('bigDoc');
+					$this->doc = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('bigDoc');
 					$this->doc->backPath = $BACK_PATH;
 					$this->doc->form='<form action="" id="insQuery" method="POST" style="width:113%;">';
 					//$this->doc->styleSheetFile =$BACK_PATH.'typo3/stylesheet.css'; 
@@ -178,12 +167,12 @@ class tx_wfqbe_tx_wfqbe_query_querywiz extends t3lib_SCbase {
 
 					$this->pageinfo = t3lib_BEfunc::readPageAccess($this->id,$this->perms_clause);
 					$access = is_array($this->pageinfo) ? 1 : 0;
-					if (($this->id && $access) || ($BE_USER->user['admin'] && !$this->id))	{
-						if ($BE_USER->user['admin'] && !$this->id)	{
+					if (($this->id && $access) || ($GLOBALS['BE_USER']->user['admin'] && !$this->id))	{
+						if ($GLOBALS['BE_USER']->user['admin'] && !$this->id)	{
 							$this->pageinfo=array('title' => '[root-level]','uid'=>0,'pid'=>0);
 						}
 
-						//$headerSection = $this->doc->getHeader('pages',$this->pageinfo,$this->pageinfo['_thePath']).'<br>'.$LANG->sL('LLL:EXT:lang/locallang_core.xml:labels.path').': '.t3lib_div::fixed_lgd_pre($this->pageinfo['_thePath'],50);
+						//$headerSection = $this->doc->getHeader('pages',$this->pageinfo,$this->pageinfo['_thePath']).'<br>'.$LANG->sL('LLL:EXT:lang/locallang_core.xml:labels.path').': '.\TYPO3\CMS\Core\Utility\GeneralUtility::fixed_lgd_pre($this->pageinfo['_thePath'],50);
 						$headerSection = "";
 						$this->content.="<div id=\"tx_wfqbe_queryform\">";
 						$this->content.=$this->doc->startPage($LANG->getLL('title'));
@@ -198,8 +187,8 @@ class tx_wfqbe_tx_wfqbe_query_querywiz extends t3lib_SCbase {
 
 
 						// ShortCut
-						if ($BE_USER->mayMakeShortcut())	{
-							$this->content.=$this->doc->spacer(20).$this->doc->section('',$this->doc->makeShortcutIcon('id',implode(',',array_keys($this->MOD_MENU)),$this->MCONF['name']));
+						if ($GLOBALS['BE_USER']->mayMakeShortcut())	{
+							$this->content.=$this->doc->spacer(20).$this->doc->section('',$this->doc->makeShortcutIcon('id',implode(',',array_keys($this->MOD_MENU)),$this->$GLOBALS['TBE_MODULES']['_configuration']['tx_wfqbe_query_query']['name']));
 						}
 					}
 					$this->content.=$this->doc->spacer(10).'</div>';
@@ -225,12 +214,12 @@ class tx_wfqbe_tx_wfqbe_query_querywiz extends t3lib_SCbase {
 				$content='';
 					//switch((string)$this->MOD_SETTINGS['function'])	{
 						//case 1:
-								$var=t3lib_div::_GP('P');//P � l'array che contiene tutte le info passate dal plugin al wizard
-								//t3lib_div::debug($this->P);
+								$var=\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('P');//P � l'array che contiene tutte le info passate dal plugin al wizard
+								//\TYPO3\CMS\Core\Utility\GeneralUtility::debug($this->P);
 								$this->P=$var;
-								//t3lib_div::debug($var);
+								//\TYPO3\CMS\Core\Utility\GeneralUtility::debug($var);
 								$where = 'tx_wfqbe_query.uid='.$var['uid'].' AND tx_wfqbe_query.deleted!=1 AND ';
-								$CONN = t3lib_div::makeInstance("tx_wfqbe_connect");
+								$CONN = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance("tx_wfqbe_connect");
 								$connection_obj = $CONN->connect($where);								
 								
 								if (!$connection_obj)	{
@@ -243,7 +232,7 @@ class tx_wfqbe_tx_wfqbe_query_querywiz extends t3lib_SCbase {
 									// Settaggio tag apertura form. Questo form � quello principale che contiene i vari tipi di campi per 
 									//creare la query. La variabile $rUri contiene il path della pagina del wizard e viene utilizzata cona valore
 									// dell'attributo action del form
-									list($rUri) = explode('#',t3lib_div::getIndpEnv('REQUEST_URI'));
+									list($rUri) = explode('#',\TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('REQUEST_URI'));
 									
 									$content.='<form action="'.htmlspecialchars($rUri).'" method="post" name="insQuery">';
 									$content.= '<div id="c-saveButtonPanel">';
@@ -275,19 +264,10 @@ class tx_wfqbe_tx_wfqbe_query_querywiz extends t3lib_SCbase {
 	
 										$content.='<hr>';
 										
-										// If save command found, include tcemain. t3lib_tcemain.php � una classe per la manipolazione del database.
-										// Se i parametri savedoc_x e saveandclose_x sono passati tramite post allora includi la classe sopra specificata 
-										// che servir� per fare dei salvataggi.
-										if ($_POST['savedok_x'] || $_POST['saveandclosedok_x'])	{
-											if (intval(str_replace('.','',TYPO3_branch))<62)
-												require_once (PATH_t3lib.'class.t3lib_tcemain.php');
-										}
-							
-							
 										// Se i pulsanti di salvataggio e salvataggio/uscita son premuti allora
 										if ($_POST['savedok_x'] || $_POST['saveandclosedok_x'])	{
 											// creo una istanza della classe importata(viene salvata nella variabile tca)
-											$tce = t3lib_div::makeInstance('t3lib_TCEmain');
+											$tce = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('t3lib_TCEmain');
 											$tce->stripslashes_values=0;
 	
 											// Creo un array di nome data e inserisco la query che verr� salvata nella tabella table(query),nella
@@ -306,7 +286,7 @@ class tx_wfqbe_tx_wfqbe_query_querywiz extends t3lib_SCbase {
 											// Se � stato premuto il tasto salvataggio/uscita ,oltre a fare tutto il lavoro che si f� per il pulsante
 											//salvataggio, bisogna tornare nella pagina di inserimento nuovo record
 											if ($_POST['saveandclosedok_x'])	{
-												header('Location: '.t3lib_div::locationHeaderUrl($this->P['returnUrl']));
+												header('Location: '.\TYPO3\CMS\Core\Utility\GeneralUtility::locationHeaderUrl($this->P['returnUrl']));
 												exit;
 											}
 										}
@@ -322,19 +302,10 @@ class tx_wfqbe_tx_wfqbe_query_querywiz extends t3lib_SCbase {
 
 
 
-if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wfqbe/tx_wfqbe_query_query/index.php'])	{
-	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/wfqbe/tx_wfqbe_query_query/index.php']);
-}
-
-
-
-
 // Make instance:
-$SOBE = t3lib_div::makeInstance('tx_wfqbe_tx_wfqbe_query_querywiz');
+$SOBE = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_wfqbe_tx_wfqbe_query_querywiz');
 $SOBE->init();
 
 
 $SOBE->main();
 $SOBE->printContent();
-
-?>
