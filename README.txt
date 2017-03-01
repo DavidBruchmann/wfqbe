@@ -15,3 +15,8 @@ for extbase.
 This repository is aimed to serve for further development.
 Pullrequests and issues will be handled if I find the time.
 Feel free to fork the repo.
+
+With TYPO3 Version 7 the database abstraction has been depreacated and the whole 
+database usage in wfqbe has to be changed for usage for TYPO3 Version 9.
+Therefore the development is getting quite a lot of work and it might be
+questionable if and how all the old features can be realized in future.
