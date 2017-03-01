@@ -13,5 +13,5 @@ The version available here has many many changes and is still under development.
 The structure changed very much, many classes have been defined as extension
 for extbase.
 This repository is aimed to serve for further development.
-Pullrequests and issues and will be handled if I find the time.
+Pullrequests and issues will be handled if I find the time.
 Feel free to fork the repo.
