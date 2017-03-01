@@ -1,0 +1,143 @@
+
+plugin.tx_wfqbe_pi1 {
+	view {
+		templateRootPaths.0 = {$plugin.tx_wfqbe_pi1.view.templateRootPath}
+		partialRootPaths.0 = {$plugin.tx_wfqbe_pi1.view.partialRootPath}
+		layoutRootPaths.0 = {$plugin.tx_wfqbe_pi1.view.layoutRootPath}
+	}
+	persistence {
+		storagePid = {$plugin.tx_wfqbe_pi1.persistence.storagePid}
+	}
+	settings  {
+		foo = TEXT
+		foo {
+			value = here some text
+		}
+		template = EXT:wfqbe/Resources/Private/Templates_old/Pi1/wfqbe_template.html
+		style = EXT:wfqbe/Resources/Public/CSS/stile.css
+		defLayout = 0
+		debugQuery = 0
+		wrapInBaseClass = 1
+		enableXAJAX = 0
+		pageLimit = -1
+		
+		results	{
+			enableOrderByHeaders = 1
+		}
+		
+		subinsert	{
+			pageConfirmation = 0
+		}
+		
+		insert	{
+			pageConfirmation = 1
+			requiredSymbol = *
+			add_new	{
+				icon = EXT:wfqbe/Resources/Public/Icons/add.gif
+			}
+			select_wizard	{
+				icon = EXT:wfqbe/Resources/Public/Icons/open.gif
+			}
+			edit_wizard	{
+				icon = EXT:wfqbe/Resources/Public/Icons/edit.gif
+			}
+			delete_wizard	{
+				icon = EXT:wfqbe/Resources/Public/Icons/delete.gif
+			}
+			
+			help_link = ?
+			help_link.wrap = (|)
+		}
+		
+		classes {
+			even = wfqbe_even
+			odd = wfqbe_odd
+		}
+		
+		email	{
+			debug = 0
+			from_email = wfqbe@domain.com
+			from = DB Integration module
+			bcc = wfqbe@domain.com
+			notify_email = 
+			notify_subject = 
+			template = EXT:wfqbe/Resources/Private/Templates_old/mail_template.html
+			send_email = 0
+			
+			send_email_user = 0
+			field_email_user = 
+			notify_subject_user = 
+		}
+		
+		
+		backend {
+			template = EXT:wfqbe/Resources/Private/Templates_old/backend_default_template.html
+		}
+	}
+}
+
+## So geht es mit dem Flexform auslesen
+#	10 < styles.content.get
+#	10 {
+#		select.where = colpos = 0
+#		select.andWhere = list_type='meinPlugin_pi1'
+#	}
+#}
+
+plugin.tx_wfqbe._CSS_DEFAULT_STYLE (
+	textarea.f3-form-error {
+		background-color:#FF9F9F;
+		border: 1px #FF0000 solid;
+	}
+
+	input.f3-form-error {
+		background-color:#FF9F9F;
+		border: 1px #FF0000 solid;
+	}
+
+	.tx-wfqbe table {
+		border-collapse:separate;
+		border-spacing:10px;
+	}
+
+	.tx-wfqbe table th {
+		font-weight:bold;
+	}
+
+	.tx-wfqbe table td {
+		vertical-align:top;
+	}
+
+	.typo3-messages .message-error {
+		color:red;
+	}
+
+	.typo3-messages .message-ok {
+		color:green;
+	}
+
+)
+
+ # Module configuration
+module.tx_wfqbe_user_wfqbemod1 {
+	persistence {
+		storagePid = {$module.tx_wfqbe_mod1.persistence.storagePid}
+	}
+	view {
+		templateRootPaths.0 = {$module.tx_wfqbe_mod1.view.templateRootPath}
+		partialRootPaths.0 = {$module.tx_wfqbe_mod1.view.partialRootPath}
+		layoutRootPaths.0 = {$module.tx_wfqbe_mod1.view.layoutRootPath}
+	}
+}
+
+ # Module configuration
+module.tx_wfqbe_web_wfqbemod2 {
+	persistence {
+		storagePid = {$module.tx_wfqbe_mod2.persistence.storagePid}
+	}
+	view {
+		templateRootPaths.0 = {$module.tx_wfqbe_mod2.view.templateRootPath}
+		partialRootPaths.0 = {$module.tx_wfqbe_mod2.view.partialRootPath}
+		layoutRootPaths.0 = {$module.tx_wfqbe_mod2.view.layoutRootPath}
+	}
+}

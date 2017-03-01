@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" datatype="plaintext" original="messages" date="2017-02-24T15:49:07Z" product-name="wfqbe">
+		<header/>
+		<body>
+			<trans-unit id="tx_wfqbe_domain_model_credential">
+				<source>Credential</source>
+			</trans-unit>
+			<trans-unit id="tx_wfqbe_domain_model_credential.title">
+				<source>Title</source>
+			</trans-unit>
+			<trans-unit id="tx_wfqbe_domain_model_credential.host">
+				<source>Host</source>
+			</trans-unit>
+			<trans-unit id="tx_wfqbe_domain_model_credential.dbms">
+				<source>Dbms</source>
+			</trans-unit>
+			<trans-unit id="tx_wfqbe_domain_model_credential.username">
+				<source>Username</source>
+			</trans-unit>
+			<trans-unit id="tx_wfqbe_domain_model_credential.passw">
+				<source>Passw</source>
+			</trans-unit>
+			<trans-unit id="tx_wfqbe_domain_model_credential.conn_type">
+				<source>Conn Type</source>
+			</trans-unit>
+			<trans-unit id="tx_wfqbe_domain_model_credential.setdbinit">
+				<source>Setdbinit</source>
+			</trans-unit>
+			<trans-unit id="tx_wfqbe_domain_model_credential.dbname">
+				<source>Dbname</source>
+			</trans-unit>
+			<trans-unit id="tx_wfqbe_domain_model_credential.connection_mode">
+				<source>Connection Mode</source>
+			</trans-unit>
+			<trans-unit id="tx_wfqbe_domain_model_credential.connection_uri">
+				<source>Connection Uri</source>
+			</trans-unit>
+			<trans-unit id="tx_wfqbe_domain_model_credential.connection_localconf">
+				<source>Connection Localconf</source>
+			</trans-unit>
+			<trans-unit id="tx_wfqbe_domain_model_query">
+				<source>Query</source>
+			</trans-unit>
+			<trans-unit id="tx_wfqbe_domain_model_query.title">
+				<source>Title</source>
+			</trans-unit>
+			<trans-unit id="tx_wfqbe_domain_model_query.description">
+				<source>Description</source>
+			</trans-unit>
+			<trans-unit id="tx_wfqbe_domain_model_query.query">
+				<source>Query</source>
+			</trans-unit>
+			<trans-unit id="tx_wfqbe_domain_model_query.dbname">
+				<source>Dbname</source>
+			</trans-unit>
+			<trans-unit id="tx_wfqbe_domain_model_query.search">
+				<source>Search</source>
+			</trans-unit>
+			<trans-unit id="tx_wfqbe_domain_model_query.insertq">
+				<source>Insertq</source>
+			</trans-unit>
+			<trans-unit id="tx_wfqbe_domain_model_query.type">
+				<source>Type</source>
+			</trans-unit>
+			<trans-unit id="tx_wfqbe_domain_model_query.fe_group">
+				<source>Fe Group</source>
+			</trans-unit>
+			<trans-unit id="tx_wfqbe_domain_model_query.credentials">
+				<source>Credentials</source>
+			</trans-unit>
+			<trans-unit id="tx_wfqbe_domain_model_query.searchinquery">
+				<source>Searchinquery</source>
+			</trans-unit>
+			<trans-unit id="tx_wfqbe_domain_model_backend">
+				<source>Backend</source>
+			</trans-unit>
+			<trans-unit id="tx_wfqbe_domain_model_backend.title">
+				<source>Title</source>
+			</trans-unit>
+			<trans-unit id="tx_wfqbe_domain_model_backend.description">
+				<source>Description</source>
+			</trans-unit>
+			<trans-unit id="tx_wfqbe_domain_model_backend.recordsforpage">
+				<source>Recordsforpage</source>
+			</trans-unit>
+			<trans-unit id="tx_wfqbe_domain_model_backend.searchq_position">
+				<source>Searchq Position</source>
+			</trans-unit>
+			<trans-unit id="tx_wfqbe_domain_model_backend.typoscript">
+				<source>Typoscript</source>
+			</trans-unit>
+			<trans-unit id="tx_wfqbe_domain_model_backend.export_mode">
+				<source>Export Mode</source>
+			</trans-unit>
+			<trans-unit id="tx_wfqbe_domain_model_backend.listq">
+				<source>Listq</source>
+			</trans-unit>
+			<trans-unit id="tx_wfqbe_domain_model_backend.detailsq">
+				<source>Detailsq</source>
+			</trans-unit>
+			<trans-unit id="tx_wfqbe_domain_model_backend.searchq">
+				<source>Searchq</source>
+			</trans-unit>
+			<trans-unit id="tx_wfqbe_domain_model_backend.insertq">
+				<source>Insertq</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

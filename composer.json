@@ -1,0 +1,9 @@
+{
+    "name": "bildung-rp/wfqbe76",
+    "type": "typo3-cms-extension",
+    "description": "DB Integration originally developed by Mauro Lorenzutti",
+    "homepage": "http://www.webformat.com",
+    "license": ["GPL-2.0+"],
+    "keywords": ["qbe", "sql"],
+    "version": "7.6.2"
+}

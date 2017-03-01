@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" datatype="plaintext" original="messages" date="2017-02-24T15:49:07Z" product-name="wfqbe">
+		<header/>
+		<body>
+			<trans-unit id="title.description">
+				<source>title</source>
+			</trans-unit>
+			<trans-unit id="description.description">
+				<source>description</source>
+			</trans-unit>
+			<trans-unit id="recordsforpage.description">
+				<source>recordsforpage</source>
+			</trans-unit>
+			<trans-unit id="searchq_position.description">
+				<source>searchqPosition</source>
+			</trans-unit>
+			<trans-unit id="typoscript.description">
+				<source>typoscript</source>
+			</trans-unit>
+			<trans-unit id="export_mode.description">
+				<source>exportMode</source>
+			</trans-unit>
+			<trans-unit id="listq.description">
+				<source>listq</source>
+			</trans-unit>
+			<trans-unit id="detailsq.description">
+				<source>detailsq</source>
+			</trans-unit>
+			<trans-unit id="searchq.description">
+				<source>searchq</source>
+			</trans-unit>
+			<trans-unit id="insertq.description">
+				<source>insertq</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>
