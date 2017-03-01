@@ -1,4 +1,7 @@
 <?php
+
+
+
 /***************************************************************
 *  Copyright notice
 *
@@ -22,6 +25,11 @@
 *
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
+
+use \TYPO3\CMS\Core\Utility\GeneralUtility;
+use \TYPO3\CMS\Extbase\Utility\DebuggerUtility;
+use \Barlian\Wfqbe\Utility\ArrayUtility;
+
 /**
  * Search results class for the 'wfqbe' extension.
  *
@@ -29,8 +37,6 @@
  * @author	Mauro Lorenzutti <mauro.lorenzutti@webformat.com>
  *
  */
-
-
 class tx_wfqbe_results {
 
 	var $conf;
@@ -63,18 +69,24 @@ class tx_wfqbe_results {
 	/**
 	 * This function is used to show the results
 	 */
-	function do_sGetFormResult($row, $h)	{
-		$ris = $this->getResultQuery($row, $h);
+	function do_sGetFormResult($row, $h, $request = NULL)	{
+		$ris = $this->getResultQuery($row, $h, $request);
 		$mA = array();
-
-		if ($this->conf['debugQuery'] || $this->conf['customProcess.'][$row['uid'].'.']['debugQuery'])
+DebuggerUtility::var_dump(array(
+	'__METHOD__' => __METHOD__,
+	'__LINE__' => __LINE__,
+	'$row'=>$row,
+	'$h'=>$h,
+	'$ris'=>$ris
+));
+		if ($this->conf['debugQuery'] || $this->conf['customProcess.'][ $row->getUid().'.']['debugQuery'])
 			$content .= '<br /><strong>Query constructed:</strong><br />'.$this->query.'<br /><strong>Execution time:</strong>'.$this->executionTime.'<br /><br />';
 
 		if($ris === false)	{
-			if ($this->conf['debugQuery'] || $this->conf['customProcess.'][$row['uid'].'.']['debugQuery'])
-				$content .= "Query failed (uid=".$row['uid'].")<br />".$h->ErrorMsg();
+			if ($this->conf['debugQuery'] || $this->conf['customProcess.'][$row->getUid().'.']['debugQuery'])
+				$content .= "Query failed (uid=".$row->getUid().")<br />".$h->ErrorMsg();
 			
-			$content = $this->pibase->pi_getLL('no_data');
+			$content = 'no data'; //$this->pibase->pi_getLL('no_data');
 			return $content;
 		}
 
@@ -82,10 +94,10 @@ class tx_wfqbe_results {
 			// if the resultset is empty, it shows the empty results template
 			$content .= $this->emptyLayout($row);
 		}	else	{
-			if ($this->conf['customProcess.'][$row['uid'].'.']['template']!='')
-				$this->conf['template'] = $this->conf['customProcess.'][$row['uid'].'.']['template'];
-			if ($this->conf['customProcess.'][$row['uid'].'.']['defLayout']!='')
-				$this->conf['defLayout'] = $this->conf['customProcess.'][$row['uid'].'.']['defLayout'];
+			if ($this->conf['customProcess.'][$row->getUid().'.']['template']!='')
+				$this->conf['template'] = $this->conf['customProcess.'][$row->getUid().'.']['template'];
+			if ($this->conf['customProcess.'][$row->getUid().'.']['defLayout']!='')
+				$this->conf['defLayout'] = $this->conf['customProcess.'][$row->getUid().'.']['defLayout'];
 			
 			// This checks if the user has set a template. If yes it uses the template set, else it uses the default one
 			if($this->conf["defLayout"]==0 || $this->conf["defLayout"]=="" || \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('type')==181)
@@ -96,17 +108,17 @@ class tx_wfqbe_results {
 			if ($this->conf['exportAll']==1)
 				$this->pibase->piVars['showpage'] = 'all';
 
-			if ($this->conf['customProcess.'][$row['uid'].'.']['CSVquery']!='')
-				$csv_query = $this->conf['customProcess.'][$row['uid'].'.']['CSVquery'];
+			if ($this->conf['customProcess.'][$row->getUid().'.']['CSVquery']!='')
+				$csv_query = $this->conf['customProcess.'][$row->getUid().'.']['CSVquery'];
 			if ($this->conf['globalCustomProcess.']['CSVquery']!='')
 				$csv_query = $this->conf['globalCustomProcess.']['CSVquery'];
 			else
-				$csv_query = $row['uid'];
+				$csv_query = $row->getUid();
 			
 			if ($this->conf['ff_data']['csvDownload']==1)	{
 				$csvLink = $this->pibase->pi_linkTP_keepPIvars_url();
 				$csvLink .= (strpos($csvLink, '?')>0 ? '' : '?');
-				$mA["###CONF_CSV###"] = htmlentities($csvLink.'&type=181&Tx_Wfqbe_Pi1[wfqbe_results_query]='.$csv_query);
+				$mA["###CONF_CSV###"] = htmlentities($csvLink.'&type=181&tx_wfqbe_pi1[wfqbe_results_query]='.$csv_query);
 				$mA['###LABEL_CSV###'] = $this->pibase->pi_getLL('csv_link', 'Export in CSV');
 			}
 			
@@ -120,19 +132,46 @@ class tx_wfqbe_results {
 
 
 
-	function getResultQuery($row, $h)	{
+	function getResultQuery($row, $h, $request = NULL)	{
 		// SELECT
-		$API = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance("tx_wfqbe_api_xml2array");
-		$API2 = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance("tx_wfqbe_queryform_generator");
-		$loadValue= $API->xml2array($row["query"]);//converto la stringa che rappresenta la query creata tramite wizard in array
-		$wfqbe=$loadValue['contentwfqbe']["wfqbe"];//selezione solo una parte e cio� elimino in tag radice <wfqbe>
-		$rawwfqbe=$loadValue['contentwfqbe']["rawwfqbe"];
-		$query= $API2->createQuery($wfqbe,$rawwfqbe,$this->pibase->piVars,$row['uid'],$this);//This function creates the SQL query
+		$API        = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance("tx_wfqbe_queryform_generator");
+		
+		// EN: Converting the string representing the query in an array
+		// IT: converto la stringa che rappresenta la query creata tramite wizard in array
+		$loadValue  = ArrayUtility::xml2array( $row->getQuery() );
+		
+		// EN: Selecting only a part and eliminating the root-tag   <wfqbe>
+		// IT: Selezione solo una parte e ciò elimino in tag radice <wfqbe>
+		$wfqbe      = $loadValue['contentwfqbe']["wfqbe"];
+		$rawwfqbe   = $loadValue['contentwfqbe']["rawwfqbe"];
+		//This function creates the SQL query:
+		$query      = $API->createQuery(
+			$wfqbe,
+			$rawwfqbe,
+			$request->getArguments(), //GeneralUtility::_GP('tx_wfqbe_pi1'),
+			$row->getUid(),
+			$this
+		);
+
+\TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump(array(
+	'__METHOD__' => __METHOD__,
+	'__LINE__' => __LINE__,
+	'$row'=>$row,
+	'$h'=>$h,
+	'$API' => $API,
+	'$loadValue' => $loadValue,
+	'$wfqbe' => $wfqbe,
+	'$rawwfqbe' => $rawwfqbe,
+	'$query'=>$query,
+	'$this->piVars' => GeneralUtility::_GP('tx_wfqbe_pi1'),
+	#'backtrace' => debug_backtrace()
+));
+
 		$mA = array();
 
 		// Gestione parametri query
 		// Sosituisce i marcatori ###WFQBE_NOMEVARIABILE### con \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('wfqbe[nomevariabile]')
-		$parametri = $this->pibase->piVars;
+		$parametri = $request->getArguments();
 		$markerParametri = array();
 		
 		if (is_array($parametri))	{
@@ -141,9 +180,9 @@ class tx_wfqbe_results {
 		//unset($markerParametri);
 		
 		
-		// If TYPO3_MODE = BE then it will be possible to provide addition parameters through the User TSConfig field
+		// If TYPO3_MODE = BE then it will be possible to provide additional parameters through the User TSConfig field
 		/*
-		 * The sintax is the following:
+		 * The syntax is the following:
 		 * 
 		 * Page TS Config:
 		 * mod.wfqbe.filter.parameter1 = value1
@@ -153,10 +192,10 @@ class tx_wfqbe_results {
 		 * page.mod.wfqbe.filter.parameter1 = value1
 		 * page.mod.wfqbe.filter.parameter2 = value2
 		 */
-		if ($this->pibase->beMode)	{
+		if ($GLOBALS['TYPO3_MODE']=='BE') {
 			$modTSconfig = $GLOBALS['BE_USER']->getTSConfig(
-					'mod.wfqbe',
-					t3lib_BEfunc::getPagesTSconfig(\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('id'))
+				'mod.wfqbe',
+				TYPO3\CMS\Backend\Utility\BackendUtility::getPagesTSconfig(\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('id'))
 			);
 			if (is_array($modTSconfig) && is_array($modTSconfig['properties']) && is_array($modTSconfig['properties']['filter.']))	{
 				$markerParametri = $this->parametersToMarkers($modTSconfig['properties']['filter.'], $markerParametri, 0);
@@ -175,19 +214,19 @@ class tx_wfqbe_results {
 					foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['wfqbe']['processMarkerParametersBeforeTSRendering'] as $_classRef)    {
 						$_procObj = &\TYPO3\CMS\Core\Utility\GeneralUtility::getUserObj($_classRef);
 						$_params = array(
-								'markerParametri' => $markerParametri,
-								'marker' => $marker
-								);
+							'markerParametri' => $markerParametri,
+							'marker' => $marker
+						);
 						$markerParametri = $_procObj->processMarkerParametersBeforeTSRendering($_params, $this);
 					}
 				}
 				
-				if ($this->conf['customQuery.'][$row['uid'].'.'][$marker]!="" && (($markerParametri["###".$marker."###"]=='' && $this->conf['customQuery.'][$row['uid'].'.'][$marker."."]["overrideIfEmpty"]==1) || ($markerParametri["###".$marker."###"]!='' && $this->conf['customQuery.'][$row['uid'].'.'][$marker."."]["overrideIfNotEmpty"]==1) || $this->conf['customQuery.'][$row['uid'].'.'][$marker."."]["overrideAlways"]==1))	{
-					if ($markerParametri["###".$marker."###"]=='' && $this->conf['customQuery.'][$row['uid'].'.'][$marker."."]["overrideIfEmpty"]==1)
+				if ($this->conf['customQuery.'][$row->getUid().'.'][$marker]!="" && (($markerParametri["###".$marker."###"]=='' && $this->conf['customQuery.'][$row->getUid().'.'][$marker."."]["overrideIfEmpty"]==1) || ($markerParametri["###".$marker."###"]!='' && $this->conf['customQuery.'][$row->getUid().'.'][$marker."."]["overrideIfNotEmpty"]==1) || $this->conf['customQuery.'][$row->getUid().'.'][$marker."."]["overrideAlways"]==1))	{
+					if ($markerParametri["###".$marker."###"]=='' && $this->conf['customQuery.'][$row->getUid().'.'][$marker."."]["overrideIfEmpty"]==1)
 						$emptyCase = true;
-					$confArray = $this->conf["customQuery."][$row['uid']."."][$marker."."];
+					$confArray = $this->conf["customQuery."][$row->getUid()."."][$marker."."];
 					$confArray = $this->parseTypoScriptConfiguration($confArray, $markerParametri);
-					eval('$markerParametri["###".$marker."###"]=$this->cObj->'.$this->conf["customQuery."][$row["uid"]."."][$marker].'($confArray);');
+					eval('$markerParametri["###".$marker."###"]=$this->cObj->'.$this->conf["customQuery."][$row->getUid()."."][$marker].'($confArray);');
 				}	elseif ($this->conf['globalCustomQuery.'][$marker]) {
 					$confArray = $this->conf["globalCustomQuery."][$marker."."];
 					$confArray = $this->parseTypoScriptConfiguration($confArray, $markerParametri);
@@ -198,9 +237,9 @@ class tx_wfqbe_results {
 					eval('$markerParametri["###".$marker."###"]=$this->cObj->'.$this->conf["customGlobalQuery."][$marker].'($confArray);');
 				}
 
-				if (!$emptyCase && $this->conf['customQuery.'][$row['uid'].'.'][$marker.'.']!="" && $this->conf['customQuery.'][$row['uid'].'.'][$marker."."]["wfqbe."]['intval']==1)	{
+				if (!$emptyCase && $this->conf['customQuery.'][$row->getUid().'.'][$marker.'.']!="" && $this->conf['customQuery.'][$row->getUid().'.'][$marker."."]["wfqbe."]['intval']==1)	{
 					$markerParametri["###".$marker."###"] = intval($markerParametri["###".$marker."###"]);
-				}	elseif (!$emptyCase && $this->conf['customQuery.'][$row['uid'].'.'][$marker.'.']!="" && $this->conf['customQuery.'][$row['uid'].'.'][$marker."."]["wfqbe."]['floatval']==1)	{
+				}	elseif (!$emptyCase && $this->conf['customQuery.'][$row->getUid().'.'][$marker.'.']!="" && $this->conf['customQuery.'][$row->getUid().'.'][$marker."."]["wfqbe."]['floatval']==1)	{
 					$markerParametri["###".$marker."###"] = floatval($markerParametri["###".$marker."###"]);
 				}
 			}
@@ -217,9 +256,10 @@ class tx_wfqbe_results {
 			$query = $this->cObj->substituteMarkerArray($query, $markerParametri);
 		}
 		unset($markerParametri);
-
+# \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump(array('$row'=>$row,'$h'=>$h,'$query'=>$query));
+# echo $query;
 		$this->query = preg_replace("/(###)+[a-z,A-Z,0-9,@,!,_]+(###)/","",$query);
-//t3lib_utility_Debug::debug($this->query,'query after substitution');
+//		\TYPO3\CMS\Core\Utility\DebugUtility::debug($this->query,'query after substitution');
 		
 		$start = microtime(true);
 		$ris = $h -> Execute($this->query);//eseguo la query definita dall'utente e cio� quello che voglio visualizzare a frontend
@@ -286,7 +326,7 @@ class tx_wfqbe_results {
 		if ($this->conf['ff_data']['emptyResult']!='')
 			$mA['###CONF_EMPTYTEXT###'] = $this->conf['ff_data']['emptyResult'];
 		else
-			$mA['###CONF_EMPTYTEXT###'] = $this->pibase->pi_getLL('empty_results');
+			$mA['###CONF_EMPTYTEXT###'] = 'CONF_EMPTYTEXT'; ///$this->pibase->pi_getLL('empty_results');
 
 		if ($this->pibase->piVars['wfqbe_select_wizard']=='')	{
 			$emptyTemplate = $this->cObj->substituteSubpart($emptyTemplate, '###WIZARD_TEMPLATE###', '', 0,0);
@@ -299,7 +339,7 @@ class tx_wfqbe_results {
 			$mA['###INSERT_HIDDEN_FIELDS###'] = $API->getHiddenFields($this->pibase->piVars);
 		}
 		$mA['###CONF_DIVID###'] = $this->conf['ff_data']['div_id'];
-		$mA['###LABEL_CANCEL###'] = $this->pibase->pi_getLL('cancel', 'Cancel');
+		$mA['###LABEL_CANCEL###'] = 'LABEL_CANCEL'; // $this->pibase->pi_getLL('cancel', 'Cancel');
 		
 		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['wfqbe']['processMarkerArrayEmptyResults']))    {
 			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['wfqbe']['processMarkerArrayEmptyResults'] as $_classRef)    {
@@ -344,7 +384,7 @@ class tx_wfqbe_results {
 		$numRows = $ris->RecordCount();
 		$this->conf['wf_data']['queryNumRows'] = $numRows;
 		
-		$actualPage = $this->pibase->piVars['showpage'][$row['uid']]!="" ? $this->pibase->piVars['showpage'][$row['uid']] : 1;
+		$actualPage = $this->pibase->piVars['showpage'][ $row->getUid() ]!="" ? $this->pibase->piVars['showpage'][ $row->getUid() ] : 1;
 		if ($this->conf['ff_data']['recordsForPage']=='' || $this->conf['ff_data']['recordsForPage']==0 || $actualPage=='all')
 			$this->conf['ff_data']['recordsForPage']=$numRows;
 		$numPages = $numRows==0 ? $numRows : ceil($numRows / $this->conf['ff_data']['recordsForPage']);
@@ -374,36 +414,36 @@ class tx_wfqbe_results {
 				$wfqbeArray['###WFQBE_FIELD_'.$key.'###'] = $value;
 			$listaColonne="";
 			for($i=0;$i<sizeof($array);$i++){
-				if (is_int($keys[$i]) && !\TYPO3\CMS\Core\Utility\GeneralUtility::inList($this->conf["customProcess."][$row['uid']."."]['excludeColumns'], $keys[$i]))	{
-					$mA["###TD_ATTRIBUTES###"] = $this->conf['globalCustomProcess.'][$keys[$i].'.']["td_attribs"]!='' ? $this->conf['globalCustomProcess.'][$keys[$i].'.']["td_attribs"] : $this->conf["customProcess."][$row['uid']."."][$keys[$i]."."]["td_attribs"];
+				if (is_int($keys[$i]) && !\TYPO3\CMS\Core\Utility\GeneralUtility::inList($this->conf["customProcess."][ $row->getUid() ."."]['excludeColumns'], $keys[$i]))	{
+					$mA["###TD_ATTRIBUTES###"] = $this->conf['globalCustomProcess.'][$keys[$i].'.']["td_attribs"]!='' ? $this->conf['globalCustomProcess.'][$keys[$i].'.']["td_attribs"] : $this->conf["customProcess."][ $row->getUid() ."."][$keys[$i]."."]["td_attribs"];
 					if (
 							(
 								($this->conf["globalCustomProcess."]['excludeDuplicatedValuesInColumns']!='' && \TYPO3\CMS\Core\Utility\GeneralUtility::inList($this->conf["globalCustomProcess."]['excludeDuplicatedValuesInColumns'], $keys[$i]))
 								 ||
-								 ($this->conf["customProcess."][$row['uid']."."]['excludeDuplicatedValuesInColumns']!='' && \TYPO3\CMS\Core\Utility\GeneralUtility::inList($this->conf["customProcess."][$row['uid']."."]['excludeDuplicatedValuesInColumns'], $keys[$i])
+								 ($this->conf["customProcess."][ $row->getUid() ."."]['excludeDuplicatedValuesInColumns']!='' && \TYPO3\CMS\Core\Utility\GeneralUtility::inList($this->conf["customProcess."][ $row->getUid() ."."]['excludeDuplicatedValuesInColumns'], $keys[$i])
 								 )
 								 ) && $array[$keys[$i]]==$excludeDuplicatedValuesInColumns[$keys[$i]]){
 						$mA["###COLUMN_DATA###"]='';
-						$mA["###TD_ATTRIBUTES###"] = $this->conf['globalCustomProcess.'][$keys[$i].'.']["td_attribs_emptyDuplicate"]!='' ? $this->conf['globalCustomProcess.'][$keys[$i].'.']["td_attribs_emptyDuplicate"] : $this->conf["customProcess."][$row['uid']."."][$keys[$i]."."]["td_attribs_emptyDuplicate"];
+						$mA["###TD_ATTRIBUTES###"] = $this->conf['globalCustomProcess.'][$keys[$i].'.']["td_attribs_emptyDuplicate"]!='' ? $this->conf['globalCustomProcess.'][$keys[$i].'.']["td_attribs_emptyDuplicate"] : $this->conf["customProcess."][ $row->getUid() ."."][$keys[$i]."."]["td_attribs_emptyDuplicate"];
 					}	else	{
 						$excludeDuplicatedValuesInColumns[$keys[$i]] = $array[$keys[$i]];
 						if (
 							(
 								($this->conf["globalCustomProcess."]['excludeDuplicatedValuesInColumns']!='' && \TYPO3\CMS\Core\Utility\GeneralUtility::inList($this->conf["globalCustomProcess."]['excludeDuplicatedValuesInColumns'], $keys[$i]))
 								 ||
-								 ($this->conf["customProcess."][$row['uid']."."]['excludeDuplicatedValuesInColumns']!='' && \TYPO3\CMS\Core\Utility\GeneralUtility::inList($this->conf["customProcess."][$row['uid']."."]['excludeDuplicatedValuesInColumns'], $keys[$i])
+								 ($this->conf["customProcess."][ $row->getUid() ."."]['excludeDuplicatedValuesInColumns']!='' && \TYPO3\CMS\Core\Utility\GeneralUtility::inList($this->conf["customProcess."][ $row->getUid() ."."]['excludeDuplicatedValuesInColumns'], $keys[$i])
 								 )
 								 ))
-							$mA["###TD_ATTRIBUTES###"] = $this->conf['globalCustomProcess.'][$keys[$i].'.']["td_attribs_valueDuplicate"]!='' ? $this->conf['globalCustomProcess.'][$keys[$i].'.']["td_attribs_valueDuplicate"] : $this->conf["customProcess."][$row['uid']."."][$keys[$i]."."]["td_attribs_valueDuplicate"];
+							$mA["###TD_ATTRIBUTES###"] = $this->conf['globalCustomProcess.'][$keys[$i].'.']["td_attribs_valueDuplicate"]!='' ? $this->conf['globalCustomProcess.'][$keys[$i].'.']["td_attribs_valueDuplicate"] : $this->conf["customProcess."][ $row->getUid() ."."][$keys[$i]."."]["td_attribs_valueDuplicate"];
 							
-						if ($this->conf["customProcess."][$row['uid']."."][$keys[$i]]!="")	{
-							$mergedConf = $this->manageTyposcriptAlternatives($flag, 'customProcess', $row['uid'], $keys[$i]);
+						if ($this->conf["customProcess."][ $row->getUid() ."."][$keys[$i]]!="")	{
+							$mergedConf = $this->manageTyposcriptAlternatives($flag, 'customProcess',  $row->getUid() , $keys[$i]);
 							$confArray = $mergedConf['config'];
 							$confFunc = $mergedConf['func'];
 							$confArray = $this->parseTypoScriptConfiguration($confArray, $wfqbeArray);
 							eval('$mA["###COLUMN_DATA###"]=$this->cObj->'.$confFunc.'($confArray);');
 						}	elseif ($this->conf['globalCustomProcess.'][$keys[$i]]) {
-							$mergedConf = $this->manageTyposcriptAlternatives($flag, 'globalCustomProcess', $row['uid'], $keys[$i]);
+							$mergedConf = $this->manageTyposcriptAlternatives($flag, 'globalCustomProcess',  $row->getUid() , $keys[$i]);
 							$confArray = $mergedConf['config'];
 							$confFunc = $mergedConf['func'];
 							$confArray = $this->parseTypoScriptConfiguration($confArray, $wfqbeArray);
@@ -459,7 +499,7 @@ class tx_wfqbe_results {
 		//scandisco l'array che contiene le chiavi e le accodo nella variabile $listaIntestazione
 		$hA = array();
 		for($i=0;$i<$ris->FieldCount();$i++){
-			if (\TYPO3\CMS\Core\Utility\GeneralUtility::inList($this->conf["customProcess."][$row['uid']."."]['excludeColumns'], $i))
+			if (\TYPO3\CMS\Core\Utility\GeneralUtility::inList($this->conf["customProcess."][ $row->getUid() ."."]['excludeColumns'], $i))
 				continue;
 
 			if ($this->conf['results.']['enableOrderByHeaders']==1)
@@ -470,10 +510,10 @@ class tx_wfqbe_results {
 			//siccome $key identifica una posizione con l'indice o in modo associativo utilizzo la funzione is_int() per non visualizzare
 			//l'intestazione in forma numerica(ha pi� senso visualizzare quella associativa che � il nome della colonna della tabella).
 			$field = $ris->FetchField($i);
-			if ($this->conf["customHeader."][$row['uid']."."][$i]!="")	{
+			if ($this->conf["customHeader."][ $row->getUid() ."."][$i]!="")	{
 				$wfqbeArray = array();
 				$wfqbeArray['###WFQBE_NAME_'.$key.'###'] = $field->name;
-				$confArray = $this->conf["customHeader."][$row['uid']."."][$i."."];
+				$confArray = $this->conf["customHeader."][ $row->getUid() ."."][$i."."];
 				$confArray = $this->parseTypoScriptConfiguration($confArray, $wfqbeArray);
 				eval('$mA["###COLUMN_NAME###"]=$this->cObj->'.$this->conf["customHeader."][$row["uid"]."."][$i].'($confArray);');
 				if ($confArray['enableOrderByHeaders']==1)
@@ -498,7 +538,7 @@ class tx_wfqbe_results {
 
 			if ($enableOrderByHeaders && \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('type')!=181)	{
 				$mode = 'ASC';
-				if ($this->pibase->piVars['orderby'][$row['uid']]['field']==$field->name && $this->pibase->piVars['orderby'][$row['uid']]['mode']=='ASC')
+				if ($this->pibase->piVars['orderby'][ $row->getUid() ]['field']==$field->name && $this->pibase->piVars['orderby'][ $row->getUid() ]['mode']=='ASC')
 					$mode = 'DESC';
 				$orderLink = array();
 				if ($this->pibase->beMode==1)
@@ -508,7 +548,7 @@ class tx_wfqbe_results {
 				$orderLink['addQueryString'] = 1;
 				$orderLink['addQueryString.']['method'] = 'POST,GET';
 				$orderLink['addQueryString.']['exclude'] = 'id';
-				$orderLink['additionalParams'] = '&Tx_Wfqbe_Pi1[orderby]['.$row['uid'].'][mode]='.$mode.'&Tx_Wfqbe_Pi1[orderby]['.$row['uid'].'][field]='.$field->name;
+				$orderLink['additionalParams'] = '&tx_wfqbe_pi1[orderby]['. $row->getUid() .'][mode]='.$mode.'&tx_wfqbe_pi1[orderby]['. $row->getUid() .'][field]='.$field->name;
 				if ($this->pibase->beMode==1)	{
 					$backend = \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('tx_wfqbe_backend');
 					$orderLink['additionalParams'] .= '&tx_wfqbe_backend[uid]='.$backend['uid'].'&tx_wfqbe_backend[mode]='.$backend['mode'];
@@ -562,7 +602,7 @@ class tx_wfqbe_results {
 		if ($numPages<2)
 			$content = $this->cObj->substituteSubpart($content, '###BROWSE_TEMPLATE###', '', 1,0);
 		else	{
-			$content = $this->showBrowser($content, $mA, $numPages, $numRows, $actualPage, $row['uid']);
+			$content = $this->showBrowser($content, $mA, $numPages, $numRows, $actualPage,  $row->getUid() );
 		}
 
 		if ($this->conf['ff_data']['csvDownload']!=1)
@@ -597,7 +637,7 @@ class tx_wfqbe_results {
 		$numRows = $ris->RecordCount();
 		$this->conf['wf_data']['queryNumRows'] = $numRows;
 
-		$actualPage = $this->pibase->piVars['showpage'][$row['uid']]!="" ? $this->pibase->piVars['showpage'][$row['uid']] : 1;
+		$actualPage = $this->pibase->piVars['showpage'][ $row->getUid() ]!="" ? $this->pibase->piVars['showpage'][ $row->getUid() ] : 1;
 		if ($this->conf['ff_data']['recordsForPage']=='' || $this->conf['ff_data']['recordsForPage']==0 || $actualPage=='all')
 			$this->conf['ff_data']['recordsForPage']=$numRows;
 			
@@ -621,7 +661,7 @@ class tx_wfqbe_results {
 							(
 								($this->conf["globalCustomProcess."]['excludeDuplicatedValuesInColumns']!='' && \TYPO3\CMS\Core\Utility\GeneralUtility::inList($this->conf["globalCustomProcess."]['excludeDuplicatedValuesInColumns'], $keys[$i]))
 								 ||
-								 ($this->conf["customProcess."][$row['uid']."."]['excludeDuplicatedValuesInColumns']!='' && \TYPO3\CMS\Core\Utility\GeneralUtility::inList($this->conf["customProcess."][$row['uid']."."]['excludeDuplicatedValuesInColumns'], $keys[$i])
+								 ($this->conf["customProcess."][ $row->getUid()."."]['excludeDuplicatedValuesInColumns']!='' && \TYPO3\CMS\Core\Utility\GeneralUtility::inList($this->conf["customProcess."][ $row->getUid() ."."]['excludeDuplicatedValuesInColumns'], $keys[$i])
 								 )
 								 ) && $array[$keys[$i]]==$excludeDuplicatedValuesInColumns[$keys[$i]]){
 						$mA["###FIELD_".$keys[$i]."###"]='';
@@ -629,14 +669,14 @@ class tx_wfqbe_results {
 						$excludeDuplicatedValuesInColumns[$keys[$i]] = $array[$keys[$i]];
 
 
-					if ($this->conf["customProcess."][$row['uid']."."][$keys[$i]]!="")	{
-						$mergedConf = $this->manageTyposcriptAlternatives($flag, 'customProcess', $row['uid'], $keys[$i]);
+					if ($this->conf["customProcess."][ $row->getUid() ."."][$keys[$i]]!="")	{
+						$mergedConf = $this->manageTyposcriptAlternatives($flag, 'customProcess',  $row->getUid() , $keys[$i]);
 						$confArray = $mergedConf['config'];
 						$confFunc = $mergedConf['func'];
 						$confArray = $this->parseTypoScriptConfiguration($confArray, $wfqbeArray, $flag);
 						eval('$mA["###FIELD_".$keys[$i]."###"]=$this->cObj->'.$confFunc.'($confArray);');
 					}	elseif ($this->conf['globalCustomProcess.'][$keys[$i]]) {
-						$mergedConf = $this->manageTyposcriptAlternatives($flag, 'globalCustomProcess', $row['uid'], $keys[$i]);
+						$mergedConf = $this->manageTyposcriptAlternatives($flag, 'globalCustomProcess',  $row->getUid() , $keys[$i]);
 						$confArray = $mergedConf['config'];
 						$confFunc = $mergedConf['func'];
 						$confArray = $this->parseTypoScriptConfiguration($confArray, $wfqbeArray, $flag);
@@ -653,7 +693,7 @@ class tx_wfqbe_results {
 				$mA["###WFQBE_CLASS###"]=$this->conf['classes.']['odd'];
 			$flag++;
 
-			if (!($this->conf["customProcess."][$row['uid']."."]['excludeDuplicatedValuesInColumns']!='' && $this->conf["customProcess."][$row['uid']."."]['emptyRowForExcludeDuplicatedValuesInColumns']==1 && $this->isEmptyRowForExcludeDuplicatedValuesInColumns($row, $mA)))	{
+			if (!($this->conf["customProcess."][ $row->getUid() ."."]['excludeDuplicatedValuesInColumns']!='' && $this->conf["customProcess."][ $row->getUid() ."."]['emptyRowForExcludeDuplicatedValuesInColumns']==1 && $this->isEmptyRowForExcludeDuplicatedValuesInColumns($row, $mA)))	{
 			$listaRighe.=$this->cObj->substituteMarkerArray($templateLista, $mA);
 		}
 		}
@@ -673,13 +713,13 @@ class tx_wfqbe_results {
 
 				//siccome $key identifica una posizione con l'indice o in modo associativo utilizzo la funzione is_int() per non visualizzare
 				//l'intestazione in forma numerica(ha pi� senso visualizzare quella associativa che � il nome della colonna della tabella).
-				if ($this->conf["customHeader."][$row['uid']."."][$i]!="" || $this->conf["customHeader."][$row['uid']."."][$col]!="")	{
-					if ($this->conf["customHeader."][$row['uid']."."][$col]!="")	{
-						$confCustomHeader = $this->conf["customHeader."][$row['uid']."."][$col.'.'];
-						$confCustomHeaderObj = $this->conf["customHeader."][$row['uid']."."][$col];
+				if ($this->conf["customHeader."][ $row->getUid() ."."][$i]!="" || $this->conf["customHeader."][ $row->getUid() ."."][$col]!="")	{
+					if ($this->conf["customHeader."][ $row->getUid() ."."][$col]!="")	{
+						$confCustomHeader = $this->conf["customHeader."][ $row->getUid() ."."][$col.'.'];
+						$confCustomHeaderObj = $this->conf["customHeader."][ $row->getUid() ."."][$col];
 					}	else	{
-						$confCustomHeader = $this->conf["customHeader."][$row['uid']."."][$i.'.'];
-						$confCustomHeaderObj = $this->conf["customHeader."][$row['uid']."."][$i];
+						$confCustomHeader = $this->conf["customHeader."][ $row->getUid() ."."][$i.'.'];
+						$confCustomHeaderObj = $this->conf["customHeader."][ $row->getUid() ."."][$i];
 					}
 					$wfqbeArray = array();
 					$wfqbeArray['###WFQBE_NAME_'.$key.'###'] = $col;
@@ -694,7 +734,7 @@ class tx_wfqbe_results {
 				}
 				if ($enableOrderByHeaders && \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('type')!=181)	{
 					$mode = 'ASC';
-					if ($this->pibase->piVars['orderby'][$row['uid']]['field']==$col && $this->pibase->piVars['orderby'][$row['uid']]['mode']=='ASC')
+					if ($this->pibase->piVars['orderby'][ $row->getUid() ]['field']==$col && $this->pibase->piVars['orderby'][ $row->getUid() ]['mode']=='ASC')
 						$mode = 'DESC';
 					$orderLink = array();
 					if ($this->pibase->beMode==1)
@@ -704,7 +744,7 @@ class tx_wfqbe_results {
 					$orderLink['addQueryString'] = 1;
 					$orderLink['addQueryString.']['method'] = 'POST,GET';
 					$orderLink['addQueryString.']['exclude'] = 'id';
-					$orderLink['additionalParams'] = '&Tx_Wfqbe_Pi1[orderby]['.$row['uid'].'][mode]='.$mode.'&Tx_Wfqbe_Pi1[orderby]['.$row['uid'].'][field]='.$col;
+					$orderLink['additionalParams'] = '&tx_wfqbe_pi1[orderby]['. $row->getUid() .'][mode]='.$mode.'&tx_wfqbe_pi1[orderby]['. $row->getUid() .'][field]='.$col;
 					if ($this->pibase->beMode==1)	{
 						$backend = \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('tx_wfqbe_backend');
 						$orderLink['additionalParams'] .= '&tx_wfqbe_backend[uid]='.$backend['uid'].'&tx_wfqbe_backend[mode]='.$backend['mode'];
@@ -727,7 +767,7 @@ class tx_wfqbe_results {
 		if ($numPages<2)
 			$listaRighe = $this->cObj->substituteSubpart($listaRighe, '###BROWSE_TEMPLATE###', '', 1,0);
 		else	{
-			$listaRighe = $this->showBrowser($listaRighe, $mA, $numPages, $numRows, $actualPage, $row['uid']);
+			$listaRighe = $this->showBrowser($listaRighe, $mA, $numPages, $numRows, $actualPage,  $row->getUid() );
 		}
 		
 		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['wfqbe']['processMarkerArrayUserLayoutResults']))    {
@@ -747,7 +787,7 @@ class tx_wfqbe_results {
 
 	
 	private function isEmptyRowForExcludeDuplicatedValuesInColumns($row, $mA)	{
-		$fields = explode(',', $this->conf["customProcess."][$row['uid']."."]['excludeDuplicatedValuesInColumns']);
+		$fields = explode(',', $this->conf["customProcess."][ $row->getUid() ."."]['excludeDuplicatedValuesInColumns']);
 		if (is_array($fields))	{
 			foreach ($fields as $field)	{
 				if ($mA['###FIELD_'.$field.'###']!='')
@@ -872,7 +912,7 @@ class tx_wfqbe_results {
 		$lA['###PAGE_RECORDS_TOTAL###'] = $numRows;
 		$lA['###PAGE_RECORDS_FROM###'] = ($this->conf['ff_data']['recordsForPage']*($actualPage-1))+1;
 		$lA['###PAGE_RECORDS_TO###'] = min(($this->conf['ff_data']['recordsForPage']*$actualPage), $numRows);
-		$mA['###LABEL_PAGE_RECORDS###'] = $this->pibase->cObj->substituteMarkerArray($this->pibase->pi_getLL('pagebrowser_records'), $lA);
+		#$mA['###LABEL_PAGE_RECORDS###'] = $this->pibase->cObj->substituteMarkerArray( $this->pibase->pi_getLL('pagebrowser_records' ), $lA);
 
 		$mA['###PAGE_TOTAL###'] = $numPages;
 		$mA['###PAGE_ACTUAL###'] = (int)$actualPage;
@@ -882,35 +922,35 @@ class tx_wfqbe_results {
 			$content = $this->cObj->substituteSubpart($content, '###SUBPART_PREV###', '');
 		}	else	{
 			$this->pibase->piVars['showpage'][$uid] = $actualPage-1>0 ? $actualPage-1 : 1;
-			$mA['###PAGE_PREV###'] = htmlentities($this->pibase->pi_linkTP_keepPIvars_url(array(),0,0,$altPageId).$backendParams);
-			$mA['###PAGE_PREV_TITLE###'] = 'title="'.$this->pibase->pi_getLL('prev').'"';
+			#$mA['###PAGE_PREV###'] = htmlentities($this->pibase->pi_linkTP_keepPIvars_url(array(),0,0,$altPageId).$backendParams);
+			#$mA['###PAGE_PREV_TITLE###'] = 'title="'.$this->pibase->pi_getLL('prev').'"';
 		}
 		
 		if ($pageLimit>0 && $end>=$numPages)	{
 			$content = $this->cObj->substituteSubpart($content, '###SUBPART_NEXT###', '');
 		}	else	{
 			$this->pibase->piVars['showpage'][$uid] = $actualPage+1<$numPages ? $actualPage+1 : $numPages;
-			$mA['###PAGE_NEXT###'] = htmlentities($this->pibase->pi_linkTP_keepPIvars_url(array(),0,0,$altPageId).$backendParams);
-			$mA['###PAGE_NEXT_TITLE###'] = 'title="'.$this->pibase->pi_getLL('next').'"';
+			#$mA['###PAGE_NEXT###'] = htmlentities($this->pibase->pi_linkTP_keepPIvars_url(array(),0,0,$altPageId).$backendParams);
+			#$mA['###PAGE_NEXT_TITLE###'] = 'title="'.$this->pibase->pi_getLL('next').'"';
 		}
 
-		$mA['###LABEL_NEXT_LINK###'] = $this->pibase->pi_getLL('next_link', '&gt;&gt;');
-		$mA['###LABEL_PREV_LINK###'] = $this->pibase->pi_getLL('prev_link', '&lt;&lt;');
-		$mA['###LABEL_PAGE###'] = $this->pibase->pi_getLL('page', 'Page');
-		$mA['###LABEL_OF###'] = $this->pibase->pi_getLL('of', 'of');
+		#$mA['###LABEL_NEXT_LINK###'] = $this->pibase->pi_getLL('next_link', '&gt;&gt;');
+		#$mA['###LABEL_PREV_LINK###'] = $this->pibase->pi_getLL('prev_link', '&lt;&lt;');
+		#$mA['###LABEL_PAGE###'] = $this->pibase->pi_getLL('page', 'Page');
+		#$mA['###LABEL_OF###'] = $this->pibase->pi_getLL('of', 'of');
 
 		$mA['###PAGE_LIST###'] = '';
 		//for ($i=1; $i<=$numPages; $i++)	{
 		for ($i=$start; $i<=$numPages && $i<=$end; $i++)	{
 			if ($i==$actualPage)
-				$mA['###PAGE_LIST###'] .= ' <span class="wfqbe_actualPage">'.$i.'</span>'.$this->pibase->pi_getLL('page_separator');
+				$mA['###PAGE_LIST###'] .= ' <span class="wfqbe_actualPage">'.$i.'</span>'.'  ||| '; //.$this->pibase->pi_getLL('page_separator');
 			else	{
 				$this->pibase->piVars['showpage'][$uid] = $i;
-				$mA['###PAGE_LIST###'] .= ' <a href="'.htmlentities($this->pibase->pi_linkTP_keepPIvars_url(array(),0,0,$altPageId).$backendParams).'" title="'.$this->pibase->pi_getLL('go_to_page').' '.$i.'">'.$i.'</a>'.$this->pibase->pi_getLL('page_separator');
+				#$mA['###PAGE_LIST###'] .= ' <a href="'.htmlentities($this->pibase->pi_linkTP_keepPIvars_url(array(),0,0,$altPageId).$backendParams).'" title="'.$this->pibase->pi_getLL('go_to_page').' '.$i.'">'.$i.'</a>'.$this->pibase->pi_getLL('page_separator');
 			}
 		}
-		if ($mA['###PAGE_LIST###']!='' && $this->pibase->pi_getLL('page_separator')!='')
-			$mA['###PAGE_LIST###'] = substr($mA['###PAGE_LIST###'], 0, -strlen($this->pibase->pi_getLL('page_separator')));
+		#if ($mA['###PAGE_LIST###']!='') && $this->pibase->pi_getLL('page_separator')!='')
+		#	$mA['###PAGE_LIST###'] = substr($mA['###PAGE_LIST###'], 0, -strlen($this->pibase->pi_getLL('page_separator')));
 		
 		return $content;
 	}

@@ -1,4 +1,7 @@
 <?php
+
+# namespace Barlian\Wfqbe\...
+
 /***************************************************************
 *  Copyright notice
 *
@@ -21,25 +24,40 @@
 *
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
+
+# $LANG->includeLLFile('EXT:wfqbe/tx_wfqbe_query_insert/locallang.xml');
+
 /**
  * 
  *
  * @author	Mauro Lorenzutti (Webformat srl) (mauro.lorenzutti@webformat.com)
  */
-
-$LANG->includeLLFile('EXT:wfqbe/tx_wfqbe_query_insert/locallang.xml');
-
 class tx_wfqbe_insertform_generator{
-	var $extKey = 'wfqbe';	// The extension key.
 	
+	/*
+	 *
+	 */
 	var $blocks;
+	
+	/*
+	 *
+	 */
 	var $markers;
 	
+	/*
+	 *
+	 */
 	var $RAW_MODE = false;
-	
-	// Elenco dei tipi di input disponibili
-	// time toegevoegd EW 12-1-2015 
+
+	/*
+	 * Elenco dei tipi di input disponibili
+	 * time toegevoegd EW 12-1-2015 
+	 */
 	var $types = array ('display only', 'input', 'datetype', 'calendar', 'timepicker', 'datepicker', 'password', 'radio', 'select', 'textarea', 'checkbox', 'hidden', 'upload', 'relation', 'PHP function', 'Raw HTML');
+	
+	/*
+	 *
+	 */
 	var $calendarDateFormats = array(
 		'datetocal' => array(
 			'%d/%m/%Y',
@@ -67,6 +85,9 @@ class tx_wfqbe_insertform_generator{
 	);
 	
 	
+	/*
+	 *
+	 */
 	function init(){
 		$wfqbe = \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('wfqbe');
 		$this->blocks = $wfqbe;
@@ -96,7 +117,6 @@ class tx_wfqbe_insertform_generator{
 	*
 	* @return	[string]	$content: stringa che contiene l'html del form	
  	*/
-	
 	function showForm($h){
 		if ($this->blocks['RAW_MODE']==1)
 			$this->RAW_MODE = true;
@@ -299,9 +319,7 @@ class tx_wfqbe_insertform_generator{
 
 		return $content.'</table>';
 	}
-	
-	
-	
+
 	/**
 	 * Funzione che restituisce una select dei tipi possibili di input
 	 * 
@@ -347,7 +365,6 @@ class tx_wfqbe_insertform_generator{
 		return $html;
 	}
 	
-	
 	/**
 	 * Function used to create the label input field
 	 */
@@ -365,7 +382,6 @@ class tx_wfqbe_insertform_generator{
 		
 		return $html;
 	}
-	
 	
 	/**
 	 * Function used to create the help input field
@@ -385,9 +401,6 @@ class tx_wfqbe_insertform_generator{
 		return $html;
 	}
 	
-	
-	
-	
 	/**
 	 * Function used to create a display value and to configure it
 	 * 
@@ -403,7 +416,6 @@ class tx_wfqbe_insertform_generator{
 		return $html;
 	}
 	
-	
 	/**
 	 * Function used to create an input field and to configure it
 	 * 
@@ -417,7 +429,6 @@ class tx_wfqbe_insertform_generator{
 		$html .= ' - MaxLength: <input type="text" name="wfqbe[fields]['.$key.'][form][maxlength]" value="'.$form['maxlength'].'" />';
 		return $html;
 	}
-	
 	
 	/** Function used to create a datetype field and to configure it (added by Fabian Moser)
 	 * 
@@ -450,7 +461,6 @@ class tx_wfqbe_insertform_generator{
 		//$html .= ' - MaxLength: <input type="text" name="wfqbe[fields]['.$key.'][form][maxlength]" value="'.$form['maxlength'].'" />';
 		return $html;
 	}
-	
 	
 	/**
 	 * Function used to create a calendar field
@@ -546,7 +556,10 @@ class tx_wfqbe_insertform_generator{
         
         return $html;
     }
-	
+
+	/*
+	 *
+	 */
     function showDate($key, $form)	{
 		$html = $this->labelInput($key, $form['label']);
         
@@ -554,6 +567,7 @@ class tx_wfqbe_insertform_generator{
         
         return $html;
     }
+
 	/**
 	 * Function used to create a password field and to configure it
 	 * 
@@ -567,7 +581,6 @@ class tx_wfqbe_insertform_generator{
 		$html .= ' - MaxLength: <input type="text" name="wfqbe[fields]['.$key.'][form][maxlength]" value="'.$form['maxlength'].'" />';
 		return $html;
 	}
-	
 	
 	/**
 	 * Funzione che visualizza le opzioni di configurazione nel caso di tipo 'file'
@@ -596,9 +609,6 @@ class tx_wfqbe_insertform_generator{
 		return $html;
 	}
 	
-	
-	
-	
 	/**
 	 * Funzione che visualizza le opzioni di configurazione nel caso di tipo 'hidden'
 	 * 
@@ -611,9 +621,6 @@ class tx_wfqbe_insertform_generator{
 		$html .= '<br />Get value from parameter: <input type="text" name="wfqbe[fields]['.$key.'][form][value_from_parameter]" value="'.$form['value_from_parameter'].'" />';
 		return $html;
 	}
-	
-	
-	
 	
 	/**
 	 * Funzione che visualizza le opzioni di configurazione nel caso di tipo 'textarea'
@@ -634,11 +641,7 @@ class tx_wfqbe_insertform_generator{
 		$html .= ' - Cols: <input type="text" name="wfqbe[fields]['.$key.'][form][cols]" value="'.$form['cols'].'" size="3" />';
 		return $html;
 	}
-	
-	
-	
-	
-	
+
 	/**
 	 * Funzione che visualizza le opzioni di configurazione nel caso di tipo 'radio'
 	 * 
@@ -692,10 +695,6 @@ class tx_wfqbe_insertform_generator{
 		return $html;
 	}
 	
-	
-	
-	
-	
 	/**
 	 * Funzione che visualizza le opzioni di configurazione nel caso di tipo 'checkbox'
 	 * 
@@ -748,10 +747,6 @@ class tx_wfqbe_insertform_generator{
 				
 		return $html;
 	}
-	
-	
-	
-	
 	
 	/**
 	 * Funzione che visualizza le opzioni di configurazione nel caso di tipo 'select'
@@ -829,9 +824,6 @@ $html .= '<br />-----';
 		return $html;
 	}
 	
-	
-	
-	
 	/**
 	 * Function used to present the configuration options for the input type 'relation'
 	 * 
@@ -884,8 +876,6 @@ $html .= '<br />-----';
 			
 		return $html;
 	}
-		
-	
 	
 	/**
 	 * Funzione che visualizza le opzioni di configurazione nel caso di tipo 'PHP Function'
@@ -899,11 +889,6 @@ $html .= '<br />-----';
 		return $html;
 	}
 	
-	
-	
-	
-	
-	
 	/**
 	 * Function that provides a textarea where to put the raw HTML content
 	 *
@@ -915,11 +900,6 @@ $html .= '<br />-----';
 		$html = 'Raw HTML code: <textarea cols="60" rows="10" name="wfqbe[fields]['.$key.'][form][code]">'.$form['code'].'</textarea>';
 		return $html;
 	}
-	
-	
-	
-	
-	
 		
 	/**
  	* This function lists the tables of the selected database
@@ -930,7 +910,6 @@ $html .= '<br />-----';
 	*
  	* @return	[string]		$content: selector box with all the database tables	
  	*/
-	
 	function showSelectTable($h,$selectedTable, $name="wfqbe[table]"){
 		if ($this->RAW_MODE)	{
 			$html = '<input type="text" name="'.$name.'" value="'.$selectedTable.'" />';
@@ -953,7 +932,6 @@ $html .= '<br />-----';
 		
 		return $html;
 	}
-	
 		
 	/**
  	* This function lists the columns of the selected table
@@ -965,7 +943,6 @@ $html .= '<br />-----';
 	* 
  	* @return	[string]		$content: selector box with all the table fields.
  	*/
-	
 	function showSelectField($h,$selectedField, $selectedTable, $name, $onchange=false, $custom=false){
 		if ($this->RAW_MODE)	{
 			$html = '<input type="text" name="'.$name.'" value="'.$selectedField.'" />';
@@ -1000,8 +977,6 @@ $html .= '<br />-----';
 	
 	}
 	
-	
-	
 	/**
 	 * Function used to provide a selector box of wfqbe records
 	 */
@@ -1032,10 +1007,7 @@ $html .= '<br />-----';
 		
 		return $html;
 	}
-	
-	
-	
-	
+
 	/**
 	 * Function used to check the fields definitions
 	 */
@@ -1058,8 +1030,9 @@ $html .= '<br />-----';
 		}
 	}
 	
-	
-	
+	/*
+	 *
+	 */
 	function clearFunctions($key, $input)	{
 		$content = '';
 		if ($input=='input' || $input=='textarea')	{
@@ -1094,16 +1067,13 @@ $html .= '<br />-----';
 		}
 		return $content;
 	}
-	
-	
-	
+
 	/**
  	*
 	* Utilizza la funzione xml2array() definita nella classe tx_wfqbe_api_xml2array che converte un file xml in un array
 	*
     * @return	[void]	
  	*/
-	
 	function parseModule(){
 		
 		$API = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance("tx_wfqbe_api_xml2array");
@@ -1114,4 +1084,5 @@ $html .= '<br />-----';
 		$row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
 		$this->blocks = $API->xml2array($row["insertq"]);
 	}
+
 }

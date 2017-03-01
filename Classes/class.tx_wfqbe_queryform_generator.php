@@ -1,4 +1,7 @@
 <?php
+
+
+
 /***************************************************************
  *  Copyright notice
  *
@@ -22,89 +25,117 @@
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
+
+use \TYPO3\CMS\Core\Utility\GeneralUtility;
+use \Barlian\Wfqbe\Utility\ArrayUtility;
+
 /**
  *
  *
  * @author	Menegon Davide (Webformat srl) (menedav@libero.it)
  * @author  Mauro Lorenzutti <mauro.lorenzutti@webformat.com>
  */
-
-
 class tx_wfqbe_queryform_generator{
+
 	var $extKey = 'wfqbe';	// The extension key.
+
 	//array globale che contiene le coppie chiave valore (es : orderby->prova.nome)degli elementi utilizzati per costruire il form
 	var $wfqbe;
+
 	//array globale che contiene le coppie chiave valore degli elementi utilizzati per costruire la text area per inserimento a mano
 	var $rawwfqbe;
+
 	//array globale che contiene le coppie chiave valore degli elementi ausiliari utilizzati per memorizzare le stringe xml
 	//delle query temporane
 	var $pass;
+
 	//contiene tutti i possibili operatori che si possono usare nella clausola where
 	var $operatoriWhere = array(">",">=","<","<=","=","!=","LIKE","ILIKE","IS","IS NOT","IN","NOT IN","BETWEEN","NOT BETWEEN");
+
 	//contiene tutti i possibili tipi di join che si possono usare nella clausola from
 	var $operatoriJoin = array("NATURAL JOIN","JOIN","LEFT OUTER JOIN","RIGHT OUTER JOIN","FULL OUTER JOIN");
+
 	//contiene tutti i possibili operatori che si possono usare nella clausola from e piu' precisamente nel costrutto ON
 	var $operatoriOn=array("=");
+
 	//contiene tutte le possibili funzioni che si possono usare nella clausola having
 	var $aggregationFunctions=array("COUNT","MAX","MIN","AVG","SUM");
+
 	//contiene tutti i possibili operatori che si possono usare nella clausola having
 	var $havingOperator = array(">",">=","<","<=","=","!=");
+
 	//variabili usate nella funzione showOn() e contengono rispettivamente i nomi dei campi contenuti nell'ultima tabella(i-esima) selezionata
 	//e in tutte le altre (0...i-1)
 	var $rightOn="";
+
 	var $leftOn="";
+
 	var $operator=array("/","*","+","-");
+
 	//contiene tutti i possibili operatori possono usare utilizzare le operazioni insiemistiche
 	var $setOperator=array("UNION","EXCEPT","INTERSECT");
+
 	//contiene l'html  temporaneo della query creata tramite il form.Il contenuto viene inserito come valore dll'elemento pass[hiddenqbe]
 	//utilizzato nella modalita' RAW QUERY
 	var $hiddenqbe;
+
 	//contiene l'html  temporaneo della query creata tramite la text area.Il contenuto viene inserito come valore dll'elemento pass[hiddenraw]
 	//utilizzato nelle modalita' QBE
 	var $hiddenraw;
+
 	// contiene la modalita' selezionata(QBE o RAW QUERY)
 	var $wfqbefunction;
 	//var $setoperator;
 
 	function init(){
-		$API = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance("tx_wfqbe_api_array2xml");
-		$API2 = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance("tx_wfqbe_api_xml2array");
 
-		$this->wfqbefunction= \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('wfqbefunction');
-		if($this->wfqbefunction=="RAWQUERY" && \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('rawwfqbe')!=""){//caso in cui resto nella modalita' RAWQUERY
-			$this->rawwfqbe=\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('rawwfqbe');
-			$this->pass=\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('pass');
-			$this->hiddenqbe= $this->pass['hiddenqbe'];
+		$this->wfqbefunction = GeneralUtility::_GP('wfqbefunction');
+		
+		//caso in cui resto nella modalita' RAWQUERY
+		if ($this->wfqbefunction=="RAWQUERY" && GeneralUtility::_GP('rawwfqbe')!="") {
+			$this->rawwfqbe  = GeneralUtility::_GP('rawwfqbe');
+			$this->pass      = GeneralUtility::_GP('pass');
+			$this->hiddenqbe = $this->pass['hiddenqbe'];
 
-		}elseif($this->wfqbefunction=="QBE" && \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('wfqbe')!="") {//caso in cui resto nella modalita' QBE
-			$this->wfqbe=\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('wfqbe');
-			$this->pass=\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('pass');
-			$this->hiddenraw= $this->pass['hiddenraw'];
+		}
+		//caso in cui resto nella modalita' QBE
+		elseif ($this->wfqbefunction=="QBE" && GeneralUtility::_GP('wfqbe')!="") {
+			$this->wfqbe     = GeneralUtility::_GP('wfqbe');
+			$this->pass      = GeneralUtility::_GP('pass');
+			$this->hiddenraw = $this->pass['hiddenraw'];
 
-		}elseif($this->wfqbefunction=="RAWQUERY" && \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('rawwfqbe')==""){//caso in cui passo da QBE a RAWQUERY
-			$this->wfqbe=\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('wfqbe');
-			$this->pass=\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('pass');
+		}
+		//caso in cui passo da QBE a RAWQUERY
+		elseif ($this->wfqbefunction=="RAWQUERY" && GeneralUtility::_GP('rawwfqbe')=="") {
+			$this->wfqbe     = GeneralUtility::_GP('wfqbe');
+			$this->pass      = GeneralUtility::_GP('pass');
 
-			if($this->wfqbe!="")
-			$this->hiddenqbe=$API->array2xml($this->wfqbe);
-			else //se provengo dal qbe in modalita' impossibile memorizzo in hiddenqbe il contenuto del campo pass[hiddenqbe]
-			$this->hiddenqbe=$this->pass['hiddenqbe'];
+			if($this->wfqbe!="") {
+				$this->hiddenqbe = ArrayUtility::array2xml($this->wfqbe);
+			}
+			else {    //se provengo dal qbe in modalita' impossibile memorizzo in hiddenqbe il contenuto del campo pass[hiddenqbe]
+				$this->hiddenqbe = $this->pass['hiddenqbe'];
+			}
 
-			//$this->rawwfqbe=$API2->xml2array("<tempwfqbe>".$this->pass['hiddenraw']."</tempwfqbe>");
-			$this->rawwfqbe=$API2->xml2array($this->pass['hiddenraw']);
-			$this->rawwfqbe=$this->rawwfqbe;
+			//$this->rawwfqbe = ArrayUtility::xml2array("<tempwfqbe>".$this->pass['hiddenraw']."</tempwfqbe>");
+			$this->rawwfqbe  = ArrayUtility::xml2array($this->pass['hiddenraw']);
+			$this->rawwfqbe  = $this->rawwfqbe;
 
-		}else{//caso in cui passo da RAWQUERY a QBE
-			$this->rawwfqbe=\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('rawwfqbe');
-			$this->pass=\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('pass');
+		}
+		//caso in cui passo da RAWQUERY a QBE
+		else {
+			$this->rawwfqbe  = GeneralUtility::_GP('rawwfqbe');
+			$this->pass      = GeneralUtility::_GP('pass');
 
-			if($this->rawwfqbe!="")
-			$this->hiddenraw=$API->array2xml($this->rawwfqbe);
-			else
-			$this->hiddenraw="";
-			if ($this->pass['hiddenqbe']!="")
-			$this->wfqbe=$API2->xml2array($this->pass['hiddenqbe']);
-			//$this->wfqbe=$this->wfqbe['tempwfqbe'];
+			if($this->rawwfqbe!="") {
+				$this->hiddenraw = ArrayUtility::array2xml($this->rawwfqbe);
+			} else {
+				$this->hiddenraw = "";
+			}
+			if ($this->pass['hiddenqbe']!="") {
+				$this->wfqbe = ArrayUtility::xml2array($this->pass['hiddenqbe']);
+				//$this->wfqbe=$this->wfqbe['tempwfqbe'];
+			}
 		}
                 
                 /*se "provengo" dal plugin(e percio' l'array wfqbe e' vuoto) allora richiamo la funzione parseQuery che ha il compito di riempire l'array
@@ -112,11 +143,12 @@ class tx_wfqbe_queryform_generator{
 		if($this->wfqbe=="" && $this->rawwfqbe==""){
                     $this->parseQuery();
                 }else{
-                    $var=\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('P');
+                    $var=GeneralUtility::_GP('P');
                     $this->rawwfqbe['orgId'] = intval($var['uid']);
                     $this->rawwfqbe['orgPid'] = intval($var['pid']);
 	        }
 	}
+
 
 	/**
 	 *
@@ -124,12 +156,11 @@ class tx_wfqbe_queryform_generator{
 	 *
 	 * @return	[void]
 	 */
-
 	function parseQuery(){
 
-		$API = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance("tx_wfqbe_api_xml2array");
+		$API = GeneralUtility::makeInstance("tx_wfqbe_api_xml2array");
 
-		$var=\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('P');
+		$var=GeneralUtility::_GP('P');
 		//estraggo la query salvata dal database (modalita' xml) e la converto in array
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('query', 'tx_wfqbe_query', 'tx_wfqbe_query.uid='.intval($var['uid']).' AND tx_wfqbe_query.deleted!=1', '', '','');
 		$row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
@@ -148,8 +179,9 @@ class tx_wfqbe_queryform_generator{
 		$this->rawwfqbe=$saveXml['rawwfqbe'];
 		$this->wfqbefunction=$saveXml['function'];
 	}
-        
-        /**
+
+
+    /**
 	 * Crea una stringa che contiene l'xml della query creata.
 	 * Questa funzione viene richiamata nel file index.php quando si salva oppure si salva e si chiede il file.
 	 * Utilizza la funzione array2xml() definita nella classe tx_wfqbe_api_array2xml che converte un array in un file(stringa) xml.
@@ -157,16 +189,16 @@ class tx_wfqbe_queryform_generator{
 	 * @return	[string]	$xml: stringa che contiene la query in formato xml
 	 */
 	function saveQuery(){
-		$API = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance("tx_wfqbe_api_array2xml");
-		$API2 = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance("tx_wfqbe_api_xml2array");
+		$API = GeneralUtility::makeInstance("tx_wfqbe_api_array2xml");
+		$API2 = GeneralUtility::makeInstance("tx_wfqbe_api_xml2array");
 		$xml="";
 		//Aggiungo all'inizio e alla fine dei tag contenitori per rispettare le regole XML.
 		//Se compongo la query tramite la textArea(e quindi senza usare il form) racchiudo l'html tra i tag <rawquery> e </rawquery>.Se
 		//invece costruisco la query servendomi del form allora racchiudo l'html tra <wfqbe> e </wfqbe>.
 		//In ogni caso salvo la modalita' (QBE o RAW QBE) tra i tag <function> e </function> e percio' , sempre per rispettare la sintassi xml,
 		//racchiudo tutto tra i tag <contentwfqbe> e </contentwfqbe>.
-		//\TYPO3\CMS\Core\Utility\GeneralUtility::debug($this->rawwfqbe);
-		//\TYPO3\CMS\Core\Utility\GeneralUtility::debug($this->wfqbe);
+		//GeneralUtility::debug($this->rawwfqbe);
+		//GeneralUtility::debug($this->wfqbe);
 
 		if($this->rawwfqbe['rawquery']!="")	{
 			$saveArray['contentwfqbe']['rawwfqbe']['rawquery'] = $this->rawwfqbe['rawquery'];
@@ -174,9 +206,9 @@ class tx_wfqbe_queryform_generator{
 			//$xml = "<contentwfqbe><rawwfqbe>".$API->array2xml($this->rawwfqbe)."</rawwfqbe><function>".$this->wfqbefunction."</function></contentwfqbe>";
 			$xml = $API->array2xml($saveArray);
 		}	else	{
-			//\TYPO3\CMS\Core\Utility\GeneralUtility::debug($this->pass['hiddenraw']);
+			//GeneralUtility::debug($this->pass['hiddenraw']);
 			$this->rawwfqbe = $API2->xml2array($this->pass['hiddenraw']);
-			//\TYPO3\CMS\Core\Utility\GeneralUtility::debug($this->rawwfqbe);
+			//GeneralUtility::debug($this->rawwfqbe);
 			if($this->rawwfqbe['rawquery']!="")	{
 				$saveArray['contentwfqbe']['rawwfqbe']['rawquery'] = $this->rawwfqbe['rawquery'];
 				$saveArray['contentwfqbe']['function'] = "RAWQUERY";
@@ -194,6 +226,7 @@ class tx_wfqbe_queryform_generator{
 		return $xml;
 	}
 
+
 	/**
 	 * Crea il form per la creazione della query
 	 *
@@ -201,7 +234,6 @@ class tx_wfqbe_queryform_generator{
 	 *
 	 * @return	[string]	$content: stringa che contiene l'html del form
 	 */
-
 	function showForm($h){
 		$content='<table style="font-size: 0.9em" class="typo3-dblist">';
 		$content.='<tr class="db_list_normal"><td>'.$this->showMenu().'</td></tr>';
@@ -307,6 +339,7 @@ class tx_wfqbe_queryform_generator{
 		return $content;
 	}
 
+
 	/**
 	 * Crea il menu' per la selezione della modalita'
 	 *
@@ -330,6 +363,7 @@ class tx_wfqbe_queryform_generator{
 
 	}
 
+
 	/**
 	 * Crea un elemento "select" dove gli elementi "option" contengono le tabelle del database selezionato.
 	 *
@@ -341,7 +375,6 @@ class tx_wfqbe_queryform_generator{
 	 *
 	 * @return	[string]	$content: stringa che contiene html degli elementi select per la selezione delle tabelle
 	 */
-
 	function showSelectTable($h,$numSelect,$selectedTable,$nextEmpty,$tabelle,$numForm){
 		//visualizzo "table" solo la prima volta
 		if($numSelect==0)
@@ -358,10 +391,8 @@ class tx_wfqbe_queryform_generator{
 		if($nextEmpty)
 		$content.='<option  value=""></option>';
 		for($i=0;$i<sizeof($tabelle);$i++){
-			if($selectedTable==$tabelle[$i])
-			$content.='<option  value="'.$tabelle[$i].'" selected="true">'.$tabelle[$i].'</option>';
-			else
-			$content.='<option  value="'.$tabelle[$i].'">'.$tabelle[$i].'</option>';
+			$str_selected = ($selectedTable==$tabelle[$i]) ? ' selected="true"' : '';
+			$content.='<option  value="'.$tabelle[$i].'"'.$str_selected.'>'.$tabelle[$i].'</option>';
 		}
 		$content.='</select>';
 
@@ -400,11 +431,10 @@ class tx_wfqbe_queryform_generator{
 				if($this->wfqbe[$numForm]['table'][$numSelect]!="")
 				$content.=$this->showJoin($numSelect,$numForm);
 			}
-
 		}
-
 		return $content;
 	}
+
 
 	/**
 	 * Visualizza gli elementi che contengono le clausole di join o prodotto cartesiano
@@ -412,7 +442,6 @@ class tx_wfqbe_queryform_generator{
 	 * @param	[type]		 $j:indice elemento corrente
 	 * @return	[string]	 $content:
 	 */
-
 	function showJoin($j,$numForm){
 
 		$content.='<select onChange="updateForm();"  name="wfqbe['.$numForm.'][join]['.$j.']" title="join['.$j.']" >';
@@ -433,15 +462,14 @@ class tx_wfqbe_queryform_generator{
 			$this->wfqbe[$numForm]['join'][$j]="JOIN";
 		}
 		for($i=0;$i<sizeof($this->operatoriJoin);$i++){
-			if($this->operatoriJoin[$i]==$this->wfqbe[$numForm]['join'][$j])
-			$content.='<option value="'.$this->operatoriJoin[$i].'" selected="true">'.$this->operatoriJoin[$i].'</option>';
-			else
-			$content.='<option value="'.$this->operatoriJoin[$i].'">'.$this->operatoriJoin[$i].'</option>';
+			$str_selected = ($this->operatoriJoin[$i]==$this->wfqbe[$numForm]['join'][$j]) ? ' selected="true"' : '';
+			$content.='<option value="'.$this->operatoriJoin[$i].'"'.$str_selected.'>'.$this->operatoriJoin[$i].'</option>';
 		}
 		$content.='</select>';
 
 		return $content;
 	}
+
 
 	/**
 	 * Visualizza gli elementi che contengono i campi delle tabelle selezionate da utilizzare nell'elemento ON
@@ -451,13 +479,12 @@ class tx_wfqbe_queryform_generator{
 	 * @param	[type]		 $numForm:
 	 * @return	[string]	 $content:
 	 */
-
 	function showON($i,$h,$numForm){
 
-		$content.='<div style="margin-left: 8em;">';
+		$content.= '<div style="margin-left: 8em;">';
 
-		$content.='<strong>ON : </strong>';
-		$content.="&nbsp;&nbsp;";
+		$content.= '<strong>ON : </strong>';
+		$content.= '&nbsp;&nbsp;';
 
 		//primo elemento del cosrtutto on.Contiene i campi di tutte le tabelle selezionate ad eccezione dell'ultima i cui campi sono
 		//contenuti nel secondo costrutto on.
@@ -467,10 +494,8 @@ class tx_wfqbe_queryform_generator{
 		//prima tabella selezionata attraverso una connessione al database
 		if($this->leftOn=="" && $this->rightOn==""){
 			$this->leftOn=$h->MetaColumnNames($this->wfqbe[$numForm]['table'][0]);
-			if($this->wfqbe[$numForm]['renametable'][0]!="")
-			$tableName=$this->wfqbe[$numForm]['renametable'][0];
-			else
-			$tableName=$this->wfqbe[$numForm]['table'][0];
+			$str_tableKey = ($this->wfqbe[$numForm]['renametable'][0] != '') ? 'renametable' : 'table';
+			$tableName=$this->wfqbe[$numForm][$str_tableKey][0];
 			//ogni campo ricavato lo concateno al nome della tabella
 			foreach($this->leftOn AS $key => $value)
 			$this->leftOn[$key]=$tableName.".".$this->leftOn[$key];
@@ -480,26 +505,20 @@ class tx_wfqbe_queryform_generator{
 		//tabelle selezionate durante la costuzione del secondo elemento del costrutto ON) e se il campo e'  stato selezionato inserisco
 		//l'attributo selected="true"
 		foreach($this->leftOn AS $key => $value){
-			if($value == $this->wfqbe[$numForm]['on1'][$i])
-			$content.='<option  value="'.$value.'" selected="true">'.$value.'</option>';
-			else
-			$content.='<option  value="'.$value.'">'.$value.'</option>';
+			$str_selected = ($value == $this->wfqbe[$numForm]['on1'][$i]) ? ' selected="true"' : '';
+			$content.='<option  value="'.$value.'"'.$str_selected.'>'.$value.'</option>';
 		}
 		$content.='</select>';
-
 		$content.="&nbsp;&nbsp;&nbsp;&nbsp;";
 
 		//elemento che contiene gli operatori dell'on
 		$content.='<select onChange="updateForm();"  name="wfqbe['.$numForm.'][operatorion]['.$i.']" title="on operator['.$i.']" >';
 		$content.='<option  value="" ></option>';
 		for($p=0;$p<sizeof($this->operatoriOn);$p++){
-			if($this->operatoriOn[$p]==$this->wfqbe[$numForm]['operatorion'][$i])
-			$content.='<option value="'.$this->operatoriOn[$p].'" selected="true">'.$this->operatoriOn[$p].'</option>';
-			else
-			$content.='<option value="'.$this->operatoriOn[$p].'">'.$this->operatoriOn[$p].'</option>';
+			$str_selected = ($this->operatoriOn[$p]==$this->wfqbe[$numForm]['operatorion'][$i]) ? ' selected="true"' : '';
+			$content.='<option value="'.$this->operatoriOn[$p].'"'.$str_selected.'>'.$this->operatoriOn[$p].'</option>';
 		}
 		$content.='</select>';
-
 		$content.="&nbsp;&nbsp;&nbsp;&nbsp;";
 
 		//secondo elemento del cosrtutto on.Contiene i campi dell'ultima tabella selezionata.
@@ -508,58 +527,46 @@ class tx_wfqbe_queryform_generator{
 		//il contenuto del secondo elemento del costrutto on deve essere sempre calcolato con una connessione al databasa perche' deve
 		//contenere solamente i campi dell'ultima tabella selezionata
 		$this->rightOn=$h->MetaColumnNames($this->wfqbe[$numForm]['table'][$i]);
-		if($this->wfqbe[$numForm]['renametable'][$i]!="")
-		$tableName=$this->wfqbe[$numForm]['renametable'][$i];
-		else
-		$tableName=$this->wfqbe[$numForm]['table'][$i];
+		$str_tableKey = ($this->wfqbe[$numForm]['renametable'][$i] != '') ? 'renametable' : 'table';
+		$tableName=$this->wfqbe[$numForm][$str_tableKey][$i];
 		foreach($this->rightOn AS $key => $value){
-			if($tableName.".".$value == $this->wfqbe[$numForm]['on2'][$i])
-			$content.='<option  value="'.$tableName.".".$value.'" selected="true">'.$tableName.".".$value.'</option>';
-			else
-			$content.='<option  value="'.$tableName.".".$value.'">'.$tableName.".".$value.'</option>';
+			$str_selected = ($tableName.".".$value == $this->wfqbe[$numForm]['on2'][$i]) ? ' selected="true"' : '';
+			$content.='<option  value="'.$tableName.".".$value.'"'.$str_selected.'>'.$tableName.".".$value.'</option>';
 			//dopo aver inserito i campi dell'ultima tabella selezionata nell'elemento select inserisco ogni campo nell'array leftOn che
 			//deve contenere tutti i campi delle tabelle selezionate ad eccezione dell'ultima
 			array_push($this->leftOn,$tableName.".".$value);
 		}
-		$content.='</select>';
-
-		$content.='</div>';
-
-		$content.='<br/>';
-
+		$content.= '</select>';
+		$content.= '</div>';
+		$content.= '<br/>';
 		return $content;
 	}
+
 
 	/**
 	 * Visualizza  l'opzione distinct/all
 	 *
 	 * @return	[string]	$content: stringa che contiene l'html della text area che contiene tutti i campi della tabella.
 	 */
-
 	function showDistinctAll($numForm){
-
-		$content.='<h4>Distinct/All : </h4>';
-		$content.='<select   onChange="updateForm();" name="wfqbe['.$numForm.'][distinctall]" title="distinct all" >';
-		$content.='<option  value="" ></option>';
-		if($this->wfqbe[$numForm]['distinctall']==""){
-			$content.='<option  value="distinct" >DISTINCT</option>';
-			$content.='<option  value="all" >ALL</option>';
-		}else{
-			if($this->wfqbe[$numForm]['distinctall']=='distinct'){
-				$content.='<option  value="distinct" selected="true">DISTINCT</option>';
-				$content.='<option  value="all">ALL</option>';
-			}
-			else{
-				$content.='<option  value="distinct">DISTINCT</option>';
-				$content.='<option  value="all"  selected="true">ALL</option>';
+		$content.= '<h4>Distinct/All : </h4>';
+		$content.= '<select onChange="updateForm();" name="wfqbe['.$numForm.'][distinctall]" title="distinct all" >';
+		$content.= '<option value="" ></option>';
+		$str_select_1 = '';
+		$str_select_2 = '';
+		if($this->wfqbe[$numForm]['distinctall'] !== '') {
+			if($this->wfqbe[$numForm]['distinctall'] == 'distinct') {
+				$str_select_1 = ' selected="true"';
+			} else {
+				$str_select_2 = ' selected="true"';
 			}
 		}
-		$content.='</select>';
-
-
+		$content.= '<option value="distinct"'.$str_select_1.'>DISTINCT</option>';
+		$content.= '<option value="all"'.$str_select_2.'>ALL</option>';
+		$content.= '</select>';
 		return $content;
-
 	}
+
 
 	/**
 	 * Visualizza  le colonne delle tabelle selezionate
@@ -567,7 +574,6 @@ class tx_wfqbe_queryform_generator{
 	 * @param	[type]		 $h: puntatore alla connessine
 	 * @return	[string]	$content: stringa che contiene l'html della text area che contiene tutti i campi della tabella.
 	 */
-
 	function showFields($h,$numForm){
 		//variabile utilizzata per rappresentare l'indice degli elementi fild e selectedfields
 		$index=1;
@@ -597,14 +603,13 @@ class tx_wfqbe_queryform_generator{
 		$content.='<td>';
 		$content.='<select   onChange="insertField(\'field'.$numForm.$index.'\',\'selectedfields'.$numForm.$index.'\');updateForm()" id="field'.$numForm.$index.'" name="wfqbe['.$numForm.'][field]" title="fields" multiple="multiple" size="10" >';
 		$content.='<option value="*">*</option>';
-		for($i=0;$i<sizeof($this->wfqbe[$numForm]['table']);$i++){
+		for($i=0; $i<sizeof($this->wfqbe[$numForm]['table']); $i++){
 			//se l'i-esima posizione dell'array e' vuota mi fermo altrimenti andrei a estrarre le colonne di una tabella inesistente
-			if($this->wfqbe[$numForm]['table'][$i]=="")
-			break;
-			if($this->wfqbe[$numForm]['renametable'][$i]!="")
-			$tableName=$this->wfqbe[$numForm]['renametable'][$i];
-			else
-			$tableName=$this->wfqbe[$numForm]['table'][$i];
+			if($this->wfqbe[$numForm]['table'][$i]=="") {
+				break;
+			}
+			$str_tableName = ($this->wfqbe[$numForm]['renametable'][$i] != '') ? 'renametable' : 'table';
+			$tableName = $this->wfqbe[$numForm][$str_tableName][$i];
 			$column=$h->MetaColumnNames($this->wfqbe[$numForm]['table'][$i]);
 			foreach($column AS $key => $value)
 			$content.='<option  value="'.$tableName.".".$value.'" >'.$tableName.".".$value.'</option>';
@@ -621,13 +626,13 @@ class tx_wfqbe_queryform_generator{
 
 	}
 
+
 	/**
 	 * Crea la clausola where
 	 *
 	 * @param	[type]		$h:
 	 * @return	[string]	$content: stringa che contiene l'html della clausola where.
 	 */
-
 	function showWhere($h,$numForm){
 		//contatore che contiene il numero delle parentesi aperte
 		$parentesiAperte=0;
@@ -648,8 +653,9 @@ class tx_wfqbe_queryform_generator{
 			if($this->wfqbe[$numForm]['parentesiopen'][$j]=='open'){
 				$content.='<option  value="open" selected="true">(</option>';
 				$parentesiAperte++;
-			}else
-			$content.='<option  value="open">(</option>';
+			} else {
+				$content.='<option  value="open">(</option>';
+			}
 			$content.='</select>';
 			$content.='</div>';
 
@@ -661,18 +667,15 @@ class tx_wfqbe_queryform_generator{
 			$content.='<option  value="" ></option>';
 			for($i=0;$i<sizeof($this->wfqbe[$numForm]['table']);$i++){
 				//se l'i-esima posizione dell'array e' vuota mi fermo altrimenti andrei a estrarre le colonne di una tabella inesistente
-				if($this->wfqbe[$numForm]['table'][$i]=="")
-				break;
-				if($this->wfqbe[$numForm]['renametable'][$i]!="")
-				$tableName=$this->wfqbe[$numForm]['renametable'][$i];
-				else
-				$tableName=$this->wfqbe[$numForm]['table'][$i];
+				if($this->wfqbe[$numForm]['table'][$i]==""){
+					break;
+				}
+				$str_tableKey = ($this->wfqbe[$numForm]['renametable'][$i] != '') ? 'renametable' : 'table';
+				$tableName=$this->wfqbe[$numForm][$str_tableKey][$i];
 				$column=$h->MetaColumnNames($this->wfqbe[$numForm]['table'][$i]);
 				foreach($column AS $key => $value){
-					if($tableName.".".$value == $this->wfqbe[$numForm]['where'][$j])
-					$content.='<option  value="'.$tableName.".".$value.'" selected="true">'.$tableName.".".$value.'</option>';
-					else
-					$content.='<option  value="'.$tableName.".".$value.'">'.$tableName.".".$value.'</option>';
+					$str_selected = ($tableName.".".$value == $this->wfqbe[$numForm]['where'][$j]) ? ' selected="true"' : '';
+					$content.='<option  value="'.$tableName.".".$value.'"'.$str_selected.'>'.$tableName.".".$value.'</option>';
 				}
 			}
 			$content.='</select>';
@@ -683,10 +686,8 @@ class tx_wfqbe_queryform_generator{
 			$content.='<select onChange="updateForm();"  name="wfqbe['.$numForm.'][op]['.$j.']" title="where operator['.$j.']" >';
 			$content.='<option  value="" ></option>';
 			for($i=0;$i<sizeof($this->operatoriWhere);$i++){
-				if($this->operatoriWhere[$i]==$this->wfqbe[$numForm]['op'][$j])
-				$content.='<option value="'.$this->operatoriWhere[$i].'" selected="true">'.$this->operatoriWhere[$i].'</option>';
-				else
-				$content.='<option value="'.$this->operatoriWhere[$i].'">'.$this->operatoriWhere[$i].'</option>';
+				$str_selected = ($this->operatoriWhere[$i]==$this->wfqbe[$numForm]['op'][$j]) ? ' selected="true"' : '';
+				$content.='<option value="'.$this->operatoriWhere[$i].'"'.$str_selected.'>'.$this->operatoriWhere[$i].'</option>';
 			}
 			$content.='</select>';
 
@@ -725,22 +726,17 @@ class tx_wfqbe_queryform_generator{
 						//se l'i-esima posizione dell'array e' vuota mi fermo altrimenti andrei a estrarre le colonne di una tabella inesistente
 						if($this->wfqbe[$numForm]['table'][$i]=="")
 						break;
-						if($this->wfqbe[$numForm]['renametable'][$i]!="")
-						$tableName=$this->wfqbe[$numForm]['renametable'][$i];
-						else
-						$tableName=$this->wfqbe[$numForm]['table'][$i];
+						$str_tableKey = ($this->wfqbe[$numForm]['renametable'][$i]!="") ? 'renametable' : 'table';
+						$tableName=$this->wfqbe[$numForm][$str_tableKey][$i];
 						$column=$h->MetaColumnNames($this->wfqbe[$numForm]['table'][$i]);
 						foreach($column AS $key => $value){
-							if($tableName.".".$value == $this->wfqbe[$numForm]['insertfield'][$j])
-							$content.='<option  value="'.$tableName.".".$value.'" selected="true">'.$tableName.".".$value.'</option>';
-							else
-							$content.='<option  value="'.$tableName.".".$value.'">'.$tableName.".".$value.'</option>';
+							$str_selected = ($tableName.".".$value == $this->wfqbe[$numForm]['insertfield'][$j]) ? ' selected="true"' : '';
+							$content.='<option  value="'.$tableName.".".$value.'"'.$str_selected.'>'.$tableName.".".$value.'</option>';
 						}
 					}
 					$content.='</select>';
 				}
 			}
-
 			$content.='</div>';
 
 			//elemento select che contiene le parentesi da chiudere
@@ -762,8 +758,9 @@ class tx_wfqbe_queryform_generator{
 						//select che permette di chiudere le parentesi numero i
 						for($w=0;$w<$numParChiuse;$w++)
 						$parentesiAperte--;
-					}else
-					$content.='<option  value="'.$parOpen.'">'.$parOpen.'</option>';
+					} else {
+						$content.='<option  value="'.$parOpen.'">'.$parOpen.'</option>';
+					}
 				}
 				$content.='</select>';
 				$content.='</div>';
@@ -776,14 +773,14 @@ class tx_wfqbe_queryform_generator{
 			//elemento select che contiene le congiunzioni logiche
 			$content.='<select onChange="updateForm();"  name="wfqbe['.$numForm.'][ao]['.$j.']" title="and or['.$j.']" >';
 			$content.='<option  value="" ></option>';
-			if($this->wfqbe[$numForm]['ao'][$j]==""){
+			if ($this->wfqbe[$numForm]['ao'][$j]=="") {
 				$content.='<option  value="AND" >AND</option>';
 				$content.='<option  value="OR" >OR</option>';
-			}else{
-				if($this->wfqbe[$numForm]['ao'][$j]=="AND"){
+			} else {
+				if ($this->wfqbe[$numForm]['ao'][$j]=="AND") {
 					$content.='<option  value="AND" selected="true">AND</option>';
 					$content.='<option  value="OR" >OR</option>';
-				}else{
+				} else {
 					$content.='<option  value="AND">AND</option>';
 					$content.='<option  value="OR" selected="true">OR</option>';
 				}
@@ -794,16 +791,9 @@ class tx_wfqbe_queryform_generator{
 
 			if($this->wfqbe[$numForm]['ao'][$j]=="")
 			break;
-
-
-
 		}
-
-
-
 		return $content;
 	}
-
 
 
 	/**
@@ -814,7 +804,6 @@ class tx_wfqbe_queryform_generator{
 	 * @param	[type]		$nextEmpty:verifica se il successivo elemento dell'array wfqbe['groupby'] e' vuoto
 	 * @return	[string]	$content: stringa che contiene l'html dell'elemento select che rappresenta la clausola groupBy
 	 */
-
 	function showGroupBy($h,$num,$nextEmpty,$numForm){
 		//vado a capo 2 volte prima di creare ogni elemento group by(ad eccezione del primo)
 		if($num!=0)
@@ -827,29 +816,24 @@ class tx_wfqbe_queryform_generator{
 		for($i=0;$i<sizeof($this->wfqbe[$numForm]['table']);$i++){
 			if($this->wfqbe[$numForm]['table'][$i]!=""){
 				$column=$h->MetaColumnNames($this->wfqbe[$numForm]['table'][$i]);
-				if($this->wfqbe[$numForm]['renametable'][$i]!="")
-				$tableName=$this->wfqbe[$numForm]['renametable'][$i];
-				else
-				$tableName=$this->wfqbe[$numForm]['table'][$i];
+				$str_tableKey = ($this->wfqbe[$numForm]['renametable'][$i] != '') ? 'renametable' : 'table';
+				$tableName=$this->wfqbe[$numForm][$str_tableKey][$i];
 				foreach($column AS $key => $value){
-					if($tableName.".".$value == $this->wfqbe[$numForm]['groupby'][$num])
-					$content.='<option  value="'.$tableName.".".$value.'" selected="true">'.$tableName.".".$value.'</option>';
-					else
-					$content.='<option  value="'.$tableName.".".$value.'">'.$tableName.".".$value.'</option>';
+					$str_selected = ($tableName.".".$value == $this->wfqbe[$numForm]['groupby'][$num]) ? ' selected="true"' : '';
+					$content.='<option  value="'.$tableName.".".$value.'"'.$str_selected.'>'.$tableName.".".$value.'</option>';
 				}
 			}
 		}
 		$content.='</select>';
-
 		return $content;
 	}
+
 
 	/**
 	 * Crea l'elemento having
 	 *
 	 * @return	[string]	$content: contiente l'html dell'elemento having
 	 */
-
 	function showHaving($h,$numForm){
 		$content.='<h4>Having : </h4>';
 
@@ -857,10 +841,8 @@ class tx_wfqbe_queryform_generator{
 		$content.='<select onChange="updateForm();"  name="wfqbe['.$numForm.'][having]" title="having" >';
 		$content.='<option  value=""></option>';
 		for($i=0;$i<sizeof($this->aggregationFunctions);$i++){
-			if($this->aggregationFunctions[$i]==$this->wfqbe[$numForm]['having'])
-			$content.='<option value="'.$this->aggregationFunctions[$i].'" selected="true">'.$this->aggregationFunctions[$i].'</option>';
-			else
-			$content.='<option value="'.$this->aggregationFunctions[$i].'">'.$this->aggregationFunctions[$i].'</option>';
+			$str_selected = ($this->aggregationFunctions[$i]==$this->wfqbe[$numForm]['having']) ? ' selected="true"' : '';
+			$content.='<option value="'.$this->aggregationFunctions[$i].'"'.$str_selected.'>'.$this->aggregationFunctions[$i].'</option>';
 		}
 		$content.='</select>';
 
@@ -869,29 +851,21 @@ class tx_wfqbe_queryform_generator{
 		//elemento che contiene tutti i campi(e l'operatore *) che si possono usare nell'elemento having
 		$content.='<select onChange="updateForm();"  name="wfqbe['.$numForm.'][havingfield]" title="having field" >';
 		$content.='<option  value=""></option>';
-		if($this->wfqbe[$numForm]['havingfield']=="*")
-		$content.='<option value="*" selected="true">*</option>';
-		else
-		$content.='<option value="*">*</option>';
+		$str_selected = ($this->wfqbe[$numForm]['havingfield']=="*") ? ' selected="true"' : '';
+		$content.='<option value="*"'.$str_selected.'>*</option>';
 
 		for($i=0;$i<sizeof($this->wfqbe[$numForm]['table']);$i++){
 			//se l'i-esima posizione dell'array e' vuota mi fermo altrimenti andrei a estrarre le colonne di una tabella inesistente
 			if($this->wfqbe[$numForm]['table'][$i]=="")
 			break;
 			$column=$h->MetaColumnNames($this->wfqbe[$numForm]['table'][$i]);
-			if($this->wfqbe[$numForm]['renametable'][$i]!="")
-			$tableName=$this->wfqbe[$numForm]['renametable'][$i];
-			else
-			$tableName=$this->wfqbe[$numForm]['table'][$i];
+			$str_tableKey = ($this->wfqbe[$numForm]['renametable'][$i]!="") ? 'renametable' : 'table';
+			$tableName=$this->wfqbe[$numForm][$str_tableKey][$i];
 			foreach($column AS $key => $value){
-				if($tableName.".".$value == $this->wfqbe[$numForm]['havingfield'])
-				$content.='<option  value="'.$tableName.".".$value.'" selected="true">'.$tableName.".".$value.'</option>';
-				else
-				$content.='<option  value="'.$tableName.".".$value.'">'.$tableName.".".$value.'</option>';
-
+				$str_selected = ($tableName.".".$value == $this->wfqbe[$numForm]['havingfield']) ? ' selected="true"' : '';
+				$content.='<option  value="'.$tableName.".".$value.'"'.$str_selected.'>'.$tableName.".".$value.'</option>';
 			}
 		}
-
 		$content.='</select>';
 
 		$content.="&nbsp;&nbsp;&nbsp;&nbsp;";
@@ -900,10 +874,8 @@ class tx_wfqbe_queryform_generator{
 		$content.='<select onChange="updateForm();"  name="wfqbe['.$numForm.'][havingoperator]" title="having operator" >';
 		$content.='<option  value=""></option>';
 		for($i=0;$i<sizeof($this->havingOperator);$i++){
-			if($this->havingOperator[$i]==$this->wfqbe[$numForm]['havingoperator'])
-			$content.='<option value="'.$this->havingOperator[$i].'" selected="true">'.$this->havingOperator[$i].'</option>';
-			else
-			$content.='<option value="'.$this->havingOperator[$i].'">'.$this->havingOperator[$i].'</option>';
+			$str_selected = ($this->havingOperator[$i]==$this->wfqbe[$numForm]['havingoperator']) ? ' selected="true"' : '';
+			$content.='<option value="'.$this->havingOperator[$i].'"'.$str_selected.'>'.$this->havingOperator[$i].'</option>';
 		}
 		$content.='</select>';
 
@@ -913,8 +885,8 @@ class tx_wfqbe_queryform_generator{
 		$content.='<input type="text"  value="'.$this->wfqbe[$numForm]['inserthaving'].'" name="wfqbe['.$numForm.'][inserthaving]" title="insert having"/>';
 
 		return $content;
-
 	}
+
 
 	/**
 	 * Crea l'elemento orderBy che contiene tutti i campi delle tabelle selezionate
@@ -924,57 +896,50 @@ class tx_wfqbe_queryform_generator{
 	 * @param	[type]		$nextEmpty:verifica se il successivo elemento dell'array wfqbe['orderby'] e' vuoto
 	 * @return	[string]	$content: stringa che contiene l'html dell'elemento select che rappresenta la clausola groupBy
 	 */
-
-	function showOrderBy($h,$num,$nextEmpty,$numForm){
+	function showOrderBy($h, $num, $nextEmpty, $numForm) {
 		//vado a capo 2 volte prima di creare ogni elemento order by(ad eccezione del primo)
-		if($num!=0)
-		$content.='<br/><br/>';
-		if($num==0)
-		$content.='<h4>OrderBy : </h4>';
-		$content.='<select onChange="updateForm();"  name="wfqbe['.$numForm.'][orderby]['.$num.']" title="order by['.$num.']" >';
-		if($nextEmpty)
-		$content.='<option  value=""></option>';
-		for($i=0;$i<sizeof($this->wfqbe[$numForm]['table']);$i++){
-			if($this->wfqbe[$numForm]['table'][$i]!=""){
-				$column=$h->MetaColumnNames($this->wfqbe[$numForm]['table'][$i]);
-				if($this->wfqbe[$numForm]['renametable'][$i]!="")
-				$tableName=$this->wfqbe[$numForm]['renametable'][$i];
-				else
-				$tableName=$this->wfqbe[$numForm]['table'][$i];
+		if($num!=0) {
+			$content.= '<br/><br/>';
+		}
+		if($num==0) {
+			$content.= '<h4>OrderBy : </h4>';
+		}
+		$content.= '<select onChange="updateForm();"  name="wfqbe['.$numForm.'][orderby]['.$num.']" title="order by['.$num.']" >';
+		if($nextEmpty) {
+			$content.= '<option  value=""></option>';
+		}
+		for($i=0; $i<sizeof($this->wfqbe[$numForm]['table']); $i++) {
+			if($this->wfqbe[$numForm]['table'][$i] != ''){
+				$column = $h->MetaColumnNames( $this->wfqbe[$numForm]['table'][$i] );
+				$str_tableKey = ($this->wfqbe[$numForm]['renametable'][$i] != '') ? 'renametable' : 'table';
+				$tableName = $this->wfqbe[$numForm][$str_tableKey][$i];
 				foreach($column AS $key => $value){
-					if($tableName.".".$value == $this->wfqbe[$numForm]['orderby'][$num])
-					$content.='<option  value="'.$tableName.".".$value.'" selected="true">'.$tableName.".".$value.'</option>';
-					else
-					$content.='<option  value="'.$tableName.".".$value.'">'.$tableName.".".$value.'</option>';
+					$str_selected = $tableName.".".$value == $this->wfqbe[$numForm]['orderby'][$num] ? ' selected="true"' : '';
+					$content.= '<option  value="'.$tableName.".".$value.'"'.$str_selected.'>'.$tableName.".".$value.'</option>';
 				}
 			}
 		}
-
-		$content.='</select>';
+		$content.= '</select>';
 		//spazi inserito per distanziare le radiobutton
 		$content.="&nbsp;&nbsp;&nbsp;&nbsp;";
 
-
-		if($this->wfqbe[$numForm]['orderby'][$num] != ""){
-			$content.='Ascending ';
-			if($this->wfqbe[$numForm]['ad'][$num] == "" )
-			$this->wfqbe[$numForm]['ad'][$num] = "ASC";
-			if($this->wfqbe[$numForm]['ad'][$num] == "ASC" )
-			$content.='<input onChange="updateForm();" type="radio" name="wfqbe['.$numForm.'][ad]['.$num.']" value="ASC" checked="checked"/>';
-			else
-			$content.='<input onChange="updateForm();" type="radio" name="wfqbe['.$numForm.'][ad]['.$num.']" value="ASC" />';
-
-			$content.="&nbsp;&nbsp;&nbsp;&nbsp;";
-
-			$content.='Descending ';
-			if($this->wfqbe[$numForm]['ad'][$num] == "DESC")
-			$content.='<input onChange="updateForm();" type="radio" name="wfqbe['.$numForm.'][ad]['.$num.']" value="DESC" checked="checked"/>';
-			else
-			$content.='<input onChange="updateForm();" type="radio" name="wfqbe['.$numForm.'][ad]['.$num.']" value="DESC"/>';
+		if($this->wfqbe[$numForm]['orderby'][$num] != ''){
+			$content.= 'Ascending ';
+			if($this->wfqbe[$numForm]['ad'][$num] == '') {
+				$this->wfqbe[$numForm]['ad'][$num] = 'ASC';
+			}
+			$str_checked = $this->wfqbe[$numForm]['ad'][$num] == 'ASC' ? ' checked="checked"' : '';
+			$content.= '<input onChange="updateForm();" type="radio" name="wfqbe['.$numForm.'][ad]['.$num.']" value="ASC"'.$str_checked.'/>';
+			
+			$content.= '&nbsp;&nbsp;&nbsp;&nbsp;';
+			
+			$content.= 'Descending ';
+			$str_checked = $this->wfqbe[$numForm]['ad'][$num] == 'DESC' ? ' checked="checked"' : '';
+			$content.= '<input onChange="updateForm();" type="radio" name="wfqbe['.$numForm.'][ad]['.$num.']" value="DESC"'.$str_checked.'/>';
 		}
-
 		return $content;
 	}
+
 
 	/**
 	 * Visualizza l'elemento select che permette di fare operazioni insiamistiche
@@ -982,55 +947,49 @@ class tx_wfqbe_queryform_generator{
 	 * @param	[type]		$num : indice identificativo dell'elemento corrente che viene costruito
 	 * @return	[string]	$content: contiente l'html del'elemento select che permette di fare operazioni insiamistiche
 	 */
-
 	function showSetOperations($numForm){
-		$content.='<h4>Set operator :</h4>';
-		$content.='<select onChange="updateForm();"  name="wfqbe[setoperator]['.$numForm.']" title="set operator" >';
-		$content.='<option  value=""></option>';
-		for($i=0;$i<sizeof($this->setOperator);$i++){
-			if($this->setOperator[$i]==$this->wfqbe['setoperator'][$numForm])
-			$content.='<option value="'.$this->setOperator[$i].'" selected="true">'.$this->setOperator[$i].'</option>';
-			else
-			$content.='<option value="'.$this->setOperator[$i].'">'.$this->setOperator[$i].'</option>';
+		$content.= '<h4>Set operator :</h4>';
+		$content.= '<select onChange="updateForm();"  name="wfqbe[setoperator]['.$numForm.']" title="set operator" >';
+		$content.= '<option  value=""></option>';
+		for($i=0; $i<sizeof($this->setOperator); $i++) {
+			$str_selected = ($this->setOperator[$i]==$this->wfqbe['setoperator'][$numForm]) ?  ' selected="true"' : '';
+			$content.= '<option value="'.$this->setOperator[$i].'"'.$str_selected.'>'.$this->setOperator[$i].'</option>';
 		}
-
-		$content.='</select>';
-
-
+		$content.= '</select>';
 		return $content;
-
 	}
+
 
 	/**
 	 * Crea una textarea per permettere l'inserimento della query senza utilizzare il form
 	 *
 	 * @return	[string]	$content: contiente l'html della textarea che permette di visualizzare in tempo reale la query creata
 	 */
-
 	function showInsertQuery(){
 		$index=1;
 
-		$content.='<h4>Insert query :</h4>';
-		$content.='<textarea onChange="invalidWfqbe(\'invalidwfqbe'.$index.'\');updateForm()" name="rawwfqbe[rawquery]" id="rawquery'.$index.'" rows="25" cols="160" title="insert query">';
-		if($this->rawwfqbe['rawquery']!="")
-		$content.= $this->rawwfqbe['rawquery'];
-		$content.='</textarea>';
-
-		$content.="<input type='hidden' value='".$this->rawwfqbe['invalidwfqbe']."' id='invalidwfqbe".$index."' name='rawwfqbe[invalidwfqbe]'/>";
-		//se provengo dal plu-in  hiddenqbe e vuoto e allora lo inizializzo a mano
-		if($this->hiddenqbe=="")	{
-			//$this->hiddenqbe="<table><numericValue_0></numericValue_0></table>";
-			$this->hiddenqbe=serialize(array("table" => array(0 => "")));
+		$content.= '<h4>Insert query :</h4>';
+		$content.= '<textarea onChange="invalidWfqbe(\'invalidwfqbe'.$index.'\');updateForm()" name="rawwfqbe[rawquery]" id="rawquery'.$index.'" rows="25" cols="160" title="insert query">';
+		if($this->rawwfqbe['rawquery'] != '') {
+			$content.= $this->rawwfqbe['rawquery'];
 		}
-		$content.="<input type='hidden' value='".$this->hiddenqbe."'  name='pass[hiddenqbe]'/>";
+		$content.= '</textarea>';
 
-		$content.='<br/><br/><br/>';
-		$content.='<input type="button" onClick="cancelContentTextArea(\'rawquery'.$index.'\',\'invalidwfqbe'.$index.'\');updateForm()" value="RESET" name="rawwfqbe[button]"/>';
-		$content.="<br/><br/><br/>";
-		$content.="<em>Before save click outside the text area</em>";
+		$content.= '<input type="hidden" value="'.$this->rawwfqbe['invalidwfqbe'].'" id="invalidwfqbe'.$index.'" name="rawwfqbe[invalidwfqbe]"/>';
+		//se provengo dal plu-in  hiddenqbe e vuoto e allora lo inizializzo a mano
+		if($this->hiddenqbe == '') {
+			// $this->hiddenqbe = '<table><numericValue_0></numericValue_0></table>';
+			$this->hiddenqbe = serialize(array("table" => array(0 => '')));
+		}
+		$content.= '<input type="hidden" value="' . $this->hiddenqbe .'"  name="pass[hiddenqbe]"/>';
+
+		$content.= '<br/><br/><br/>';
+		$content.= '<input type="button" onClick="cancelContentTextArea(\'rawquery'.$index.'\',\'invalidwfqbe'.$index.'\');updateForm()" value="RESET" name="rawwfqbe[button]"/>';
+		$content.= '<br/><br/><br/>';
+		$content.= '<em>Before save click outside the text area</em>';
 		return $content;
-
 	}
+
 
 	/**
 	 * Crea la query
@@ -1038,148 +997,148 @@ class tx_wfqbe_queryform_generator{
 	 * @param	[type]
 	 * @return	[string]	$query: stringa che contiene la query creata tramite il wizard
 	 */
-
-	function createQuery($wfqbe=NULL,$rawwfqbe=NULL,$piVars=NULL,$query_uid=NULL,$pObj=NULL){
-
+	function createQuery($wfqbe=NULL, $rawwfqbe=NULL, $piVars=NULL, $query_uid=NULL, $pObj=NULL){
 
 		if($wfqbe!=NULL)
 		$this->wfqbe=$wfqbe;
-		//\TYPO3\CMS\Core\Utility\GeneralUtility::debug($wfqbe);
+
+//GeneralUtility::debug($wfqbe);
+
 		//se la query e' stata inserita manualmente in $query metto il contenuto della text area e mi fermo
-		if($rawwfqbe!=NULL){
-			if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['wfqbe']['preProcessRawQuery']))    {
-				foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['wfqbe']['preProcessRawQuery'] as $_classRef)    {
-					$_procObj = &\TYPO3\CMS\Core\Utility\GeneralUtility::getUserObj($_classRef);
+		if($rawwfqbe != NULL){
+			if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['wfqbe']['preProcessRawQuery'])) {
+				foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['wfqbe']['preProcessRawQuery'] as $_classRef) {
+					$_procObj = &GeneralUtility::getUserObj($_classRef);
 					$rawwfqbe = $_procObj->process_raw_query($rawwfqbe, $piVars, $query_uid, $this);
 				}
 			}
-			$query=$rawwfqbe['rawquery'];
+			$query = $rawwfqbe['rawquery'];
 			if ($piVars['orderby'][$query_uid]['field']) {
 				$query.= 'ORDER BY '.
-					addslashes($piVars['orderby'][$query_uid]['field'])." ".
-					addslashes($piVars['orderby'][$query_uid]['mode'])." ";
+					addslashes($piVars['orderby'][$query_uid]['field']) . ' '.
+					addslashes($piVars['orderby'][$query_uid]['mode']) . ' ';
 			}
 			return $query;
 		}
-		$query="";
 
 		// Hook that can be used to pre-process a query structure before creating the SQL
-		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['wfqbe']['preProcessQueryStructure']))    {
-			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['wfqbe']['preProcessQueryStructure'] as $_classRef)    {
-				$_procObj = &\TYPO3\CMS\Core\Utility\GeneralUtility::getUserObj($_classRef);
-				$remove = $_procObj->process_query_structure($this->wfqbe, $piVars, $query_uid, $this);
+		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['wfqbe']['preProcessQueryStructure'])) {
+			foreach($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['wfqbe']['preProcessQueryStructure'] as $_classRef) {
+				$_procObj = &GeneralUtility::getUserObj($_classRef);
+				$remove   = $_procObj->process_query_structure($this->wfqbe, $piVars, $query_uid, $this);
 			}
-
-			if (sizeof($remove)>0)	{
-				foreach ($remove as $key)	{
+			if (sizeof($remove) > 0) {
+				foreach ($remove as $key) {
 					//unset($this->wfqbe[0]['parentesiopen'][$key]);
 					unset($this->wfqbe[0]['where'][$key]);
 					unset($this->wfqbe[0]['op'][$key]);
 					unset($this->wfqbe[0]['insertfield'][$key]);
 					unset($this->wfqbe[0]['ao'][$key-1]);
 					//unset($this->wfqbe[0]['parentesiclose'][$key]);
-					if ($key==0)
-					unset($this->wfqbe[0]['ao'][0]);
+					if ($key == 0) {
+						unset($this->wfqbe[0]['ao'][0]);
+					}
 				}
 			}
 		}
 
-		for($numForm=0;$numForm<sizeof($this->wfqbe['setoperator'])+1;$numForm++){
+		$query = '';
+		for ($numForm = 0; $numForm < (sizeof($this->wfqbe['setoperator']) + 1); $numForm++) {
 
-			if ($numForm!=0 && $this->wfqbe['setoperator'][$numForm-1] == "")
-			continue;
-
-			//sezione select
-			$query.="SELECT";
-			$query.=" ";
-			//se e' stata selezionata la clausola distinct la aggiungo ma se e' stata selezionata la clausola all non la agguingo perche' per lo
-			//standard sql select a = select all a
-			if($this->wfqbe[$numForm]['distinctall']=='distinct'){
-				$query.="DISTINCT";
-				$query.=" ";
+			if ($numForm != 0 && $this->wfqbe['setoperator'][$numForm-1] == '') {
+				continue;
 			}
 
-			$query.=$this->wfqbe[$numForm]['selectedfields'];
+			//sezione select
+			$query.= 'SELECT ';
+			//se e' stata selezionata la clausola distinct la aggiungo ma se e' stata selezionata la clausola all non la agguingo perche' per lo
+			//standard sql select a = select all a
+			if($this->wfqbe[$numForm]['distinctall'] == 'distinct'){
+				$query.= 'DISTINCT ';
+			}
+
+			$query.= $this->wfqbe[$numForm]['selectedfields'];
 
 			$query.=" ";
 
 			//sezione from
-			if($this->wfqbe[$numForm]['table']!="")
-			$query.="FROM";
-			$query.=" ";
+			if($this->wfqbe[$numForm]['table'] != '') {
+				$query.= 'FROM ';
+			}
 
 			//$from e' una variabile che utilizzo per contenere temporaneamente il codice SQL della sezione from
 			$from="";
-			if($this->wfqbe[$numForm]['join']!=""){
-				for($j=0;$j<sizeof($this->wfqbe[$numForm]['join']);$j++){
-					if($this->wfqbe[$numForm]['join'][$j]=="")
-					break;
+			if($this->wfqbe[$numForm]['join'] != ''){
+				for($j=0; $j<sizeof($this->wfqbe[$numForm]['join']); $j++){
+					if($this->wfqbe[$numForm]['join'][$j] == '') {
+						break;
+					}
 					//per ogni join creato devo inserire una parentesi aperta dopo la parola chiave from. La inserisco in questo punto perche'
 					//quando entro nel for esterno sono sicuro che ho creato un join e quindi inserisco una parentesi aperta
-					$from="(".$from;
-					if($j==0){
-						$from.=" ";
-						$from.=$this->wfqbe[$numForm]['table'][$j];
-						$from.=" ";
-						if($this->wfqbe[$numForm]['renametable'][$j]!=""){
-							$from.="AS ";
-							$from.=$this->wfqbe[$numForm]['renametable'][$j];
-							$from.=" ";
+					$from = '('.$from;
+					if($j == 0) {
+						$from.= ' ';
+						$from.= $this->wfqbe[$numForm]['table'][$j];
+						$from.= ' ';
+						if($this->wfqbe[$numForm]['renametable'][$j] != '') {
+							$from.= 'AS ';
+							$from.= $this->wfqbe[$numForm]['renametable'][$j];
+							$from.= ' ';
 						}
 						$from.=$this->wfqbe[$numForm]['join'][$j];
-						$from.=" ";
+						$from.= ' ';
 						$from.=$this->wfqbe[$numForm]['table'][$j+1];
-						if($this->wfqbe[$numForm]['renametable'][$j+1]!=""){
-							$from.=" AS ";
-							$from.=$this->wfqbe[$numForm]['renametable'][$j+1];
-							$from.=" ";
+						if($this->wfqbe[$numForm]['renametable'][$j+1] != '') {
+							$from.= ' AS ';
+							$from.= $this->wfqbe[$numForm]['renametable'][$j+1];
+							$from.= ' ';
 						}
 						if($this->wfqbe[$numForm]['join'][$j]!="NATURAL JOIN"){
-							$from.=" ON ";
-							$from.=$this->wfqbe[$numForm]['on1'][$j+1];
-							$from.=" ";
-							$from.=$this->wfqbe[$numForm]['operatorion'][$j+1];
-							$from.=" ";
-							$from.=$this->wfqbe[$numForm]['on2'][$j+1];
+							$from.= ' ON ';
+							$from.= $this->wfqbe[$numForm]['on1'][$j+1];
+							$from.= ' ';
+							$from.= $this->wfqbe[$numForm]['operatorion'][$j+1];
+							$from.= ' ';
+							$from.= $this->wfqbe[$numForm]['on2'][$j+1];
 						}
-						$from.=" ) ";
-					}else{
-						$from.=" ";
-						$from.=$this->wfqbe[$numForm]['join'][$j];
-						$from.=" ";
-						$from.=$this->wfqbe[$numForm]['table'][$j+1];
-						$from.=" ";
-						if($this->wfqbe[$numForm]['renametable'][$j+1]!=""){
-							$from.="AS ";
+						$from.=' ) ';
+					} else {
+						$from.= ' ';
+						$from.= $this->wfqbe[$numForm]['join'][$j];
+						$from.= ' ';
+						$from.= $this->wfqbe[$numForm]['table'][$j+1];
+						$from.= ' ';
+						if($this->wfqbe[$numForm]['renametable'][$j+1] != ''){
+							$from.= 'AS ';
 							$from.=$this->wfqbe[$numForm]['renametable'][$j+1];
 						}
 						if($this->wfqbe[$numForm]['join'][$j]!="NATURAL JOIN"){
-							$from.=" ON ";
-							$from.=$this->wfqbe[$numForm]['on1'][$j+1];
-							$from.=" ";
-							$from.=$this->wfqbe[$numForm]['operatorion'][$j+1];
-							$from.=" ";
-							$from.=$this->wfqbe[$numForm]['on2'][$j+1];
+							$from.= ' ON ';
+							$from.= $this->wfqbe[$numForm]['on1'][$j+1];
+							$from.= ' ';
+							$from.= $this->wfqbe[$numForm]['operatorion'][$j+1];
+							$from.= ' ';
+							$from.= $this->wfqbe[$numForm]['on2'][$j+1];
 						}
-						$from.=" ) ";
+						$from.= ' ) ';
 					}
 				}
-			}else{
-				for($j=0;$j<sizeof($this->wfqbe[$numForm]['table']);$j++){
-					if($this->wfqbe[$numForm]['table'][$j]=="")
-					break;
-					$from.=$this->wfqbe[$numForm]['table'][$j];
-					if($this->wfqbe[$numForm]['renametable'][$j]!=""){
-						$from.=" AS";
-						$from.=" ";
-						$from.=$this->wfqbe[$numForm]['renametable'][$j].",";
+			} else {
+				for($j=0; $j<sizeof($this->wfqbe[$numForm]['table']); $j++) {
+					if($this->wfqbe[$numForm]['table'][$j] == '') {
+						break;
 					}
-					else
-					$from.=",";
+					$from.= $this->wfqbe[$numForm]['table'][$j];
+					if($this->wfqbe[$numForm]['renametable'][$j] != '') {
+						$from.= ' AS ';
+						$from.= $this->wfqbe[$numForm]['renametable'][$j] . ',';
+					} else {
+						$from.= ',';
+					}
 				}
 				//elimino dalla stringa selezionata l'ultima virgola
 				$from= substr($from,0,-1);
-				$from.=" ";
+				$from.=' ';
 			}
 			//quando ho finito di creare la clausola FROM accodo il codice SQL della clausola alla variabile $query che in questo punto contiene
 			//la clausola SELECT e poi conterra il codice SQL di tutte le clausole spacificate
@@ -1190,9 +1149,9 @@ class tx_wfqbe_queryform_generator{
 			//sezione where
 			$where_setted = true;
 			if (is_array($this->wfqbe[$numForm]['where']))	{
-				foreach ($this->wfqbe[$numForm]['parentesiopen'] as $i => $value)	{
+				foreach ($this->wfqbe[$numForm]['parentesiopen'] as $i => $value) {
 					// ##   modified for HOOK "preProcessQuery" to delete surrounding stuff
-					if (sizeof($remove)>0) {
+					if (sizeof($remove) > 0) {
 						$value_i_marked_as_deleted = false;
 						foreach ($remove as $val) {
 							if ($val == $i) {
@@ -1205,167 +1164,171 @@ class tx_wfqbe_queryform_generator{
 						}
 					}
 					// ##    end of modification
-					if ($where_setted && $this->wfqbe[$numForm]['where'][$i]!="")	{
-						$query.="WHERE ";
+					if ($where_setted && $this->wfqbe[$numForm]['where'][$i] != '') {
+						$query.= 'WHERE ';
 						$where_setted = false;
 					}
 
-					if ($this->wfqbe[$numForm]['ao'][$i-1]!="")	{
-						$query.=" ";
+					if ($this->wfqbe[$numForm]['ao'][$i-1] != '')	{
 						//inserimento operatore logico
-						$query.=$this->wfqbe[$numForm]['ao'][$i-1];
-						$query.=" ";
+						$query.= ' ' . $this->wfqbe[$numForm]['ao'][$i-1] . ' ';
 					}
 
 					//inserisco le parentesi aperte
-					if($this->wfqbe[$numForm]['parentesiopen'][$i]!="" && $this->wfqbe[$numForm]['parentesiopen'][$i]=='open')
-					$query.="(";
-					$query.=" ";
-					$query.=$this->wfqbe[$numForm]['where'][$i];
-					$query.=" ";
-					$query.=$this->wfqbe[$numForm]['op'][$i];
-					$query.=" ";
+					if($this->wfqbe[$numForm]['parentesiopen'][$i] != '' && $this->wfqbe[$numForm]['parentesiopen'][$i] == 'open') {
+						$query.= '(';
+					}
+					$query.= ' ';
+					$query.= $this->wfqbe[$numForm]['where'][$i];
+					$query.= ' ';
+					$query.= $this->wfqbe[$numForm]['op'][$i];
+					$query.= ' ';
 					//se l'operatore selezionato e' between allora inserisco i due valori e l'AND
-					if($this->wfqbe[$numForm]['op'][$i]=="BETWEEN" || $this->wfqbe[$numForm]['op'][$i]=="NOT BETWEEN"){
-						if(is_numeric($this->wfqbe[$numForm]['insertbetween1'][$i]) && $this->wfqbe[$numForm]['insertbetween1'][$i]!="")
-						$query.=$this->wfqbe[$numForm]['insertbetween1'][$i];
-						else
-						$query.="'".$this->wfqbe[$numForm]['insertbetween1'][$i]."'";
-						$query.=" ";
-						$query.="AND";
-						$query.=" ";
-						if(is_numeric($this->wfqbe[$numForm]['insertbetween2'][$i]) && $this->wfqbe[$numForm]['insertbetween2'][$i]!="")
-						$query.=$this->wfqbe[$numForm]['insertbetween2'][$i];
-						else
-						$query.="'".$this->wfqbe[$numForm]['insertbetween2'][$i]."'";
+					if ($this->wfqbe[$numForm]['op'][$i]=="BETWEEN" || $this->wfqbe[$numForm]['op'][$i]=="NOT BETWEEN") {
+						if(is_numeric($this->wfqbe[$numForm]['insertbetween1'][$i]) && $this->wfqbe[$numForm]['insertbetween1'][$i] != '') {
+							$query.= $this->wfqbe[$numForm]['insertbetween1'][$i];
+						} else {
+							$query.= "'".$this->wfqbe[$numForm]['insertbetween1'][$i]."'";
+						}
+						$query.= ' AND ';
+						if(is_numeric($this->wfqbe[$numForm]['insertbetween2'][$i]) && $this->wfqbe[$numForm]['insertbetween2'][$i] != '') {
+							$query.=$this->wfqbe[$numForm]['insertbetween2'][$i];
+						} else {
+							$query.= "'".$this->wfqbe[$numForm]['insertbetween2'][$i]."'";
+						}
 						//altrimenti
-					}else{
+					} else {
 						//se l'operatore selezionato e' in inserisco i valori
-						if($this->wfqbe[$numForm]['op'][$i]=="IN" || $this->wfqbe[$numForm]['op'][$i]=="NOT IN"){
-							$query.="(";
-							$query.=" ";
-							for($p=0;$p<sizeof($this->wfqbe[$numForm]['insertin']);$p++){
-								if($this->wfqbe[$numForm]['insertin'][$p]=="")
-								break;
-								if(is_numeric($this->wfqbe[$numForm]['insertin'][$p]))
-								$query.=$this->wfqbe[$numForm]['insertin'][$p];
-								else
-								$query.="".$this->wfqbe[$numForm]['insertin'][$p]."";
-								$query.=",";
+						if ($this->wfqbe[$numForm]['op'][$i]=="IN" || $this->wfqbe[$numForm]['op'][$i]=="NOT IN") {
+							$query.= '( ';
+							for($p=0; $p<sizeof($this->wfqbe[$numForm]['insertin']); $p++) {
+								if($this->wfqbe[$numForm]['insertin'][$p] == '') {
+									break;
+								}
+								if(is_numeric($this->wfqbe[$numForm]['insertin'][$p])) {
+									$query.= $this->wfqbe[$numForm]['insertin'][$p];
+								} else {
+									$query.= ''.$this->wfqbe[$numForm]['insertin'][$p].'';
+								}
+								$query.= ',';
 							}
-							$query=substr($query,0,-1);
-							$query.=" ";
-							$query.=")";
+							$query = substr($query,0,-1);
+							$query.= ' ';
+							$query.= ')';
 						}
 						//altrimenti procedo normalmente
-						else{
+						else {
 							//se il valore inserito e' un numero , null oppure e' stato selezionato un campo di una tabella non lo racchiudo tra apici altrimenti si
-							if((is_numeric($this->wfqbe[$numForm]['insert'][$i]) && $this->wfqbe[$numForm]['insert'][$i]!="") || $this->wfqbe[$numForm]['insert'][$i]=='null' || $this->wfqbe[$numForm]['insert'][$i]==$this->wfqbe[$numForm]['insertfield'][$i])
-							$query.=$this->wfqbe[$numForm]['insert'][$i];
-							else
-							//if($this->wfqbe['insert'][$i]!="")
-							$query.="".$this->wfqbe[$numForm]['insert'][$i]."";
+							if((is_numeric($this->wfqbe[$numForm]['insert'][$i]) && $this->wfqbe[$numForm]['insert'][$i] != '')
+								|| $this->wfqbe[$numForm]['insert'][$i] == 'null'
+								|| $this->wfqbe[$numForm]['insert'][$i] == $this->wfqbe[$numForm]['insertfield'][$i]
+							) {
+								$query.= $this->wfqbe[$numForm]['insert'][$i];
+							} else {
+								//if($this->wfqbe['insert'][$i]!='')
+								$query.= ''.$this->wfqbe[$numForm]['insert'][$i].'';
+							}
 						}
 					}
-					$query.=" ";
+					$query.=' ';
 					//inserisco parentesi chiuse
-					if($this->wfqbe[$numForm]['parentesiclose'][$i]!="")	{
-						if (strpos($query, '(    ')!==false)
-						$query = str_replace('(    ', '', $query);
-						else
-						$query.=$this->wfqbe[$numForm]['parentesiclose'][$i];
+					if ($this->wfqbe[$numForm]['parentesiclose'][$i] != '') {
+						if (strpos($query, '(') !== false) {
+							$query = str_replace('(', '', $query);
+						} else {
+							$query.=$this->wfqbe[$numForm]['parentesiclose'][$i];
+						}
 					}
 				}
 			}
-			$query.=" ";
+			$query.=' ';
 
 			//sezione group by
-			if($this->wfqbe[$numForm]['groupby'][0]!="")
-			$query.="GROUP BY ";
-			for($j=0;$j<sizeof($this->wfqbe[$numForm]['groupby']);$j++){
-				if($this->wfqbe[$numForm]['groupby'][$j]=="")
-				break;
-				$query.=$this->wfqbe[$numForm]['groupby'][$j].",";
+			if($this->wfqbe[$numForm]['groupby'][0]!='') {
+				$query.= 'GROUP BY ';
+			}
+			for ($j=0; $j<sizeof($this->wfqbe[$numForm]['groupby']); $j++) {
+				if($this->wfqbe[$numForm]['groupby'][$j]=='') {
+					break;
+				}
+				$query.= $this->wfqbe[$numForm]['groupby'][$j].',';
+			}
+			$query = substr($query,0,-1);
+			if ($this->wfqbe[$numForm]['groupby']['custom']!='') {
+				$query.= $this->wfqbe[$numForm]['groupby']['custom'];
 			}
 
-			$query=substr($query,0,-1);
-
-			if ($this->wfqbe[$numForm]['groupby']['custom']!='')
-			$query.=$this->wfqbe[$numForm]['groupby']['custom'];
-
-			$query.=" ";
+			$query.=' ';
 			
 			//sezione having
-			if($this->wfqbe[$numForm]['having'][0]!=""){
-				$query.="HAVING ";
-				$query.=$this->wfqbe[$numForm]['having'];
-				$query.="(";
-				$query.=$this->wfqbe[$numForm]['havingfield'];
-				$query.=")";
-				$query.=" ";
-				$query.=$this->wfqbe[$numForm]['havingoperator'];
-				$query.=" ";
-				$query.=$this->wfqbe[$numForm]['inserthaving'];
-				$query.=" ";
+			if($this->wfqbe[$numForm]['having'][0]!=''){
+				$query.= 'HAVING ';
+				$query.= $this->wfqbe[$numForm]['having'];
+				$query.= '(';
+				$query.= $this->wfqbe[$numForm]['havingfield'];
+				$query.= ')';
+				$query.= ' ';
+				$query.= $this->wfqbe[$numForm]['havingoperator'];
+				$query.= ' ';
+				$query.= $this->wfqbe[$numForm]['inserthaving'];
+				$query.= ' ';
 			}
 
 			$allowedOrderByFields = '';
-			if ($pObj->conf['customQuery.'][$query_uid.'.']['allowedOrderByFields']!='')	{
+			if ($pObj->conf['customQuery.'][$query_uid.'.']['allowedOrderByFields'] != '') {
 				$allowedOrderByFields = $pObj->conf['customQuery.'][$query_uid.'.']['allowedOrderByFields'];
 			}
-			
+
 			if($query_uid == '' && empty($allowedOrderByFields)){
-				$BELIB = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_wfqbe_belib');
-                                $config = $BELIB->retrievePageConfig($this->rawwfqbe['orgPid']);
-                                $allowedOrderByFields = $config['customQuery.'][$this->rawwfqbe['orgId'].'.']['allowedOrderByFields'];
-                       }
+				$BELIB = GeneralUtility::makeInstance('tx_wfqbe_belib');
+				$config = $BELIB->retrievePageConfig($this->rawwfqbe['orgPid']);
+				$allowedOrderByFields = $config['customQuery.'][$this->rawwfqbe['orgId'].'.']['allowedOrderByFields'];
+			}
 			
-			if ($this->wfqbe['setoperator'][$numForm]=='')	{
+			if ($this->wfqbe['setoperator'][$numForm]=='') {
 				//sezione order by
-				if (is_array($piVars['orderby']) && $piVars['orderby'][$query_uid]['field']!='' && \TYPO3\CMS\Core\Utility\GeneralUtility::inList($allowedOrderByFields,$piVars['orderby'][$query_uid]['field']) && \TYPO3\CMS\Core\Utility\GeneralUtility::inList('ASC,DESC', $piVars['orderby'][$query_uid]['mode']))	{
-					$query.="ORDER BY ".addslashes($piVars['orderby'][$query_uid]['field'])." ".addslashes($piVars['orderby'][$query_uid]['mode'])." ";
-				}	else	{
-					if($this->wfqbe[$numForm]['orderby'][0]!="")	{
-						$query.="ORDER BY ";
-						for($j=0;$j<sizeof($this->wfqbe[$numForm]['orderby']);$j++){
-							if($this->wfqbe[$numForm]['orderby'][$j]=="")
-							break;
-							if($j != 0)
-							$query.=",";
-							if (\TYPO3\CMS\Core\Utility\GeneralUtility::inList($allowedOrderByFields,$this->wfqbe[$numForm]['orderby'][$j]))	{
-								$query.=addslashes($this->wfqbe[$numForm]['orderby'][$j]);
-								if($this->wfqbe[$numForm]['ad'][$j]!="" && \TYPO3\CMS\Core\Utility\GeneralUtility::inList('ASC,DESC', $this->wfqbe[$numForm]['ad'][$j])){				
-									$query.=" ";
-									$query.=addslashes($this->wfqbe[$numForm]['ad'][$j]);
-									$query.=" ";
+				if (is_array($piVars['orderby'])
+					&& $piVars['orderby'][$query_uid]['field'] != ''
+					&& GeneralUtility::inList($allowedOrderByFields,$piVars['orderby'][$query_uid]['field'])
+					&& GeneralUtility::inList('ASC,DESC', $piVars['orderby'][$query_uid]['mode'])
+				) {
+					$query.= 'ORDER BY '.addslashes($piVars['orderby'][$query_uid]['field']).' '.addslashes($piVars['orderby'][$query_uid]['mode']).' ';
+				} else {
+					if($this->wfqbe[$numForm]['orderby'][0]!= '') {
+						$query.= 'ORDER BY ';
+						for($j=0; $j < sizeof($this->wfqbe[$numForm]['orderby']); $j++){
+							if($this->wfqbe[$numForm]['orderby'][$j] == '') {
+								break;
+							}
+							if($j != 0) {
+								$query.= ',';
+							}
+							if (GeneralUtility::inList($allowedOrderByFields, $this->wfqbe[$numForm]['orderby'][$j]))	{
+								$query.= addslashes($this->wfqbe[$numForm]['orderby'][$j]);
+								if($this->wfqbe[$numForm]['ad'][$j] != '' && GeneralUtility::inList('ASC,DESC', $this->wfqbe[$numForm]['ad'][$j])){				
+									$query.= ' '.addslashes($this->wfqbe[$numForm]['ad'][$j]).' ';
 								}
 							}
 						}
 					}
 				}
 			}
-			
-			$query.=$this->wfqbe['setoperator'][$numForm];
-			$query.=" ";
+			$query.= $this->wfqbe['setoperator'][$numForm];
+			$query.= ' ';
 		}
-		
 		return $query;
-
 	}
+
 
 	/**
 	 * Visualizza la query creata in tempo reale
 	 *
 	 * @return	[string]	$content: contiente l'html della textarea che permette di visualizzare in tempo reale la query creata
 	 */
-
 	function showQuery(){
-
-		$content.='<strong>Generated query:</strong><br/><br/>';
-		$content.=$this->createQuery();
-
+		$content.= '<strong>Generated query:</strong><br/><br/>';
+		$content.= $this->createQuery();
 		return $content;
-
 	}
 
 }

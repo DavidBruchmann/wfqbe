@@ -59,7 +59,7 @@ class tx_wfqbe_api_query{
 		if (is_array($piVars))
 			$this->piVars = $piVars;
 		else
-			$this->piVars = \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('Tx_Wfqbe_Pi1');
+			$this->piVars = \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('tx_wfqbe_pi1');
 		
 		// Finding the query record into the database
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', 'tx_wfqbe_query', 'uid='.$query);
@@ -128,22 +128,22 @@ class tx_wfqbe_api_query{
 	 */
 	private function &loadTSConfig($pageId)	{
 		
-		$template = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('t3lib_TStemplate');
+		$template = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\CMS\Core\TypoScript\TemplateService');
 		// Disables the logging of time-performance information.
 		$template->tt_track = 0;
 		$template->init();
 
 		// Gets the root line.
-		$sys_page = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('t3lib_pageSelect');
-		// Finds the selected page in the BE exactly as in t3lib_SCbase::init().
+		$sys_page = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\CMS\Frontend\Page\PageRepository');
+		// Finds the selected page in the BE exactly as in \TYPO3\CMS\Backend\Module\BaseScriptClass::init().
 		$rootline = $sys_page->getRootLine($pageId);
 
 		// Generates the constants/config and hierarchy info for the template.
 		$template->runThroughTemplates($rootline, 0);
 		$template->generateConfig();
 		
-		if (isset($template->setup['plugin.']['Tx_Wfqbe_Pi1.'])) {
-			$result = $template->setup['plugin.']['Tx_Wfqbe_Pi1.'];
+		if (isset($template->setup['plugin.']['tx_wfqbe_pi1.'])) {
+			$result = $template->setup['plugin.']['tx_wfqbe_pi1.'];
 		} else {
 			$result = array();
 		}
